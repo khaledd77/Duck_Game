@@ -116,7 +116,7 @@ void update_duck(Sprite& myduck1) {
 }
 
 void update() {
-    //update_duck(myduck1);
+    update_duck(myduck1);
     update_duck(myduck2);
 }
 
