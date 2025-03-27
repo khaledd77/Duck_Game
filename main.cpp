@@ -214,6 +214,7 @@ void update_duck(ducks& duck) {
     if (duck.isJumping) {
         duck.velocityY += gravity;
         duck.myduck.move(0.f, duck.velocityY);
+        duck.myarm.arm.move(0.f, duck.velocityY);
 
         if (duck.velocityY < 0) {
             duck.myduck.setTextureRect(IntRect(0, 32, 32, 32));
