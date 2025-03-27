@@ -133,6 +133,10 @@ void init() {
 }
 
 void get_weapon(ducks& duck) {
+    if (duck.haveWeapon) {
+
+        return;
+    }
     for (auto& weap : weaps) {
         if (duck.myduck.getGlobalBounds().intersects(weap.weapon.getGlobalBounds())) {
             duck.haveWeapon = true;
@@ -143,7 +147,6 @@ void get_weapon(ducks& duck) {
                 weap.weapon.setScale(-2.5f, 2.5f);
             }
             duck.myweap = weap;
-            cout << "did" << endl;
             weaps.clear();
             break;
         }
