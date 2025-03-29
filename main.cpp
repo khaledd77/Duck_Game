@@ -20,7 +20,6 @@ Sprite background;
 ll x;
 Clock Game_clock;
 
-
 const float gravity = 0.5f;
 const float jumpSpeed = -14.f;
 float velocityX = 5.f;
@@ -33,12 +32,17 @@ struct arm {
 
 struct weapons {
     Texture skin;
-    Clock myclock;
     Sprite weapon;
+    float velocityX = 0.0, velocityY = 0.0;
     ll bullets;
     bool empty;
     float posx, posy;
 }pistol;
+
+struct bullets {
+    Texture skin;
+    Sprite bullet;
+}bull1;
 
 struct ducks {
     Texture skin;
@@ -48,6 +52,8 @@ struct ducks {
     bool facingRight = true;
     bool isJumping = false;
     bool haveWeapon = false;
+    bool holding = false;
+    bool firing = false;
     weapons myweap;
     arm myarm;
     Keyboard::Key up;
@@ -58,7 +64,10 @@ struct ducks {
     float velocityY = 0.f;
 } duck1, duck2;
 
+
 vector<weapons> weaps;
+vector<bullets> bulls;
+
 
 void init() {
     window.setFramerateLimit(90);
@@ -122,6 +131,12 @@ void init() {
     pistol.bullets = 10;
     weaps.push_back(pistol);
 
+    //init bullet
+    bull1.skin.loadFromFile("img/pistol_bullet.png");
+    bull1.bullet.setTexture(bull1.skin);
+    bull1.bullet.setPosition(5.f, 5.f);
+
+
     //init the background
     ground.loadFromFile("img/map.png");
     background.setTexture(ground);
@@ -133,7 +148,32 @@ void init() {
     x = 1;
 }
 
+void drop_weapon(ducks& duck) {
+    duck.haveWeapon = false;
+    duck.myweap.velocityX = 7.f;
+    if (!duck.facingRight) {
+        duck.myweap.velocityX *= -1.f;
+    }
+    duck.myweap.velocityY = -7.f;
+    weaps.push_back(duck.myweap);
+
+    if (duck.facingRight) {
+        duck.myarm.arm.setTextureRect(IntRect(0, 0, 16, 16));
+        duck.myarm.arm.setScale(3.f, 3.f);
+        duck.myarm.arm.setOrigin(0.f, 0.f);
+    }
+    else {
+        duck.myarm.arm.setTextureRect(IntRect(0, 0, 16, 16));
+        duck.myarm.arm.setScale(-3.f, 3.f);
+        duck.myarm.arm.setOrigin(22.f, 0.f);
+    }
+}
+
 void get_weapon(ducks& duck) {
+    if (duck.haveWeapon) {
+        drop_weapon(duck);
+        return;
+    }
     for (auto& weap : weaps) {
         if (duck.myduck.getGlobalBounds().intersects(weap.weapon.getGlobalBounds())) {
             duck.haveWeapon = true;
@@ -144,9 +184,39 @@ void get_weapon(ducks& duck) {
                 weap.weapon.setScale(-2.5f, 2.5f);
             }
             duck.myweap = weap;
-            cout << "did" << endl;
             weaps.clear();
             break;
+        }
+    }
+}
+
+void update_bullets() {
+    ll sz = bulls.size();
+    for (ll i = sz - 1;i >= 0;i--) {
+        bulls[i].bullet.move(20.f, 0.f);
+        if (bulls[i].bullet.getPosition().x <= 0 || bulls[i].bullet.getPosition().x >= 1280) {
+            bulls.erase(bulls.begin() + i);
+        }
+    }
+}
+
+void Fire(ducks& duck) {
+    if (duck.myweap.bullets > 0) {
+        duck.myweap.bullets--;
+        bull1.bullet.setScale(0.08f, 0.08f);
+        bull1.bullet.setPosition(duck.myweap.weapon.getPosition().x +25.f, duck.myweap.weapon.getPosition().y-12.f);
+        bulls.push_back(bull1);
+    }
+}
+
+void update_weapons() {
+    for (auto& weap : weaps) {
+        weap.weapon.move(weap.velocityX, weap.velocityY);
+        weap.velocityY += gravity;
+        if (weap.weapon.getPosition().y >= 660.f) {
+            weap.weapon.setPosition(weap.weapon.getPosition().x, 660.f);
+            weap.velocityX = 0.f;
+            weap.velocityY = 0.f;
         }
     }
 }
@@ -230,7 +300,7 @@ void update_duck(ducks& duck) {
         }
     }
     else if (moving) {
-        if (duck.myclock.getElapsedTime().asMilliseconds() > 120) {
+        if (duck.myclock.getElapsedTime().asMilliseconds() > 80) {
             duck.frame = (duck.frame + 1) % 6;
             duck.myduck.setTextureRect(IntRect(duck.frame * 32, 0, 32, 32));
             duck.myclock.restart();
@@ -245,18 +315,57 @@ void update_duck(ducks& duck) {
 void update() {
     update_duck(duck1);
     update_duck(duck2);
+    update_weapons();
+    //update_bullets();
 
     if (Keyboard::isKeyPressed(duck1.hold)) {
-        get_weapon(duck1);
+        if (!duck1.holding) {
+            duck1.holding = true;
+            get_weapon(duck1);
+        }
+    }
+    else {
+        duck1.holding = false;
     }
     if (Keyboard::isKeyPressed(duck2.hold)) {
-        get_weapon(duck2);
+        if (!duck2.holding) {
+            duck2.holding = true;
+            get_weapon(duck2);
+        }
+    }
+    else {
+        duck2.holding = false;
+    }
+    
+    if ( duck1.haveWeapon && Keyboard::isKeyPressed(duck1.fire)) {
+        if (!duck1.firing) {
+            duck1.firing = true;
+            Fire(duck1);
+        }
+    }
+    else {
+        duck1.firing = false;
+    }
+    if (duck2.haveWeapon && Keyboard::isKeyPressed(duck2.fire)) {
+        if (!duck2.firing) {
+            duck2.firing = true;
+            Fire(duck2);
+        }
+    }
+    else {
+        duck2.firing = false;
     }
 }
 
 void draw() {
     window.clear();
     window.draw(background);
+    for (auto weap : weaps) {
+        window.draw(weap.weapon);
+    }
+    for (auto bull : bulls) {
+        window.draw(bull.bullet);
+    }
     window.draw(duck1.myduck);
     window.draw(duck2.myduck);
     if (duck1.haveWeapon) {
@@ -264,9 +373,6 @@ void draw() {
     }
     if (duck2.haveWeapon) {
         window.draw(duck2.myweap.weapon);
-    }
-    for (auto weap : weaps) {
-        window.draw(weap.weapon);
     }
     window.draw(duck1.myarm.arm);
     window.draw(duck2.myarm.arm);
