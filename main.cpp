@@ -19,6 +19,8 @@ Texture ground;
 Sprite background;
 ll x;
 Clock Game_clock;
+Texture grave;
+Sprite Grave;
 
 const float gravity = 0.5f;
 const float jumpSpeed = -14.f;
@@ -42,6 +44,7 @@ struct weapons {
 struct bullets {
     Texture skin;
     Sprite bullet;
+    ll duck;
 }bull1;
 
 struct ducks {
@@ -54,6 +57,7 @@ struct ducks {
     bool haveWeapon = false;
     bool holding = false;
     bool firing = false;
+    bool dead = false;
     weapons myweap;
     arm myarm;
     Keyboard::Key up;
@@ -137,6 +141,12 @@ void init() {
     bull1.bullet.setPosition(5.f, 5.f);
 
 
+    //init Grave
+    grave.loadFromFile("img/rip.png");
+    Grave.setTexture(grave);
+    Grave.setScale(0.16f, 0.1f);
+
+
     //init the background
     ground.loadFromFile("img/map.png");
     background.setTexture(ground);
@@ -192,19 +202,46 @@ void get_weapon(ducks& duck) {
 
 void update_bullets() {
     ll sz = bulls.size();
-    for (ll i = sz - 1;i >= 0;i--) {
+    for (ll i = sz - 1; i >= 0; i--) {
         bulls[i].bullet.move(20.f, 0.f);
+
+        FloatRect bulletBounds = bulls[i].bullet.getGlobalBounds();
+        bulletBounds.left -= 50.f;
+
+        if (bulletBounds.intersects(duck1.myduck.getGlobalBounds())) {
+            if (bulls[i].duck==1) {
+                continue;
+            }
+            bulls.erase(bulls.begin() + i);
+            Grave.setPosition(duck1.myduck.getPosition().x,640.f);
+            cout << "dead" << endl;
+            duck1.dead = true;
+            continue;
+        }
+        if (bulletBounds.intersects(duck2.myduck.getGlobalBounds())) {
+            if (bulls[i].duck == 2) {
+                continue;
+            }
+            bulls.erase(bulls.begin() + i);
+            Grave.setPosition(duck2.myduck.getPosition().x,660.f);
+            cout << "dead" << endl;
+            duck2.dead = true;
+            continue;
+        }
+
         if (bulls[i].bullet.getPosition().x <= 0 || bulls[i].bullet.getPosition().x >= 1280) {
             bulls.erase(bulls.begin() + i);
         }
     }
 }
 
-void Fire(ducks& duck) {
+
+void Fire(ducks& duck, ll shooter) {
     if (duck.myweap.bullets > 0) {
         duck.myweap.bullets--;
         bull1.bullet.setScale(0.08f, 0.08f);
-        bull1.bullet.setPosition(duck.myweap.weapon.getPosition().x +25.f, duck.myweap.weapon.getPosition().y-12.f);
+        bull1.bullet.setPosition(duck.myweap.weapon.getPosition().x +30.f, duck.myweap.weapon.getPosition().y-12.f);
+        bull1.duck = shooter;
         bulls.push_back(bull1);
     }
 }
@@ -316,7 +353,7 @@ void update() {
     update_duck(duck1);
     update_duck(duck2);
     update_weapons();
-    //update_bullets();
+    update_bullets();
 
     if (Keyboard::isKeyPressed(duck1.hold)) {
         if (!duck1.holding) {
@@ -340,7 +377,7 @@ void update() {
     if ( duck1.haveWeapon && Keyboard::isKeyPressed(duck1.fire)) {
         if (!duck1.firing) {
             duck1.firing = true;
-            Fire(duck1);
+            Fire(duck1,1);
         }
     }
     else {
@@ -349,7 +386,7 @@ void update() {
     if (duck2.haveWeapon && Keyboard::isKeyPressed(duck2.fire)) {
         if (!duck2.firing) {
             duck2.firing = true;
-            Fire(duck2);
+            Fire(duck2,2);
         }
     }
     else {
@@ -366,16 +403,26 @@ void draw() {
     for (auto bull : bulls) {
         window.draw(bull.bullet);
     }
-    window.draw(duck1.myduck);
-    window.draw(duck2.myduck);
-    if (duck1.haveWeapon) {
-        window.draw(duck1.myweap.weapon);
+    if (!duck1.dead) {
+        window.draw(duck1.myduck);
+        if (duck1.haveWeapon) {
+            window.draw(duck1.myweap.weapon);
+        }
+        window.draw(duck1.myarm.arm);
     }
-    if (duck2.haveWeapon) {
-        window.draw(duck2.myweap.weapon);
+    else {
+        window.draw(Grave);
     }
-    window.draw(duck1.myarm.arm);
-    window.draw(duck2.myarm.arm);
+    if (!duck2.dead) {
+        window.draw(duck2.myduck);
+        if (duck2.haveWeapon) {
+            window.draw(duck2.myweap.weapon);
+        }
+        window.draw(duck2.myarm.arm);
+    }
+    else {
+        window.draw(Grave);
+    }
     window.display();
 }
 
