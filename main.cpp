@@ -45,6 +45,7 @@ struct bullets {
     Texture skin;
     Sprite bullet;
     ll duck;
+    bool right;
 }bull1;
 
 struct ducks {
@@ -203,17 +204,19 @@ void get_weapon(ducks& duck) {
 void update_bullets() {
     ll sz = bulls.size();
     for (ll i = sz - 1; i >= 0; i--) {
-        bulls[i].bullet.move(20.f, 0.f);
+        if(bulls[i].right) bulls[i].bullet.move(20.f, 0.f);
+        else bulls[i].bullet.move(-20.f, 0.f);
 
         FloatRect bulletBounds = bulls[i].bullet.getGlobalBounds();
-        bulletBounds.left -= 50.f;
+        if(bulls[i].right) bulletBounds.left -= 50.f;
+        else bulletBounds.left += 50.f;
 
         if (bulletBounds.intersects(duck1.myduck.getGlobalBounds())) {
             if (bulls[i].duck==1) {
                 continue;
             }
             bulls.erase(bulls.begin() + i);
-            Grave.setPosition(duck1.myduck.getPosition().x,640.f);
+            Grave.setPosition(duck1.myduck.getPosition().x,660.f);
             cout << "dead" << endl;
             duck1.dead = true;
             continue;
@@ -239,7 +242,9 @@ void update_bullets() {
 void Fire(ducks& duck, ll shooter) {
     if (duck.myweap.bullets > 0) {
         duck.myweap.bullets--;
-        bull1.bullet.setScale(0.08f, 0.08f);
+        bull1.right = duck.facingRight;
+        if(duck.facingRight) bull1.bullet.setScale(0.08f, 0.08f);
+        else bull1.bullet.setScale(-0.08f, 0.08f);
         bull1.bullet.setPosition(duck.myweap.weapon.getPosition().x +30.f, duck.myweap.weapon.getPosition().y-12.f);
         bull1.duck = shooter;
         bulls.push_back(bull1);
