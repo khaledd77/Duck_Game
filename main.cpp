@@ -36,6 +36,7 @@ struct weapons {
     Texture skin;
     Sprite weapon;
     float velocityX = 0.0, velocityY = 0.0;
+    float velocity;
     ll bullets;
     bool empty;
     float posx, posy;
@@ -46,6 +47,7 @@ struct bullets {
     Sprite bullet;
     ll duck;
     bool right;
+    float velocity;
 }bull1;
 
 struct ducks {
@@ -134,6 +136,7 @@ void init() {
     pistol.weapon.setScale(2.5f, 2.5f);
     pistol.empty = false;
     pistol.bullets = 10;
+    pistol.velocity = 40.f;
     weaps.push_back(pistol);
 
     //init bullet
@@ -188,10 +191,10 @@ void get_weapon(ducks& duck) {
     for (auto& weap : weaps) {
         if (duck.myduck.getGlobalBounds().intersects(weap.weapon.getGlobalBounds())) {
             duck.haveWeapon = true;
-            duck.myarm.arm.setTextureRect(IntRect(0, 16*4, 16, 16));
+            duck.myarm.arm.setTextureRect(IntRect(0, 16 * 4, 16, 16));
             if (!duck.facingRight) {
                 FloatRect bounds = weap.weapon.getLocalBounds();
-                weap.weapon.setOrigin(bounds.width-5.f, 0.f);
+                weap.weapon.setOrigin(bounds.width - 5.f, 0.f);
                 weap.weapon.setScale(-2.5f, 2.5f);
             }
             duck.myweap = weap;
@@ -204,19 +207,19 @@ void get_weapon(ducks& duck) {
 void update_bullets() {
     ll sz = bulls.size();
     for (ll i = sz - 1; i >= 0; i--) {
-        if(bulls[i].right) bulls[i].bullet.move(20.f, 0.f);
-        else bulls[i].bullet.move(-20.f, 0.f);
+        if (bulls[i].right) bulls[i].bullet.move(bulls[i].velocity, 0.f);
+        else bulls[i].bullet.move(-bulls[i].velocity, 0.f);
 
         FloatRect bulletBounds = bulls[i].bullet.getGlobalBounds();
-        if(bulls[i].right) bulletBounds.left -= 50.f;
+        if (bulls[i].right) bulletBounds.left -= 50.f;
         else bulletBounds.left += 50.f;
 
         if (bulletBounds.intersects(duck1.myduck.getGlobalBounds())) {
-            if (bulls[i].duck==1) {
+            if (bulls[i].duck == 1) {
                 continue;
             }
             bulls.erase(bulls.begin() + i);
-            Grave.setPosition(duck1.myduck.getPosition().x,660.f);
+            Grave.setPosition(duck1.myduck.getPosition().x, 660.f);
             cout << "dead" << endl;
             duck1.dead = true;
             continue;
@@ -226,7 +229,7 @@ void update_bullets() {
                 continue;
             }
             bulls.erase(bulls.begin() + i);
-            Grave.setPosition(duck2.myduck.getPosition().x,660.f);
+            Grave.setPosition(duck2.myduck.getPosition().x, 660.f);
             cout << "dead" << endl;
             duck2.dead = true;
             continue;
@@ -243,10 +246,11 @@ void Fire(ducks& duck, ll shooter) {
     if (duck.myweap.bullets > 0) {
         duck.myweap.bullets--;
         bull1.right = duck.facingRight;
-        if(duck.facingRight) bull1.bullet.setScale(0.08f, 0.08f);
+        if (duck.facingRight) bull1.bullet.setScale(0.08f, 0.08f);
         else bull1.bullet.setScale(-0.08f, 0.08f);
-        bull1.bullet.setPosition(duck.myweap.weapon.getPosition().x +30.f, duck.myweap.weapon.getPosition().y-12.f);
+        bull1.bullet.setPosition(duck.myweap.weapon.getPosition().x + 30.f, duck.myweap.weapon.getPosition().y - 12.f);
         bull1.duck = shooter;
+        bull1.velocity = duck.myweap.velocity;
         bulls.push_back(bull1);
     }
 }
@@ -306,7 +310,7 @@ void update_duck(ducks& duck) {
             duck.myduck.setScale(-3.f, 3.f);
             duck.myduck.setOrigin(32.f, 0.f);
             duck.myarm.arm.setScale(-3.f, 3.f);
-            duck.myarm.arm.setOrigin(22.f,0.f);
+            duck.myarm.arm.setOrigin(22.f, 0.f);
             if (duck.haveWeapon) {
                 duck.myweap.weapon.setScale(-2.5f, 2.5f);
                 duck.myweap.weapon.setOrigin(12, 0.f);
@@ -378,11 +382,11 @@ void update() {
     else {
         duck2.holding = false;
     }
-    
-    if ( duck1.haveWeapon && Keyboard::isKeyPressed(duck1.fire)) {
+
+    if (duck1.haveWeapon && Keyboard::isKeyPressed(duck1.fire)) {
         if (!duck1.firing) {
             duck1.firing = true;
-            Fire(duck1,1);
+            Fire(duck1, 1);
         }
     }
     else {
@@ -391,7 +395,7 @@ void update() {
     if (duck2.haveWeapon && Keyboard::isKeyPressed(duck2.fire)) {
         if (!duck2.firing) {
             duck2.firing = true;
-            Fire(duck2,2);
+            Fire(duck2, 2);
         }
     }
     else {
