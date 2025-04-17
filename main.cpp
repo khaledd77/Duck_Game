@@ -48,6 +48,8 @@ struct bullets {
     ll duck;
     bool right;
     float velocity;
+    float startX;
+    float range;
 }bull1;
 
 struct ducks {
@@ -235,7 +237,7 @@ void update_bullets() {
             continue;
         }
 
-        if (bulls[i].bullet.getPosition().x <= 0 || bulls[i].bullet.getPosition().x >= 1280) {
+        if (bulls[i].bullet.getPosition().x <= 0 || bulls[i].bullet.getPosition().x >= 1280 || bulls[i].bullet.getPosition().x - bulls[i].startX >= bulls[i].range) {
             bulls.erase(bulls.begin() + i);
         }
     }
@@ -251,6 +253,8 @@ void Fire(ducks& duck, ll shooter) {
         bull1.bullet.setPosition(duck.myweap.weapon.getPosition().x + 30.f, duck.myweap.weapon.getPosition().y - 12.f);
         bull1.duck = shooter;
         bull1.velocity = duck.myweap.velocity;
+        bull1.startX = bull1.bullet.getPosition().x;
+        bull1.range = 500.f;
         bulls.push_back(bull1);
     }
 }
