@@ -40,7 +40,7 @@ struct weapons {
     ll bullets;
     bool empty;
     float posx, posy;
-}pistol;
+}pistol, sniper;
 
 struct bullets {
     Texture skin;
@@ -141,10 +141,23 @@ void init() {
     pistol.velocity = 40.f;
     weaps.push_back(pistol);
 
+
+    //init sniper
+    sniper.skin.loadFromFile("img/sniper.png");
+    sniper.weapon.setTexture(sniper.skin);
+    sniper.weapon.setPosition(200.f, 660.f);
+    sniper.posx = 200;
+    sniper.posy = 660;
+    sniper.weapon.setTextureRect(IntRect(0, 0, 33, 9));
+    sniper.weapon.setScale(2.5f, 2.5f);
+    sniper.empty = false;
+    sniper.bullets = 10;
+    sniper.velocity = 40.f;
+    weaps.push_back(sniper);
+
     //init bullet
     bull1.skin.loadFromFile("img/pistol_bullet.png");
     bull1.bullet.setTexture(bull1.skin);
-    bull1.bullet.setPosition(5.f, 5.f);
 
 
     //init Grave
@@ -190,7 +203,8 @@ void get_weapon(ducks& duck) {
         drop_weapon(duck);
         return;
     }
-    for (auto& weap : weaps) {
+    for (ll i = weaps.size() - 1;i >= 0;--i) {
+        weapons weap = weaps[i];
         if (duck.myduck.getGlobalBounds().intersects(weap.weapon.getGlobalBounds())) {
             duck.haveWeapon = true;
             duck.myarm.arm.setTextureRect(IntRect(0, 16 * 4, 16, 16));
@@ -200,7 +214,7 @@ void get_weapon(ducks& duck) {
                 weap.weapon.setScale(-2.5f, 2.5f);
             }
             duck.myweap = weap;
-            weaps.clear();
+            weaps.erase(weaps.begin() + i);
             break;
         }
     }
@@ -282,9 +296,6 @@ void update_duck(ducks& duck) {
     bool moving = false;
     float duckWidth = duck.myduck.getGlobalBounds().width / 3;
 
-    if (duck.haveWeapon) {
-        update_weapon(duck);
-    }
 
     if (Keyboard::isKeyPressed(duck.right)) {
         moving = true;
@@ -358,6 +369,9 @@ void update_duck(ducks& duck) {
     }
     else {
         duck.myduck.setTextureRect(IntRect(0, 0, 32, 32));
+    }
+    if (duck.haveWeapon) {
+        update_weapon(duck);
     }
 }
 
