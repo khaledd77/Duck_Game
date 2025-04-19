@@ -41,6 +41,7 @@ struct weapons {
     bool empty;
     float range;
     float posx, posy;
+    float fix_X, fix_Y;
 }pistol, sniper;
 
 struct bullets {
@@ -141,6 +142,8 @@ void init() {
     pistol.bullets = 10;
     pistol.velocity = 25.f;
     pistol.range = 500.f;
+    pistol.fix_X = 25.f;
+    pistol.fix_Y = -12.f;
     weaps.push_back(pistol);
 
 
@@ -156,6 +159,8 @@ void init() {
     sniper.bullets = 4;
     sniper.velocity = 50.f;
     sniper.range = 100000.f;
+    sniper.fix_X = 50.f;
+    sniper.fix_Y = -6.f;
     weaps.push_back(sniper);
 
     //init bullet
@@ -267,7 +272,9 @@ void Fire(ducks& duck, ll shooter) {
         bull1.right = duck.facingRight;
         if (duck.facingRight) bull1.bullet.setScale(0.08f, 0.08f);
         else bull1.bullet.setScale(-0.08f, 0.08f);
-        bull1.bullet.setPosition(duck.myweap.weapon.getPosition().x + 30.f, duck.myweap.weapon.getPosition().y - 12.f);
+        ll factor = 1;
+        if (!duck.facingRight) factor = -1;
+        bull1.bullet.setPosition(duck.myweap.weapon.getPosition().x + duck.myweap.fix_X * factor, duck.myweap.weapon.getPosition().y + duck.myweap.fix_Y);
         bull1.duck = shooter;
         bull1.velocity = duck.myweap.velocity;
         bull1.startX = bull1.bullet.getPosition().x;
