@@ -151,7 +151,6 @@ void init() {
     pistol.bullets = 10;
     pistol.velocity = 25.f;
     pistol.range = 500.f;
-    pistol.fix_X = 25.f;
     pistol.fix_Y = -12.f;
     pistol.fix_hold_x = -16.f;
     pistol.fix_hold_y = 55.f;
@@ -173,8 +172,7 @@ void init() {
     sniper.bullets = 4;
     sniper.velocity = 50.f;
     sniper.range = 100000.f;
-    sniper.fix_X = 50.f;
-    sniper.fix_Y = -6.f;
+    sniper.fix_Y = -7.f;
     sniper.fix_hold_x = -20.f;
     sniper.fix_hold_y = 50.f;
     sniper.bull_type = 1;
@@ -194,8 +192,7 @@ void init() {
     pewpew.bullets = 20;
     pewpew.velocity = 15.f;
     pewpew.range = 100000.f;
-    pewpew.fix_X = 50.f;
-    pewpew.fix_Y = 15.f;
+    pewpew.fix_Y = 17.f;
     pewpew.fix_hold_x = -32.f;
     pewpew.fix_hold_y = 25.f;
     pewpew.bull_type = 2;
@@ -320,10 +317,12 @@ void Fire(ducks& duck, ll shooter) {
         duck.myweap.bullets--;
         bull[idx].right = duck.facingRight;
         if (duck.facingRight) bull[idx].bullet.setScale(bull[idx].scalex, bull[idx].scaley);
-        else bull[idx].bullet.setScale(-1 * bull[idx].scalex, bull[idx].scaley);
-        ll factor = 1;
-        if (!duck.facingRight) factor = -1;
-        bull[idx].bullet.setPosition(duck.myweap.weapon.getPosition().x + duck.myweap.fix_X * factor, duck.myweap.weapon.getPosition().y + duck.myweap.fix_Y);
+        else {
+            bull[idx].bullet.setScale(-1 * bull[idx].scalex, bull[idx].scaley);
+            bull[idx].bullet.setOrigin(bull[idx].bullet.getGlobalBounds().width, 0.f);
+        }
+        if(duck.facingRight) bull[idx].bullet.setPosition(duck.myweap.weapon.getPosition().x + duck.myweap.weapon.getGlobalBounds().width, duck.myweap.weapon.getPosition().y + duck.myweap.fix_Y);
+        else bull[idx].bullet.setPosition(duck.myweap.weapon.getPosition().x - duck.myweap.weapon.getGlobalBounds().width + bull[idx].bullet.getGlobalBounds().width/2, duck.myweap.weapon.getPosition().y + duck.myweap.fix_Y);
         bull[idx].duck = shooter;
         bull[idx].velocity = duck.myweap.velocity;
         bull[idx].startX = bull[idx].bullet.getPosition().x;
@@ -520,7 +519,8 @@ int main() {
     init();
     while (window.isOpen()) {
         Mouse m;
-        cout << m.getPosition(window).x << " " << m.getPosition(window).y << endl;
+        //cout << m.getPosition(window).x << " " << m.getPosition(window).y << endl;
+        cout << bull[1].bullet.getGlobalBounds().width << endl;
         Event ev;
         while (window.pollEvent(ev)) {
             if (ev.type == Event::Closed) {
