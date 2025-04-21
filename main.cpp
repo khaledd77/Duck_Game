@@ -38,6 +38,7 @@ struct weapons {
     Texture skin;
     Sprite weapon;
     float velocityX = 0.0, velocityY = 0.0;
+    Clock myclock;
     float velocity;
     ll bullets;
     bool empty;
@@ -49,6 +50,8 @@ struct weapons {
     float space = 0.f;
     float rev;
     float angle;
+    bool hit = 0;
+    ll fact = 1;
 }pistol, sniper, pewpew, sword;
 
 
@@ -221,15 +224,15 @@ void init() {
     sword.empty = false;
     sword.fix_X = 14.f;
     sword.fix_Y = 17.f;
-    sword.fix_hold_x = -32.f;
-    sword.fix_hold_y = 25.f;
+    sword.fix_hold_x = 58.f;
+    sword.fix_hold_y = -22.f;
     sword.space = 50.f;
     sword.rev = 15.f;
     sword.type = "sword";
     sword.angle = 90.f;
-    sword.weapon.setOrigin(0, sword.weapon.getLocalBounds().height);
+    sword.weapon.setOrigin(sword.weapon.getLocalBounds().width, sword.weapon.getLocalBounds().height);
     sword.weapon.setPosition(400.f, 680);
-    //sword.weapon.setRotation(sword.angle);
+    sword.weapon.setRotation(sword.angle);
     weaps.push_back(sword);
 
     //init bullet
@@ -268,6 +271,11 @@ void drop_weapon(ducks& duck) {
         duck.myweap.velocityX *= -1.f;
     }
     duck.myweap.velocityY = -7.f;
+    if (duck.myweap.type == "sword") {
+        duck.myweap.weapon.setOrigin(duck.myweap.weapon.getLocalBounds().width, duck.myweap.weapon.getLocalBounds().height);
+        if (duck.facingRight) duck.myweap.weapon.setRotation(90);
+        else duck.myweap.weapon.setRotation(-90);
+    }
     weaps.push_back(duck.myweap);
 
     if (duck.facingRight) {
@@ -294,13 +302,20 @@ void get_weapon(ducks& duck) {
             duck.myarm.arm.setTextureRect(IntRect(0, 16 * 4, 16, 16));
             if (!duck.facingRight) {
                 FloatRect bounds = weap.weapon.getLocalBounds();
-                weap.weapon.setOrigin(weap.rev, bounds.height);
+                if (weap.type == "sword")
+                    weap.weapon.setOrigin(0.f, bounds.height);
+                else
+                    weap.weapon.setOrigin(weap.rev, bounds.height);
                 weap.weapon.setScale(-2.5f, 2.5f);
             }
             weap.weapon.setPosition(
                 duck.myduck.getPosition().x + weap.fix_hold_x, 
                 duck.myduck.getPosition().y + weap.fix_hold_y
             );
+            if (weap.type == "sword"){
+                weap.weapon.setRotation(0);
+                weap.angle = 0;
+            }
             duck.myweap = weap;
             weaps.erase(weaps.begin() + i);
             break;
@@ -347,6 +362,11 @@ void update_bullets() {
 
 void Fire(ducks& duck, ll shooter) {
     ll idx = duck.myweap.bull_type;
+    if (duck.myweap.type == "sword") {
+        duck.myweap.hit = 1;
+        duck.myweap.myclock.restart();
+        return;
+    }
     if (duck.myweap.bullets > 0) {
         duck.myweap.bullets--;
         bull[idx].right = duck.facingRight;
@@ -381,10 +401,53 @@ void update_weapons() {
     }
 }
 
+void update_sword(ducks& duck, ll shooter) {
+    //cout << "a7a2" << endl;
+    if (duck.myweap.type == "sword" && duck.myweap.hit) {
+        if (duck.myweap.weapon.getGlobalBounds().intersects(duck2.myduck.getGlobalBounds()) && shooter == 1) {
+            Grave.setPosition(duck2.myduck.getPosition().x, 640.f);
+            cout << "dead" << endl;
+            duck2.dead = true;
+        }
+        if (duck.myweap.weapon.getGlobalBounds().intersects(duck1.myduck.getGlobalBounds()) && shooter == 2) {
+            Grave.setPosition(duck1.myduck.getPosition().x, 640.f);
+            cout << "dead" << endl;
+            duck1.dead = true;
+        }
+        if (duck.facingRight) {
+            if (duck.myweap.myclock.getElapsedTime().asMilliseconds() >= 5) {
+                duck.myweap.angle = duck.myweap.angle + 15 * duck.myweap.fact;
+                duck.myweap.weapon.setRotation(duck.myweap.angle);
+                if (duck.myweap.weapon.getRotation() >= 90) {
+                    duck.myweap.fact = -1;
+                }
+                if (duck.myweap.weapon.getRotation() <= 0) {
+                    duck.myweap.fact = 1;
+                    duck.myweap.hit = 0;
+                }
+                duck.myweap.myclock.restart();
+            }
+        }
+        else {
+            if (duck.myweap.myclock.getElapsedTime().asMilliseconds() >= 5) {
+                duck.myweap.angle = duck.myweap.angle - 15 * duck.myweap.fact;
+                duck.myweap.weapon.setRotation(duck.myweap.angle);
+                if (duck.myweap.angle <= -90) {
+                    duck.myweap.fact = -1;
+                }
+                if (duck.myweap.angle >= 0) {
+                    duck.myweap.fact = 1;
+                    duck.myweap.hit = 0;
+                }
+                duck.myweap.myclock.restart();
+            }
+        }
+    }
+}
+
 void update_duck(ducks& duck) {
     bool moving = false;
     float duckWidth = duck.myduck.getGlobalBounds().width / 3;
-
 
     if (Keyboard::isKeyPressed(duck.right)) {
         moving = true;
@@ -396,7 +459,10 @@ void update_duck(ducks& duck) {
             duck.myarm.arm.setScale(3.f, 3.f);
             duck.myarm.arm.setOrigin(0.f, 0.f);
             if (duck.haveWeapon) {
-                duck.myweap.weapon.setOrigin(0.f, duck.myweap.weapon.getLocalBounds().height);
+                if (duck.myweap.type == "sword")
+                    duck.myweap.weapon.setOrigin(duck.myweap.weapon.getLocalBounds().width, duck.myweap.weapon.getLocalBounds().height);
+                else 
+                    duck.myweap.weapon.setOrigin(0.f, duck.myweap.weapon.getLocalBounds().height);
                 duck.myweap.weapon.setScale(2.5f, 2.5f);
             }
         }
@@ -417,8 +483,11 @@ void update_duck(ducks& duck) {
             duck.myarm.arm.setScale(-3.f, 3.f);
             duck.myarm.arm.setOrigin(22.f, 0.f);
             if (duck.haveWeapon) {
+                if(duck.myweap.type == "sword")
+                    duck.myweap.weapon.setOrigin(0.f, duck.myweap.weapon.getLocalBounds().height);
+                else
+                    duck.myweap.weapon.setOrigin(duck.myweap.rev, duck.myweap.weapon.getLocalBounds().height);
                 duck.myweap.weapon.setScale(-2.5f, 2.5f);
-                duck.myweap.weapon.setOrigin(duck.myweap.rev, duck.myweap.weapon.getLocalBounds().height);
             }
         }
         if (duck.myduck.getPosition().x - velocityX >= -duckWidth) {
@@ -508,6 +577,8 @@ void update() {
     else {
         duck2.firing = false;
     }
+    update_sword(duck1, 1);
+    update_sword(duck2, 2);
 }
 
 void draw() {
