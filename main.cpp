@@ -54,8 +54,6 @@ struct weapons {
     ll fact = 1;
 }pistol, sniper, pewpew, sword;
 
-
-
 struct bullets {
     Texture skin;
     Sprite bullet;
