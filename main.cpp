@@ -27,6 +27,7 @@ const float jumpSpeed = -14.f;
 float velocityX = 5.f;
 float scalex, scaley;
 
+
 struct arm {
     Texture skin;
     Sprite arm;
@@ -42,7 +43,11 @@ struct weapons {
     float range;
     float posx, posy;
     float fix_X, fix_Y;
-}pistol, sniper;
+    float fix_hold_x, fix_hold_y;
+    ll bull_type;
+    float space = 0.f;
+    float rev;
+}pistol, sniper, pewpew;
 
 struct bullets {
     Texture skin;
@@ -52,7 +57,9 @@ struct bullets {
     float velocity;
     float startX;
     float range;
-}bull1;
+    float scalex, scaley;
+};
+bullets bull[3];
 
 struct ducks {
     Texture skin;
@@ -73,6 +80,7 @@ struct ducks {
     Keyboard::Key hold;
     Keyboard::Key fire;
     float velocityY = 0.f;
+    float space;
 } duck1, duck2;
 
 
@@ -86,7 +94,8 @@ void init() {
     //init the first duck
     duck1.skin.loadFromFile("img/duck1.png");
     duck1.myduck.setTexture(duck1.skin);
-    duck1.myduck.setPosition(0.f, 600.f);
+    duck1.space = 90.f;
+    duck1.myduck.setPosition(0.f, 680.f-duck1.space);
     duck1.myduck.setTextureRect(IntRect(0, 0, 32, 32));
     duck1.myduck.setScale(3.f, 3.f);
     duck1.up = Keyboard::W;
@@ -108,7 +117,8 @@ void init() {
     //init the second duck
     duck2.skin.loadFromFile("img/duck2.png");
     duck2.myduck.setTexture(duck2.skin);
-    duck2.myduck.setPosition(1200.f, 600.f);
+    duck2.space = 90.f;
+    duck2.myduck.setPosition(1200.f, 680.f-duck2.space);
     duck2.myduck.setTextureRect(IntRect(0, 0, 32, 32));
     duck2.myduck.setScale(-3.f, 3.f);
     duck2.up = Keyboard::Up;
@@ -133,7 +143,6 @@ void init() {
     //init pistol
     pistol.skin.loadFromFile("img/pistol.png");
     pistol.weapon.setTexture(pistol.skin);
-    pistol.weapon.setPosition(600.f, 660.f);
     pistol.posx = 600;
     pistol.posy = 660;
     pistol.weapon.setTextureRect(IntRect(0, 0, 16, 10));
@@ -144,13 +153,18 @@ void init() {
     pistol.range = 500.f;
     pistol.fix_X = 25.f;
     pistol.fix_Y = -12.f;
+    pistol.fix_hold_x = -16.f;
+    pistol.fix_hold_y = 55.f;
+    pistol.bull_type = 1;
+    pistol.space = 20.f;
+    pistol.rev = 7.f;
+    pistol.weapon.setPosition(600.f, 680 - pistol.space);
     weaps.push_back(pistol);
 
 
     //init sniper
     sniper.skin.loadFromFile("img/sniper.png");
     sniper.weapon.setTexture(sniper.skin);
-    sniper.weapon.setPosition(200.f, 660.f);
     sniper.posx = 200;
     sniper.posy = 660;
     sniper.weapon.setTextureRect(IntRect(0, 0, 33, 9));
@@ -161,11 +175,45 @@ void init() {
     sniper.range = 100000.f;
     sniper.fix_X = 50.f;
     sniper.fix_Y = -6.f;
+    sniper.fix_hold_x = -20.f;
+    sniper.fix_hold_y = 50.f;
+    sniper.bull_type = 1;
+    sniper.space = 15.f;
+    sniper.rev = 8.f;
+    sniper.weapon.setPosition(200.f, 680 - sniper.space);
     weaps.push_back(sniper);
 
+    //init pewpew
+    pewpew.skin.loadFromFile("img/pewpewLaser.png");
+    pewpew.weapon.setTexture(pewpew.skin);
+    pewpew.posx = 300;
+    pewpew.posy = 300;
+    pewpew.weapon.setTextureRect(IntRect(0, 0, 32, 32));
+    pewpew.weapon.setScale(2.5f, 2.5f);
+    pewpew.empty = false;
+    pewpew.bullets = 20;
+    pewpew.velocity = 15.f;
+    pewpew.range = 100000.f;
+    pewpew.fix_X = 50.f;
+    pewpew.fix_Y = 15.f;
+    pewpew.fix_hold_x = -32.f;
+    pewpew.fix_hold_y = 25.f;
+    pewpew.bull_type = 2;
+    pewpew.space = 45.f;
+    pewpew.rev = 15.f;
+    pewpew.weapon.setPosition(300.f, 680 - pewpew.space);
+    weaps.push_back(pewpew);
+
     //init bullet
-    bull1.skin.loadFromFile("img/pistol_bullet.png");
-    bull1.bullet.setTexture(bull1.skin);
+    bull[1].skin.loadFromFile("img/pistol_bullet.png");
+    bull[1].bullet.setTexture(bull[1].skin);
+    bull[1].scalex = 0.08f;
+    bull[1].scaley = 0.08f;
+
+    bull[2].skin.loadFromFile("img/laser_bullet1.png");
+    bull[2].bullet.setTexture(bull[2].skin);
+    bull[2].scalex = 0.3f;
+    bull[2].scaley = 0.3f;
 
 
     //init Grave
@@ -218,7 +266,7 @@ void get_weapon(ducks& duck) {
             duck.myarm.arm.setTextureRect(IntRect(0, 16 * 4, 16, 16));
             if (!duck.facingRight) {
                 FloatRect bounds = weap.weapon.getLocalBounds();
-                weap.weapon.setOrigin(bounds.width - 5.f, 0.f);
+                weap.weapon.setOrigin(weap.rev, 0.f);
                 weap.weapon.setScale(-2.5f, 2.5f);
             }
             duck.myweap = weap;
@@ -259,7 +307,7 @@ void update_bullets() {
             continue;
         }
 
-        if (bulls[i].bullet.getPosition().x <= 0 || bulls[i].bullet.getPosition().x >= 1280 || bulls[i].bullet.getPosition().x - bulls[i].startX >= bulls[i].range) {
+        if (bulls[i].bullet.getPosition().x <= 0 || bulls[i].bullet.getPosition().x >= 1280 || abs(bulls[i].bullet.getPosition().x - bulls[i].startX) >= bulls[i].range) {
             bulls.erase(bulls.begin() + i);
         }
     }
@@ -267,28 +315,30 @@ void update_bullets() {
 
 
 void Fire(ducks& duck, ll shooter) {
+    ll idx = duck.myweap.bull_type;
     if (duck.myweap.bullets > 0) {
         duck.myweap.bullets--;
-        bull1.right = duck.facingRight;
-        if (duck.facingRight) bull1.bullet.setScale(0.08f, 0.08f);
-        else bull1.bullet.setScale(-0.08f, 0.08f);
+        bull[idx].right = duck.facingRight;
+        if (duck.facingRight) bull[idx].bullet.setScale(bull[idx].scalex, bull[idx].scaley);
+        else bull[idx].bullet.setScale(-1 * bull[idx].scalex, bull[idx].scaley);
         ll factor = 1;
         if (!duck.facingRight) factor = -1;
-        bull1.bullet.setPosition(duck.myweap.weapon.getPosition().x + duck.myweap.fix_X * factor, duck.myweap.weapon.getPosition().y + duck.myweap.fix_Y);
-        bull1.duck = shooter;
-        bull1.velocity = duck.myweap.velocity;
-        bull1.startX = bull1.bullet.getPosition().x;
-        bull1.range = duck.myweap.range;
-        bulls.push_back(bull1);
+        bull[idx].bullet.setPosition(duck.myweap.weapon.getPosition().x + duck.myweap.fix_X * factor, duck.myweap.weapon.getPosition().y + duck.myweap.fix_Y);
+        bull[idx].duck = shooter;
+        bull[idx].velocity = duck.myweap.velocity;
+        bull[idx].startX = bull[idx].bullet.getPosition().x;
+        bull[idx].range = duck.myweap.range;
+        bulls.push_back(bull[idx]);
     }
 }
 
 void update_weapons() {
     for (auto& weap : weaps) {
         weap.weapon.move(weap.velocityX, weap.velocityY);
+        //cout << weap.velocityX << " " << weap.velocityY << " " << weap.velocity << endl;
         weap.velocityY += gravity;
-        if (weap.weapon.getPosition().y >= 660.f) {
-            weap.weapon.setPosition(weap.weapon.getPosition().x, 660.f);
+        if (weap.weapon.getPosition().y >= 680.f - weap.space) {
+            weap.weapon.setPosition(weap.weapon.getPosition().x, 680.f - weap.space);
             weap.velocityX = 0.f;
             weap.velocityY = 0.f;
         }
@@ -296,9 +346,11 @@ void update_weapons() {
 }
 
 void update_weapon(ducks& duck) {
+    ll factor = 0;
+    if (duck.facingRight) factor = 1;
     duck.myweap.weapon.setPosition(
-        duck.myduck.getPosition().x + duck.myduck.getGlobalBounds().width / 2 - 15.f,
-        duck.myduck.getPosition().y + 55.f
+        duck.myduck.getPosition().x + duck.myduck.getGlobalBounds().width / 2 + duck.myweap.fix_hold_x*factor,
+        duck.myduck.getPosition().y + duck.myweap.fix_hold_y
     );
 }
 
@@ -338,7 +390,7 @@ void update_duck(ducks& duck) {
             duck.myarm.arm.setOrigin(22.f, 0.f);
             if (duck.haveWeapon) {
                 duck.myweap.weapon.setScale(-2.5f, 2.5f);
-                duck.myweap.weapon.setOrigin(12, 0.f);
+                duck.myweap.weapon.setOrigin(duck.myweap.rev, 0.f);
             }
         }
         if (duck.myduck.getPosition().x - velocityX >= -duckWidth) {
@@ -364,8 +416,8 @@ void update_duck(ducks& duck) {
             duck.myduck.setTextureRect(IntRect(32, 32, 32, 32));
         }
 
-        if (duck.myduck.getPosition().y >= 600.f) {
-            duck.myduck.setPosition(duck.myduck.getPosition().x, 600.f);
+        if (duck.myduck.getPosition().y >= 680.f - duck.space) {
+            duck.myduck.setPosition(duck.myduck.getPosition().x, 680.f-duck.space);
             duck.isJumping = false;
             duck.velocityY = 0.f;
         }
@@ -410,6 +462,7 @@ void update() {
     else {
         duck2.holding = false;
     }
+
 
     if (duck1.haveWeapon && Keyboard::isKeyPressed(duck1.fire)) {
         if (!duck1.firing) {
@@ -466,6 +519,8 @@ void draw() {
 int main() {
     init();
     while (window.isOpen()) {
+        Mouse m;
+        cout << m.getPosition(window).x << " " << m.getPosition(window).y << endl;
         Event ev;
         while (window.pollEvent(ev)) {
             if (ev.type == Event::Closed) {
