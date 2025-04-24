@@ -44,7 +44,7 @@ const float gravity = 0.5f;
 const float jumpSpeed = -14.f;
 float velocityX = 5.f;
 bool GameEnd = 0;
-ll mapnum = 1;
+ll mapnum = 0;
 float DUCK_SCALE;
 float GUN_SCALE;
 
@@ -1040,7 +1040,7 @@ void Map2() {
 
 
 int main() {
-    init_Map2();
+    init_Map1();
     window.setFramerateLimit(90);
     initMainMenu(Width, Height, window);
     initGameMenu(Width, Height, window);
