@@ -14,13 +14,6 @@ using namespace std;
 using namespace sf;
 
 typedef long long ll;
-Texture grave;
-Sprite Grave;
-
-const float gravity = 0.5f;
-const float jumpSpeed = -14.f;
-float velocityX = 5.f;
-float scalex, scaley;
 
 
 struct arm {
@@ -47,7 +40,7 @@ struct weapons {
     float angle;
     bool hit = 0;
     ll fact = 1;
-}pistol, sniper, pewpew, sword;
+};
 
 struct bullets {
     Texture skin;
@@ -59,7 +52,6 @@ struct bullets {
     float range;
     float scalex, scaley;
 };
-bullets bull[3];
 
 struct ducks {
     Texture skin;
@@ -81,8 +73,6 @@ struct ducks {
     Keyboard::Key fire;
     float velocityY = 0.f;
     float space;
-} duck1, duck2;
+};
 
 
-vector<weapons> weaps;
-vector<bullets> bulls;
