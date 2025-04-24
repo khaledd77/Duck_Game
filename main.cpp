@@ -1,6 +1,7 @@
 #include "MainMenu.h"
 #include "Logic.h"
 #include "GameTile.h"
+#include "Game.h"
 #include <iostream>
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
@@ -34,21 +35,20 @@ splashScreen intro;
 
 bool fullscreen = false;
 
-int menuState = 1000; // 1000 = main menu, 0 = game, 1 = settings
+int menuState = 0; // 1000 = main menu, 0 = game, 1 = settings
 bullets bull[3];
 ducks duck1, duck2;
 weapons sword, pistol, sniper, pewpew;
 vector<weapons> weaps;
 vector<bullets> bulls;
-const float gravity = 0.5f;
-const float jumpSpeed = -14.f;
+float gravity = 0.5f;
+float jumpSpeed = -14.f;
 float velocityX = 5.f;
 bool GameEnd = 0;
-ll mapnum = 0;
+ll mapnum = 4;
 float DUCK_SCALE;
 float GUN_SCALE;
-
-
+float scalex, scaley;
 const float Width = 1280, Height = 720;
 
 //Fady
@@ -123,6 +123,7 @@ void init() {
     pistol.weapon.setOrigin(0, pistol.weapon.getLocalBounds().height);
     pistol.weapon.setPosition(600.f, 680);
     pistol.type = "pistol";
+    weaps.push_back(pistol);
 
 
     //init sniper
@@ -146,6 +147,7 @@ void init() {
     sniper.weapon.setOrigin(0, sniper.weapon.getLocalBounds().height);
     sniper.weapon.setPosition(200.f, 680);
     sniper.type = "sniper";
+    weaps.push_back(pewpew);
 
     //init pewpew
     pewpew.skin.loadFromFile("img/pewpewLaser.png");
@@ -168,6 +170,7 @@ void init() {
     pewpew.weapon.setOrigin(0, pewpew.weapon.getLocalBounds().height);
     pewpew.weapon.setPosition(300.f, 680);
     pewpew.type = "pewpew";
+    weaps.push_back(pewpew);
 
     //init sword
     sword.skin.loadFromFile("img/sword.png");
@@ -186,6 +189,7 @@ void init() {
     sword.weapon.setOrigin(sword.weapon.getLocalBounds().width, sword.weapon.getLocalBounds().height);
     sword.weapon.setPosition(400.f, 680);
     sword.weapon.setRotation(sword.angle);
+    weaps.push_back(sword);
 
     //init bullet
     bull[1].skin.loadFromFile("img/pistol_bullet.png");
@@ -528,6 +532,7 @@ void update_Logic() {
 }
 
 void draw_Logic() {
+    cout << "sss";
     for (auto weap : weaps) {
         window.draw(weap.weapon);
     }
@@ -556,7 +561,7 @@ void draw_Logic() {
     }
 }
 
-// Setting up a splash screen introduction
+// Walid
 void fadeIn() {
 
 }
@@ -1038,9 +1043,617 @@ void Map2() {
 }
 
 
+// Khaled Ghareeb
+struct block
+{
+    Sprite map_blocks;
+};
+
+block b; block obs;
+const int MAX_BLOCKS = 100;
+block finalground[MAX_BLOCKS];
+block finalblock[MAX_BLOCKS];
+block finalobs[MAX_BLOCKS];
+int groundCount = 0;
+int blockCount = 0;
+int obsCount = 0;
+
+Sprite backgroundGhareeb;
+Texture backgroundtexture;
+
+Texture mapblock_Texture;
+Texture obstacels_texture;
+
+void groundd()
+{
+    for (int i = 0; i < 10; i++)
+    {
+        block ground;
+
+
+        ground.map_blocks.setTexture(mapblock_Texture);
+        ground.map_blocks.setScale(0.45, 0.17);
+        ground.map_blocks.setPosition(0 + i * 150, 697);
+        finalground[groundCount++] = ground;
+    }
+}
+
+void obstacels_position(int x, int y)
+{
+    obs.map_blocks.setPosition(x, y);
+    finalobs[obsCount++] = obs;
+
+}
+
+void block_position(int x, int y)
+{
+
+    b.map_blocks.setPosition(x, y);
+    finalblock[blockCount++] = b;
+
+}
+
+void blocksGhareeb()
+{
+    groundd();
+
+    block_position(295, 545);
+    block_position(0, 595);
+    block_position(1060, 465);
+    block_position(0, 470);
+    block_position(190, 370);
+    block_position(400, 370);
+    block_position(610, 370);
+    block_position(820, 370);
+    block_position(1058, 620);
+    block_position(800, 540);
+    block_position(0, 270);
+    block_position(1050, 270);
+    block_position(290, 200);
+    block_position(550, 130);
+    block_position(800, 180);
+
+    obstacels_position(265, 332);
+    obstacels_position(300, 332);
+    obstacels_position(700, 619);
+    obstacels_position(661, 658);
+    obstacels_position(700, 658);
+    obstacels_position(98, 431);
+    obstacels_position(1130, 390);
+    obstacels_position(1130, 427);
+    obstacels_position(750, 331);
+    obstacels_position(460, 161);
+}
+
+void collision(ducks& player)
+{
+    for (block& b : finalblock)
+    {
+        FloatRect playerbounds = player.myduck.getGlobalBounds();
+        FloatRect wallbound = b.map_blocks.getGlobalBounds();
+        if (playerbounds.intersects(wallbound))
+        {
+            FloatRect intersection;
+            playerbounds.intersects(wallbound, intersection);
+
+            if (intersection.width < intersection.height) // left & right
+            {
+                if (playerbounds.left < wallbound.left) // right collision
+                {
+                    player.myduck.setPosition(player.myduck.getPosition().x - intersection.width, player.myduck.getPosition().y);
+                }
+                else // left collision
+                {
+                    player.myduck.setPosition(player.myduck.getPosition().x + intersection.width, player.myduck.getPosition().y);
+                }
+            }
+            else // up & down
+            {
+                if (playerbounds.top < wallbound.top) // down collision
+                {
+                    player.myduck.setPosition(player.myduck.getPosition().x, player.myduck.getPosition().y - intersection.height);
+                }
+                else // up collision
+                {
+                    player.myduck.setPosition(player.myduck.getPosition().x, player.myduck.getPosition().y + intersection.height);
+                }
+            }
+        }
+    }
+
+
+    for (block& bb : finalground)
+    {
+        FloatRect playerbounds = player.myduck.getGlobalBounds();
+        FloatRect wallbound = bb.map_blocks.getGlobalBounds();
+        if (playerbounds.intersects(wallbound))
+        {
+            FloatRect intersection;
+            playerbounds.intersects(wallbound, intersection);
+
+            if (intersection.width < intersection.height) // left & right
+            {
+                if (playerbounds.left < wallbound.left) // right collision
+                {
+                    player.myduck.setPosition(player.myduck.getPosition().x - intersection.width, player.myduck.getPosition().y);
+                }
+                else // left collision
+                {
+                    player.myduck.setPosition(player.myduck.getPosition().x + intersection.width, player.myduck.getPosition().y);
+                }
+            }
+            else // up & down
+            {
+                if (playerbounds.top < wallbound.top) // down collision
+                {
+                    player.myduck.setPosition(player.myduck.getPosition().x, player.myduck.getPosition().y - intersection.height);
+                }
+                else // up collision
+                {
+                    player.myduck.setPosition(player.myduck.getPosition().x, player.myduck.getPosition().y + intersection.height);
+                }
+            }
+        }
+    }
+
+
+    for (block& bbb : finalobs)
+    {
+        FloatRect playerbounds = player.myduck.getGlobalBounds();
+        FloatRect wallbound = bbb.map_blocks.getGlobalBounds();
+        if (playerbounds.intersects(wallbound))
+        {
+            FloatRect intersection;
+            playerbounds.intersects(wallbound, intersection);
+
+            if (intersection.width < intersection.height) // left & right
+            {
+                if (playerbounds.left < wallbound.left) // right collision
+                {
+                    player.myduck.setPosition(player.myduck.getPosition().x - intersection.width, player.myduck.getPosition().y);
+                }
+                else // left collision
+                {
+                    player.myduck.setPosition(player.myduck.getPosition().x + intersection.width, player.myduck.getPosition().y);
+                }
+            }
+            else // up & down
+            {
+                if (playerbounds.top < wallbound.top) // down collision
+                {
+                    player.myduck.setPosition(player.myduck.getPosition().x, player.myduck.getPosition().y - intersection.height);
+                }
+                else // up collision
+                {
+                    player.myduck.setPosition(player.myduck.getPosition().x, player.myduck.getPosition().y + intersection.height);
+                }
+            }
+        }
+    }
+
+
+}
+void windowcollison(ducks& player)
+{
+
+    FloatRect playerBounds = player.myduck.getGlobalBounds();
+
+    if (playerBounds.left < 0) // Left
+        player.myduck.setPosition(playerBounds.width / 2, player.myduck.getPosition().y);
+
+    if (playerBounds.left + playerBounds.width > 1280) // Right
+        player.myduck.setPosition(1280 - playerBounds.width / 2, player.myduck.getPosition().y);
+
+    if (playerBounds.top < 0)// Top
+        player.myduck.setPosition(player.myduck.getPosition().x, playerBounds.height / 2);
+
+}
+void init_Map3()
+{
+    init();
+    DUCK_SCALE = 2.5f;
+    GUN_SCALE = 2.f;
+    backgroundtexture.loadFromFile("img/background.jpg");
+    backgroundGhareeb.setTexture(backgroundtexture);
+    backgroundGhareeb.setScale(0.5, 0.5);
+
+    mapblock_Texture.loadFromFile("img/cccc.png");
+
+    obstacels_texture.loadFromFile("img/Block 2.png");
+
+    duck1.myduck.setPosition(200, 250);
+    duck1.myduck.setOrigin(duck1.myduck.getLocalBounds().width / 2, duck1.myduck.getLocalBounds().height / 2);
+
+
+    duck2.myduck.setPosition(600, 660);
+    duck2.myduck.setOrigin(duck2.myduck.getLocalBounds().width / 2, duck2.myduck.getLocalBounds().height / 2);
+
+
+    b.map_blocks.setTexture(mapblock_Texture);
+    b.map_blocks.setScale(0.45, 0.17);
+
+
+    obs.map_blocks.setTexture(obstacels_texture);
+    obs.map_blocks.setScale(0.035, 0.035);
+
+    blocksGhareeb();
+
+
+
+}
+
+void update3()
+{
+    /* duck1.move(0, gravity * deltaTime);
+     duck2.move(0, gravity * deltaTime);*/
+    windowcollison(duck1);
+    windowcollison(duck2);
+    collision(duck1);
+    collision(duck2);
+    update_Logic();
+
+}
+void draw3()
+{
+    window.draw(backgroundGhareeb);
+
+    for (int i = 0; i < groundCount; i++)
+        window.draw(finalground[i].map_blocks);
+
+    for (int i = 0; i < blockCount; i++)
+        window.draw(finalblock[i].map_blocks);
+
+    for (int i = 0; i < obsCount; i++)
+        window.draw(finalobs[i].map_blocks);
+
+    draw_Logic();
+
+
+}
+
+void Map3() {
+    update3();
+    draw3();
+}
+
+// Abdullah
+
+void initBackground()
+{
+    ground.loadFromFile("img/Lv7nNS.png");
+    background.setTexture(ground);
+    scalex = window.getSize().x * 1.0f / ground.getSize().x;
+    scaley = window.getSize().y * 1.0f / ground.getSize().y;
+    background.setScale(scalex, scaley);
+    background.setPosition(0.f, 0.f);
+}
+
+void init_Map4()
+{
+    initBackground();
+    tileCount = 0;  // track how many tiles we've added
+    DUCK_SCALE = 2.f;
+    ice.loadFromFile("img/iceBlocks.png");
+    snow.loadFromFile("img/snowBlocks.png");
+    wood.loadFromFile("img/woodBlocks.png");
+
+
+    // Define a 2D map
+    string snowMap[23] = {
+    "........................................",
+    "........................................",
+    "........................................",
+    "........................................",
+    "........................................",
+    "........................................",
+    "........................................",
+    ".._...1..........................2..._..",
+    "..|____....._............._......____|..",
+    "......|....<|.....<=>.....|>.....|......",
+    "......|.....|.............|......|......",
+    "......|.....|.............|......|......",
+    "......|.....|.............|......|......",
+    "......|...<~|++++.._..++++|=>....|......",
+    "......|..........................|......",
+    "......|..........................|......",
+    "......|..........................|......",
+    "......|++++++++++++++++++++++++++|......",
+    "........................................",
+    "........................................",
+    "........................................",
+    "........................................",
+    "........................................"
+    };
+
+    int scaleX = 0, scaleY = 0;
+    bool isSnow = false;
+
+    for (int y = 0; y < sizeof(snowMap) / sizeof(snowMap[0]); y++) {
+        for (int x = 0; x < snowMap[y].length(); x++) {
+            if (tileCount >= 1000) break;
+            char tileChar = snowMap[y][x];
+            bool isWood = false;
+            // determine which part of the texture to use
+            IntRect texRect;
+            bool valid = true;
+
+            switch (tileChar) {
+            case '_':
+                scaleX = 16;
+                scaleY = 14;
+                isSnow = true;
+                texRect = IntRect(63, 0, scaleX, scaleY);
+                break;
+            case '+':
+                scaleX = 31;
+                scaleY = 14;
+                isSnow = false;
+                texRect = IntRect(0, 0, scaleX, scaleY);
+                break;
+            case '=':
+                scaleX = 12;
+                scaleY = 9;
+                isWood = true;
+                texRect = IntRect(0, 48, scaleX, scaleY);
+                break;
+            case '~':
+                scaleX = 12;
+                scaleY = 9;
+                isWood = true;
+                texRect = IntRect(4, 32, scaleX, scaleY);
+                break;
+            case '>':
+                scaleX = 15;
+                scaleY = 9;
+                isWood = true;
+                texRect = IntRect(0, 48, scaleX, scaleY);
+                break;
+            case '<':
+                scaleX = 15;
+                scaleY = 9;
+                isWood = true;
+                texRect = IntRect(0, 32, scaleX, scaleY);
+                break;
+            case '|':
+                scaleX = 12;
+                scaleY = 14;
+                isSnow = false;
+                texRect = sf::IntRect(34, 95, scaleX, scaleY);
+                break;
+            case '.':
+                break;
+            case '1':
+                break;
+            case '2':
+                break;
+            default:
+                valid = false;
+                break;
+            }
+
+            if (valid) {
+                if (isSnow) mapTiles[tileCount].tileSprite.setTexture(snow);
+                else if (isWood) mapTiles[tileCount].tileSprite.setTexture(wood);
+                else mapTiles[tileCount].tileSprite.setTexture(ice);
+                mapTiles[tileCount].tileSprite.setTextureRect(texRect);
+                mapTiles[tileCount].tileSprite.setScale(
+                    static_cast<float>(TILE_SIZEE) / scaleX,  // scale X down to 32px
+                    static_cast<float>(TILE_SIZEE) / scaleY   // scale Y down to 32px
+                );
+                mapTiles[tileCount].tileSprite.setPosition(x * TILE_SIZEE, y * TILE_SIZEE);
+                if (tileChar == '.' || tileChar == '1' || tileChar == '2')
+                {
+                    mapTiles[tileCount].tileSprite.setScale(
+                        static_cast<float>(TILE_SIZEE),  // scale X down to 32px
+                        static_cast<float>(TILE_SIZEE)    // scale Y down to 32px
+                    );
+                    mapTiles[tileCount].isCollidable = false;
+                }
+                else mapTiles[tileCount].isCollidable = true;
+                mapTiles[tileCount].bounds = mapTiles[tileCount].tileSprite.getGlobalBounds();
+                if (tileChar == '.' || tileChar == '1' || tileChar == '2') {
+                    mapTiles[tileCount].bounds.width = 32;
+                    mapTiles[tileCount].bounds.height = 32;
+                }
+            }
+            tileCount++;
+        }
+    }
+    //for(int i = 0; i < 918; i++) cout << mapTiles[i].bounds.left << endl;;
+    //cout << tileCount;
+    init();
+}
+
+void draw4() {
+    update_Logic();
+    window.draw(background);
+    for (int i = 0; i < tileCount; i++) {
+        window.draw(mapTiles[i].tileSprite);
+    }
+    draw_Logic();
+}
+
+void Map4() {
+    draw4();
+}
+
+
+//sdsd
+CircleShape player(30,4);
+Texture backgroundTexture;
+Texture blockTexture;
+Texture groundTexture;
+Sprite blockse[25];
+Sprite backgroundSprite;
+RectangleShape blockscollider[8];
+
+void blocks5(Sprite blocks5[25]) {
+    //Bottom-Left Block:
+    blocks5[0].setPosition(120, 520);
+    blocks5[0].setScale(2.25, 1);
+    //Middle-Left Block:
+    blocks5[1].setPosition(-10, 320);
+    blocks5[1].setScale(2, 1);
+    //Bottom-Middle Block:
+    blocks5[2].setPosition(380, 390);
+    blocks5[2].setScale(3.5, 1);
+    //Top-Left Block
+    blocks5[3].setPosition(20, 90);
+    blocks5[3].setScale(2, 1);
+    //Center Block:
+    blocks5[4].setPosition(360, 175);
+    blocks5[4].setScale(1.7, 1);
+    //middle-Right Block:
+    blocks5[5].setPosition(950, 300);
+    blocks5[5].setScale(2, 1);
+    //Top-Right Block:
+    blocks5[6].setPosition(1000, 90);
+    blocks5[6].setScale(2, 1);
+    //top middle
+    blocks5[7].setPosition(710, 175);
+    blocks5[7].setScale(1.7, 1);
+
+    //ground
+    for (int i = 1;i <= 15;i++) {
+        blocks5[i + 7].setPosition((i - 1) * 100, 675);
+        blocks5[i + 7].setScale(0.5, 0.25);
+    }
+    // bottom right
+    blocks5[23].setPosition(810, 520);
+    blocks5[23].setScale(2.25, 1);
+
+}
+
+void init_Map5() {
+    DUCK_SCALE = 2.f;
+    init();
+    backgroundTexture.loadFromFile("img/nature.png");
+    blockTexture.loadFromFile("img/blocks.png");
+    ground.loadFromFile("img/ground2.png");
+    //set the photo in sprites
+    blocks5(blockse);
+    for (int i = 0;i < 24;i++) {
+        if (i > 7 && i < 23) {
+            blockse[i].setTexture(ground);
+        }
+        else
+            blockse[i].setTexture(blockTexture);
+    }
+    //background set and scale
+    backgroundSprite.setTexture(backgroundTexture);
+    Vector2f windowSize = static_cast<sf::Vector2f>(window.getSize());
+    Vector2f textureSize = static_cast<sf::Vector2f>(backgroundTexture.getSize());
+    backgroundSprite.setScale(windowSize.x / textureSize.x, windowSize.y / textureSize.y);
+    for (int i = 0;i < 8;i++) {
+        blockscollider[i].setOrigin(blockse[i].getOrigin());
+        FloatRect bounds = blockse[i].getGlobalBounds();
+
+        // Create a rectangle shape and match its size
+        blockscollider[i].setSize(Vector2f(bounds.width / 2, bounds.height / 2));
+    }
+}
+
+void collisions() {
+    for (int i = 0; i < 24; i++) {
+        if (player.getGlobalBounds().intersects(blockse[i].getGlobalBounds())) {
+            for (int i = 0; i < 24; i++) {
+                if (!(i > 7 && i < 23)) {
+                    blockse[i].setTexture(blockTexture);
+                    FloatRect playerBounds = player.getGlobalBounds();
+                    FloatRect blockBounds = blockse[i].getGlobalBounds();
+
+                    if (playerBounds.intersects(blockBounds)) {
+                        FloatRect intersection;
+                        playerBounds.intersects(blockBounds, intersection);
+
+                        if (intersection.width < intersection.height) {
+                            if (playerBounds.left < blockBounds.left) {
+                                // Right collision
+                                player.setPosition(playerBounds.left - intersection.width, playerBounds.top);
+                            }
+                            else {
+                                // Left collision
+                                player.setPosition(playerBounds.left + intersection.width, playerBounds.top);
+                            }
+                        }
+                        else {
+                            if (playerBounds.top < blockBounds.top) {
+                                // Down collision
+                                player.setPosition(playerBounds.left, playerBounds.top - intersection.height);
+                            }
+                            else {
+                                // Up collision
+                                player.setPosition(playerBounds.left, playerBounds.top + intersection.height);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        //left
+        if (player.getPosition().x < 0) {
+            player.setPosition(0, player.getPosition().y);
+        }
+        //top
+        if (player.getPosition().y < 0) {
+            player.setPosition(player.getPosition().x, 0);
+        }
+        //right
+        if (player.getPosition().x + player.getGlobalBounds().width > window.getSize().x) {
+            player.setPosition(window.getSize().x - player.getGlobalBounds().width, player.getPosition().y);
+        }
+        //bottom
+        if (player.getPosition().y + player.getGlobalBounds().height > window.getSize().y) {
+            player.setPosition(player.getPosition().x, window.getSize().y - player.getGlobalBounds().height);
+        }
+
+
+        //left
+        if (player.getPosition().x < 0) {
+            player.setPosition(0, player.getPosition().y);
+        }
+        //top
+        if (player.getPosition().y < 0) {
+            player.setPosition(player.getPosition().x, 0);
+        }
+        //right
+        if (player.getPosition().x + player.getGlobalBounds().width > window.getSize().x) {
+            player.setPosition(window.getSize().x - player.getGlobalBounds().width, player.getPosition().y);
+        }
+        //bottom
+        if (player.getPosition().y + player.getGlobalBounds().height > window.getSize().y) {
+            player.setPosition(player.getPosition().x, window.getSize().y - player.getGlobalBounds().height);
+        }
+
+    }
+}
+
+void update_Map5() {
+    collisions();
+    update_Logic();
+}
+
+void draw_Map5() {
+    FloatRect bounds = blockse[23].getGlobalBounds();
+
+    for (int i = 0;i < 8;i++) {
+        window.draw(blockscollider[i]);
+    }
+
+    window.draw(backgroundSprite);
+    for (int i = 0;i < 24;i++)
+        window.draw(blockse[i]);
+    draw_Logic();
+}
+
+void Map5() {
+    update_Map5();
+    draw_Map5();
+}
+
 
 int main() {
-    init_Map1();
+    init_Map5();
     window.setFramerateLimit(90);
     initMainMenu(Width, Height, window);
     initGameMenu(Width, Height, window);
@@ -1127,21 +1740,23 @@ int main() {
         else if (menuState == 0) {
             //drawMenu(window, gameMenu);
             if (GameEnd) {
+                duck1.dead = false;
+                duck2.dead = false;
                 GameEnd = 0;
                 mapnum++;
-                mapnum %= 2;
+                mapnum %= 3;
                 if (mapnum == 0) init_Map1();
                 if (mapnum == 1) init_Map2();
-                //if (mapnum == 2) init_Map3();
-                //if (mapnum == 3) init_Map4();
-                //if (mapnum == 4) init_Map5();
+                if (mapnum == 2) init_Map3();
+                if (mapnum == 3) init_Map4();
+                if (mapnum == 4) init_Map5();
                 // show death, and screen between rounds
             }
             if (mapnum == 0) Map1();
             if (mapnum == 1) Map2();
-            //if (mapnum == 2) Map3();
-            //if (mapnum == 3) Map4();
-            //if (mapnum == 4) Map5();
+            if (mapnum == 2) Map3();
+            if (mapnum == 3) Map4();
+            if (mapnum == 4) Map5();
         }
         else if (menuState == 1) {
             drawMenu(window, settingsMenu);
