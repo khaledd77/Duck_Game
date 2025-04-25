@@ -3,7 +3,7 @@
 #include <map>
 #include <string>
 
-class GameTile {
+struct GameTile {
 public:
     enum TileType { Ground, Cement, Tree, Weapon , Stone , Branch, Root,  None };
 

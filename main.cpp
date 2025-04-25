@@ -46,7 +46,7 @@ float gravity = 0.5f;
 float jumpSpeed = -14.f;
 float velocityX = 5.f;
 bool GameEnd = 0;
-ll mapnum = 0;
+ll mapnum = 1;
 float DUCK_SCALE;
 float GUN_SCALE;
 float scalex, scaley;
@@ -966,7 +966,7 @@ void init_Map2() {
     pewpew.rev = 16.f;
     //sword
     sword.fix_hold_x = 29.f;
-    sword.fix_hold_y = -14.f;
+    sword.fix_hold_y = -12.f;
     sword.rev = 2.f;
     //bull1
     bull[1].scalex = 0.036f;
