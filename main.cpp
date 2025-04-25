@@ -45,7 +45,7 @@ float gravity = 0.5f;
 float jumpSpeed = -14.f;
 float velocityX = 5.f;
 bool GameEnd = 0;
-ll mapnum = 0;
+ll mapnum = 1;
 float DUCK_SCALE;
 float GUN_SCALE;
 float scalex, scaley;
@@ -274,11 +274,11 @@ void update_duck(ducks& duck) {
             duck.myarm.arm.setScale(DUCK_SCALE, DUCK_SCALE);
             duck.myarm.arm.setOrigin(0.f, 0.f);
             if (duck.haveWeapon) {
+                duck.myweap.weapon.setScale(GUN_SCALE, GUN_SCALE);
                 if (duck.myweap.type == "sword")
                     duck.myweap.weapon.setOrigin(duck.myweap.weapon.getLocalBounds().width, duck.myweap.weapon.getLocalBounds().height);
                 else
                     duck.myweap.weapon.setOrigin(0.f, duck.myweap.weapon.getLocalBounds().height);
-                duck.myweap.weapon.setScale(GUN_SCALE, GUN_SCALE);
             }
         }
 
@@ -298,11 +298,8 @@ void update_duck(ducks& duck) {
             duck.myarm.arm.setScale(-DUCK_SCALE, DUCK_SCALE);
             duck.myarm.arm.setOrigin(22.f, 0.f);
             if (duck.haveWeapon) {
-                if (duck.myweap.type == "sword")
-                    duck.myweap.weapon.setOrigin(0.f, duck.myweap.weapon.getLocalBounds().height);
-                else
-                    duck.myweap.weapon.setOrigin(duck.myweap.rev, duck.myweap.weapon.getLocalBounds().height);
                 duck.myweap.weapon.setScale(-GUN_SCALE, GUN_SCALE);
+                duck.myweap.weapon.setOrigin(duck.myweap.rev, duck.myweap.weapon.getLocalBounds().height);
             }
         }
         if (duck.myduck.getPosition().x - velocityX >= -duckWidth) {
@@ -593,9 +590,9 @@ void initGameMenu(int width, int height, RenderWindow& window) {
 void initMusic() {
 
     // Music
-    if (!settingsMenu.menuMusic.openFromFile("img/music.wav")) {
-        cout << "Error loading menu music.\n";
-    }
+    //if (!settingsMenu.menuMusic.openFromFile("img/music.wav")) {
+    //    cout << "Error loading menu music.\n";
+    //}
 
     settingsMenu.menuMusic.setLoop(true);
     settingsMenu.menuMusic.play();
@@ -898,7 +895,6 @@ GameTile::GameTile() {
     loadTexture(Stone, "img/stone2.png");
     loadTexture(Root, "img/root.png");
 }
-
 void GameTile::loadTexture(TileType type, const std::string& path) {
     sf::Texture texture;
     if (texture.loadFromFile(path)) {
@@ -906,13 +902,10 @@ void GameTile::loadTexture(TileType type, const std::string& path) {
         sprites[type].setTexture(textures[type]);
     }
 }
-
 const sf::Sprite& GameTile::getTileSprite(TileType type) {
     return sprites[type];
 }
-
 const int TILE_SIZE = 9;
-
 GameTile::TileType charToTileType(char c) {
     switch (c) {
     case 'g': return GameTile::Ground;
@@ -929,8 +922,46 @@ GameTile gameTiles;
 vector<string> level;
 void init_Map2() {
     DUCK_SCALE = 1.5;
-    GUN_SCALE = 1.f;
+    GUN_SCALE = 1.2f;
     init();
+    // pistol
+    pistol.fix_X = -2.f;
+    pistol.fix_Y = -17.f;
+    pistol.fix_hold_x = 18.f;
+    pistol.fix_hold_y = -12.f;
+    pistol.rev = 11.f;
+    //sniper
+    sniper.fix_X = 13.f;
+    sniper.fix_Y = -14.f;
+    sniper.fix_hold_x = 11.f;
+    sniper.fix_hold_y = -15.f;
+    sniper.rev = 23.f;
+    //pewpew
+    pewpew.fix_X = 4.f;
+    pewpew.fix_Y = -10.f;
+    pewpew.fix_hold_x = 15.f;
+    pewpew.fix_hold_y = -13.f;
+    pewpew.rev = 16.f;
+    //sword
+    sword.fix_hold_x = 29.f;
+    sword.fix_hold_y = -14.f;
+    sword.rev = 2.f;
+    //bull1
+    bull[1].scalex = 0.036f;
+    bull[1].scaley = 0.036f;
+    //bull2
+    bull[2].scalex = 0.12f;
+    bull[2].scaley = 0.12f;
+    //grave
+    Grave.setScale(0.16f, 0.1f);
+
+    //spawn weaps
+    weaps.push_back(pistol);
+    weaps.push_back(sniper);
+    weaps.push_back(pewpew);
+    weaps.push_back(sword);
+
+
     level = {
     "                                                                                                                                    ",
     "                                                                                                                                    ",
@@ -1014,7 +1045,6 @@ void init_Map2() {
     "                                                                                                                            "
     };
 }
-
 void update_Map2() {
     for (size_t y = 0; y < level.size(); ++y) {
         for (size_t x = 0; x < level[y].size(); ++x) {
@@ -1069,14 +1099,12 @@ void groundd()
         finalground[groundCount++] = ground;
     }
 }
-
 void obstacels_position(int x, int y)
 {
     obs.map_blocks.setPosition(x, y);
     finalobs[obsCount++] = obs;
 
 }
-
 void block_position(int x, int y)
 {
 
@@ -1084,7 +1112,6 @@ void block_position(int x, int y)
     finalblock[blockCount++] = b;
 
 }
-
 void blocksGhareeb()
 {
     groundd();
@@ -1116,7 +1143,6 @@ void blocksGhareeb()
     obstacels_position(750, 331);
     obstacels_position(460, 161);
 }
-
 void collision(ducks& player)
 {
     for (block& b : finalblock)
@@ -1242,9 +1268,46 @@ void windowcollison(ducks& player)
 }
 void init_Map3()
 {
-    init();
     DUCK_SCALE = 2.5f;
     GUN_SCALE = 2.f;
+    init();
+    // pistol
+    pistol.fix_X = -6.f;
+    pistol.fix_Y = -28.f;
+    pistol.fix_hold_x = 31.f;
+    pistol.fix_hold_y = -16.f;
+    pistol.rev = 9.f;
+    //sniper
+    sniper.fix_X = 25.f;
+    sniper.fix_Y = -23.f;
+    sniper.fix_hold_x = 18.f;
+    sniper.fix_hold_y = -22.f;
+    sniper.rev = 24.f;
+    //pewpew
+    pewpew.fix_X = 3.f;
+    pewpew.fix_Y = -16.f;
+    pewpew.fix_hold_x = 28.f;
+    pewpew.fix_hold_y = -20.f;
+    pewpew.rev = 13.f;
+    //sword
+    sword.fix_hold_x = 48.f;
+    sword.fix_hold_y = -20.f;
+    //bull1
+    bull[1].scalex = 0.06f;
+    bull[1].scaley = 0.06f;
+    //bull2
+    bull[2].scalex = 0.2f;
+    bull[2].scaley = 0.2f;
+    //grave
+    Grave.setScale(0.16f, 0.1f);
+
+    //spawn weaps
+    weaps.push_back(pistol);
+    weaps.push_back(sniper);
+    weaps.push_back(pewpew);
+    weaps.push_back(sword);
+
+
     backgroundtexture.loadFromFile("img/background.jpg");
     backgroundGhareeb.setTexture(backgroundtexture);
     backgroundGhareeb.setScale(0.5, 0.5);
@@ -1273,7 +1336,6 @@ void init_Map3()
 
 
 }
-
 void update3()
 {
     /* duck1.move(0, gravity * deltaTime);
@@ -1302,12 +1364,10 @@ void draw3()
 
 
 }
-
 void Map3() {
     update3();
     draw3();
 }
-
 
 // Abdullah
 void initBackground()
@@ -1319,7 +1379,6 @@ void initBackground()
     background.setScale(scalex, scaley);
     background.setPosition(0.f, 0.f);
 }
-
 void init_Map4()
 {
     initBackground();
@@ -1327,6 +1386,44 @@ void init_Map4()
     DUCK_SCALE = 2.f;
     GUN_SCALE = 1.5f;
     init();
+    // pistol
+    pistol.fix_X = -6.f;
+    pistol.fix_Y = -28.f;
+    pistol.fix_hold_x = 31.f;
+    pistol.fix_hold_y = -16.f;
+    pistol.rev = 9.f;
+    //sniper
+    sniper.fix_X = 25.f;
+    sniper.fix_Y = -23.f;
+    sniper.fix_hold_x = 18.f;
+    sniper.fix_hold_y = -22.f;
+    sniper.rev = 24.f;
+    //pewpew
+    pewpew.fix_X = 3.f;
+    pewpew.fix_Y = -16.f;
+    pewpew.fix_hold_x = 28.f;
+    pewpew.fix_hold_y = -20.f;
+    pewpew.rev = 13.f;
+    //sword
+    sword.fix_hold_x = 48.f;
+    sword.fix_hold_y = -20.f;
+    //bull1
+    bull[1].scalex = 0.06f;
+    bull[1].scaley = 0.06f;
+    //bull2
+    bull[2].scalex = 0.2f;
+    bull[2].scaley = 0.2f;
+    //grave
+    Grave.setScale(0.16f, 0.1f);
+
+    //spawn weaps
+    weaps.push_back(pistol);
+    weaps.push_back(sniper);
+    weaps.push_back(pewpew);
+    weaps.push_back(sword);
+
+
+
     ice.loadFromFile("img/iceBlocks.png");
     snow.loadFromFile("img/snowBlocks.png");
     wood.loadFromFile("img/woodBlocks.png");
@@ -1452,7 +1549,6 @@ void init_Map4()
         }
     }
 }
-
 void draw4() {
     update_Logic();
     window.draw(background);
@@ -1461,13 +1557,12 @@ void draw4() {
     }
     draw_Logic();
 }
-
 void Map4() {
     draw4();
 }
 
 
-//sdsd
+//Hekal
 CircleShape player(30,4);
 Texture backgroundTexture;
 Texture blockTexture;
@@ -1512,11 +1607,47 @@ void blocks5(Sprite blocks5[25]) {
     blocks5[23].setScale(2.25, 1);
 
 }
-
 void init_Map5() {
     DUCK_SCALE = 2.f;
     GUN_SCALE = 1.5f;
     init();
+    // pistol
+    pistol.fix_X = -6.f;
+    pistol.fix_Y = -28.f;
+    pistol.fix_hold_x = 31.f;
+    pistol.fix_hold_y = -16.f;
+    pistol.rev = 9.f;
+    //sniper
+    sniper.fix_X = 25.f;
+    sniper.fix_Y = -23.f;
+    sniper.fix_hold_x = 18.f;
+    sniper.fix_hold_y = -22.f;
+    sniper.rev = 24.f;
+    //pewpew
+    pewpew.fix_X = 3.f;
+    pewpew.fix_Y = -16.f;
+    pewpew.fix_hold_x = 28.f;
+    pewpew.fix_hold_y = -20.f;
+    pewpew.rev = 13.f;
+    //sword
+    sword.fix_hold_x = 48.f;
+    sword.fix_hold_y = -20.f;
+    //bull1
+    bull[1].scalex = 0.06f;
+    bull[1].scaley = 0.06f;
+    //bull2
+    bull[2].scalex = 0.2f;
+    bull[2].scaley = 0.2f;
+    //grave
+    Grave.setScale(0.16f, 0.1f);
+
+    //spawn weaps
+    weaps.push_back(pistol);
+    weaps.push_back(sniper);
+    weaps.push_back(pewpew);
+    weaps.push_back(sword);
+
+
     backgroundTexture.loadFromFile("img/nature.png");
     blockTexture.loadFromFile("img/blocks.png");
     ground.loadFromFile("img/ground2.png");
@@ -1542,7 +1673,6 @@ void init_Map5() {
         blockscollider[i].setSize(Vector2f(bounds.width / 2, bounds.height / 2));
     }
 }
-
 void collisions() {
     for (int i = 0; i < 24; i++) {
         if (player.getGlobalBounds().intersects(blockse[i].getGlobalBounds())) {
@@ -1617,12 +1747,10 @@ void collisions() {
 
     }
 }
-
 void update_Map5() {
     collisions();
     update_Logic();
 }
-
 void draw_Map5() {
     FloatRect bounds = blockse[23].getGlobalBounds();
 
@@ -1635,7 +1763,6 @@ void draw_Map5() {
         window.draw(blockse[i]);
     draw_Logic();
 }
-
 void Map5() {
     update_Map5();
     draw_Map5();
@@ -1643,7 +1770,11 @@ void Map5() {
 
 
 int main() {
-    init_Map1();
+    if (mapnum == 0) init_Map1();
+    if (mapnum == 1) init_Map2();
+    if (mapnum == 2) init_Map3();
+    if (mapnum == 3) init_Map4();
+    if (mapnum == 4) init_Map5();
     window.setFramerateLimit(90);
     initMainMenu(Width, Height, window);
     initGameMenu(Width, Height, window);
