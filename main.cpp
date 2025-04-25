@@ -46,7 +46,7 @@ float gravity = 0.5f;
 float jumpSpeed = -14.f;
 float velocityX = 5.f;
 bool GameEnd = 0;
-ll mapnum = 3;
+ll mapnum = 4;
 float DUCK_SCALE;
 float GUN_SCALE;
 float scalex, scaley;
@@ -117,7 +117,7 @@ void init() {
     pistol.weapon.setScale(GUN_SCALE, GUN_SCALE);
     pistol.empty = false;
     pistol.bullets = 10;
-    pistol.velocity = 0;
+    pistol.velocity = 10;
     pistol.range = 500.f;
     pistol.bull_type = 1;
     pistol.weapon.setOrigin(0, pistol.weapon.getLocalBounds().height);
@@ -1628,37 +1628,37 @@ void blocks5(Sprite blocks5[25]) {
 }
 void init_Map5() {
     DUCK_SCALE = 2.f;
-    GUN_SCALE = 1.5f;
-    duck1.fact = 5.f;
-    duck2.fact = 5.f;
+    GUN_SCALE = 1.6f;
+    fact = 3.f;
     init();
     // pistol
-    pistol.fix_X = -6.f;
-    pistol.fix_Y = -28.f;
-    pistol.fix_hold_x = 31.f;
-    pistol.fix_hold_y = -16.f;
-    pistol.rev = 9.f;
+    pistol.fix_X = -4.f;
+    pistol.fix_Y = -23.f;
+    pistol.fix_hold_x = 25.f;
+    pistol.fix_hold_y = -12.f;
+    pistol.rev = 10.f;
     //sniper
-    sniper.fix_X = 25.f;
-    sniper.fix_Y = -23.f;
-    sniper.fix_hold_x = 18.f;
-    sniper.fix_hold_y = -22.f;
-    sniper.rev = 24.f;
+    sniper.fix_X = 17.f;
+    sniper.fix_Y = -18.f;
+    sniper.fix_hold_x = 14.f;
+    sniper.fix_hold_y = -16.f;
+    sniper.rev = 23.f;
     //pewpew
-    pewpew.fix_X = 3.f;
-    pewpew.fix_Y = -16.f;
-    pewpew.fix_hold_x = 28.f;
-    pewpew.fix_hold_y = -20.f;
-    pewpew.rev = 13.f;
+    pewpew.fix_X = 7.f;
+    pewpew.fix_Y = -13.f;
+    pewpew.fix_hold_x = 18.f;
+    pewpew.fix_hold_y = -15.f;
+    pewpew.rev = 17.f;
     //sword
-    sword.fix_hold_x = 48.f;
-    sword.fix_hold_y = -20.f;
+    sword.fix_hold_x = 38.f;
+    sword.fix_hold_y = -14.f;
+    sword.rev = 2.f;
     //bull1
-    bull[1].scalex = 0.06f;
-    bull[1].scaley = 0.06f;
+    bull[1].scalex = 0.048f;
+    bull[1].scaley = 0.048f;
     //bull2
-    bull[2].scalex = 0.2f;
-    bull[2].scaley = 0.2f;
+    bull[2].scalex = 0.16f;
+    bull[2].scaley = 0.16f;
     //grave
     Grave.setScale(0.16f, 0.1f);
 
