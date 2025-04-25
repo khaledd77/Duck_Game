@@ -45,7 +45,7 @@ float gravity = 0.5f;
 float jumpSpeed = -14.f;
 float velocityX = 5.f;
 bool GameEnd = 0;
-ll mapnum = 4;
+ll mapnum = 0;
 float DUCK_SCALE;
 float GUN_SCALE;
 float scalex, scaley;
@@ -55,6 +55,11 @@ const float Width = 1280, Height = 720;
 void init() {
 
     //init the first duck
+    ducks duck;
+    duck1 = duck;
+    duck2 = duck;
+    weaps.clear();
+    bulls.clear();
     duck1.skin.loadFromFile("img/duck1.png");
     duck1.myduck.setTexture(duck1.skin);
     duck1.myduck.setTextureRect(IntRect(0, 0, 32, 32));
@@ -111,19 +116,12 @@ void init() {
     pistol.weapon.setScale(GUN_SCALE, GUN_SCALE);
     pistol.empty = false;
     pistol.bullets = 10;
-    pistol.velocity = 30.f;
+    pistol.velocity = 0;
     pistol.range = 500.f;
-    pistol.fix_X = 34.f;
-    pistol.fix_Y = -37.f;
-    pistol.fix_hold_x = 30.f;
-    pistol.fix_hold_y = -20.f;
     pistol.bull_type = 1;
-    pistol.space = 20.f;
-    pistol.rev = 15.f;
     pistol.weapon.setOrigin(0, pistol.weapon.getLocalBounds().height);
     pistol.weapon.setPosition(600.f, 680);
     pistol.type = "pistol";
-    weaps.push_back(pistol);
 
 
     //init sniper
@@ -135,19 +133,12 @@ void init() {
     sniper.weapon.setScale(GUN_SCALE, GUN_SCALE);
     sniper.empty = false;
     sniper.bullets = 4;
-    sniper.velocity = 50.f;
+    sniper.velocity = 0;
     sniper.range = 100000.f;
-    sniper.fix_X = 60.f;
-    sniper.fix_Y = -30.f;
-    sniper.fix_hold_x = 20.f;
-    sniper.fix_hold_y = -25.f;
     sniper.bull_type = 1;
-    sniper.space = 15.f;
-    sniper.rev = 24.f;
     sniper.weapon.setOrigin(0, sniper.weapon.getLocalBounds().height);
     sniper.weapon.setPosition(200.f, 680);
     sniper.type = "sniper";
-    weaps.push_back(pewpew);
 
     //init pewpew
     pewpew.skin.loadFromFile("img/pewpewLaser.png");
@@ -158,19 +149,12 @@ void init() {
     pewpew.weapon.setScale(GUN_SCALE, GUN_SCALE);
     pewpew.empty = false;
     pewpew.bullets = 20;
-    pewpew.velocity = 15.f;
+    pewpew.velocity = 0;
     pewpew.range = 100000.f;
-    pewpew.fix_X = 23.f;
-    pewpew.fix_Y = -22.f;
-    pewpew.fix_hold_x = 30.f;
-    pewpew.fix_hold_y = -20.f;
     pewpew.bull_type = 2;
-    pewpew.space = 45.f;
-    pewpew.rev = 15.f;
     pewpew.weapon.setOrigin(0, pewpew.weapon.getLocalBounds().height);
     pewpew.weapon.setPosition(300.f, 680);
     pewpew.type = "pewpew";
-    weaps.push_back(pewpew);
 
     //init sword
     sword.skin.loadFromFile("img/sword.png");
@@ -178,37 +162,24 @@ void init() {
     sword.weapon.setTextureRect(IntRect(0, 0, 8, 23));
     sword.weapon.setScale(GUN_SCALE, GUN_SCALE);
     sword.empty = false;
-    sword.fix_X = 14.f;
-    sword.fix_Y = 17.f;
-    sword.fix_hold_x = 58.f;
-    sword.fix_hold_y = -22.f;
-    sword.space = 50.f;
-    sword.rev = 15.f;
     sword.type = "sword";
     sword.angle = 90.f;
     sword.weapon.setOrigin(sword.weapon.getLocalBounds().width, sword.weapon.getLocalBounds().height);
     sword.weapon.setPosition(400.f, 680);
     sword.weapon.setRotation(sword.angle);
-    weaps.push_back(sword);
 
     //init bullet
     bull[1].skin.loadFromFile("img/pistol_bullet.png");
     bull[1].bullet.setTexture(bull[1].skin);
-    bull[1].scalex = 0.08f;
-    bull[1].scaley = 0.08f;
 
     bull[2].skin.loadFromFile("img/laser_bullet1.png");
     bull[2].bullet.setTexture(bull[2].skin);
-    bull[2].scalex = 0.3f;
-    bull[2].scaley = 0.3f;
 
 
     //init Grave
     grave.loadFromFile("img/rip.png");
     Grave.setTexture(grave);
-    Grave.setScale(0.16f, 0.1f);
 }
-
 void Fire(ducks& duck, ll shooter) {
     ll idx = duck.myweap.bull_type;
     if (duck.myweap.type == "sword") {
@@ -225,7 +196,7 @@ void Fire(ducks& duck, ll shooter) {
         }
         else {
             bull[idx].bullet.setScale(-1 * bull[idx].scalex, bull[idx].scaley);
-            bull[idx].bullet.setOrigin(bull[idx].bullet.getGlobalBounds().width, 0.f);
+            bull[idx].bullet.setOrigin(bull[idx].bullet.getLocalBounds().width, 0.f);
         }
         if (duck.facingRight) bull[idx].bullet.setPosition(duck.myweap.weapon.getPosition().x + duck.myweap.weapon.getGlobalBounds().width, duck.myweap.weapon.getPosition().y + duck.myweap.fix_Y);
         else bull[idx].bullet.setPosition(duck.myweap.weapon.getPosition().x - duck.myweap.weapon.getGlobalBounds().width + duck.myweap.fix_X, duck.myweap.weapon.getPosition().y + duck.myweap.fix_Y);
@@ -236,11 +207,9 @@ void Fire(ducks& duck, ll shooter) {
         bulls.push_back(bull[idx]);
     }
 }
-
 void update_weapons() {
     for (auto& weap : weaps) {
         weap.weapon.move(weap.velocityX, weap.velocityY);
-        //cout << weap.velocityX << " " << weap.velocityY << " " << weap.velocity << endl;
         weap.velocityY += gravity;
         if (weap.weapon.getPosition().y >= 680.f) {
             weap.weapon.setPosition(weap.weapon.getPosition().x, 680.f);
@@ -249,19 +218,15 @@ void update_weapons() {
         }
     }
 }
-
 void update_sword(ducks& duck, ll shooter) {
-    //cout << "a7a2" << endl;
     if (duck.myweap.type == "sword" && duck.myweap.hit) {
         if (duck.myweap.weapon.getGlobalBounds().intersects(duck2.myduck.getGlobalBounds()) && shooter == 1) {
             Grave.setPosition(duck2.myduck.getPosition().x, 640.f);
             GameEnd = 1;
-            cout << "dead" << endl;
             duck2.dead = true;
         }
         if (duck.myweap.weapon.getGlobalBounds().intersects(duck1.myduck.getGlobalBounds()) && shooter == 2) {
             Grave.setPosition(duck1.myduck.getPosition().x, 640.f);
-            cout << "dead" << endl;
             GameEnd = 1;
             duck1.dead = true;
         }
@@ -295,7 +260,6 @@ void update_sword(ducks& duck, ll shooter) {
         }
     }
 }
-
 void update_duck(ducks& duck) {
     bool moving = false;
     float duckWidth = duck.myduck.getGlobalBounds().width / 3;
@@ -383,7 +347,6 @@ void update_duck(ducks& duck) {
         duck.myduck.setTextureRect(IntRect(0, 0, 32, 32));
     }
 }   
-
 void drop_weapon(ducks& duck) {
     duck.haveWeapon = false;
     duck.myweap.velocityX = 7.f;
@@ -409,12 +372,13 @@ void drop_weapon(ducks& duck) {
         duck.myarm.arm.setOrigin(22.f, 0.f);
     }
 }
-
 void get_weapon(ducks& duck) {
     if (duck.haveWeapon) {
         drop_weapon(duck);
+        cout << "sss";
         return;
     }
+    if (weaps.size() == 0) return;
     for (ll i = weaps.size() - 1;i >= 0;--i) {
         weapons weap = weaps[i];
         if (duck.myduck.getGlobalBounds().intersects(weap.weapon.getGlobalBounds())) {
@@ -427,6 +391,14 @@ void get_weapon(ducks& duck) {
                 else
                     weap.weapon.setOrigin(weap.rev, bounds.height);
                 weap.weapon.setScale(-GUN_SCALE, GUN_SCALE);
+            }
+            if (duck.facingRight) {
+                FloatRect bounds = weap.weapon.getLocalBounds();
+                if (weap.type == "sword")
+                    weap.weapon.setOrigin(bounds.width, bounds.height);
+                else
+                    weap.weapon.setOrigin(0, bounds.height);
+                weap.weapon.setScale(GUN_SCALE, GUN_SCALE);
             }
 
             weap.weapon.setPosition(
@@ -443,7 +415,6 @@ void get_weapon(ducks& duck) {
         }
     }
 }
-
 void update_bullets() {
     ll sz = bulls.size();
     for (ll i = sz - 1; i >= 0; i--) {
@@ -461,7 +432,6 @@ void update_bullets() {
             bulls.erase(bulls.begin() + i);
             Grave.setPosition(duck1.myduck.getPosition().x, 660.f);
             GameEnd = 1;
-            cout << "dead" << endl;
             duck1.dead = true;
             continue;
         }
@@ -472,7 +442,6 @@ void update_bullets() {
             bulls.erase(bulls.begin() + i);
             Grave.setPosition(duck2.myduck.getPosition().x, 660.f);
             GameEnd = 1;
-            cout << "dead" << endl;
             duck2.dead = true;
             continue;
         }
@@ -482,7 +451,6 @@ void update_bullets() {
         }
     }
 }
-
 void update_Logic() {
     update_duck(duck1);
     update_duck(duck2);
@@ -530,9 +498,7 @@ void update_Logic() {
     update_sword(duck1, 1);
     update_sword(duck2, 2);
 }
-
 void draw_Logic() {
-    cout << "sss";
     for (auto weap : weaps) {
         window.draw(weap.weapon);
     }
@@ -561,21 +527,19 @@ void draw_Logic() {
     }
 }
 
+
 // Walid
 void fadeIn() {
 
 }
-
 void fadeOut() {
 
 }
-
 void updateMusicVal() {
     int musicVal = settingsMenu.menuMusic.getVolume();
     string musicText = "MUSIC VOLUME           " + to_string(musicVal);
     settingsMenu.menuText[0].setString(musicText);
 }
-
 void initMainMenu(int width, int height, RenderWindow& window) {
 
 
@@ -591,7 +555,6 @@ void initMainMenu(int width, int height, RenderWindow& window) {
     mainMenu.menuText[0].setCharacterSize(90);
     mainMenu.menuText[0].setFillColor(Color(255, 255, 255));
     mainMenu.menuText[0].setPosition(Vector2f(width/1.5f, height / 4.f));
-    cout << width << endl;
 
     /* Second Button (SETTINGS) */
     mainMenu.menuText[1].setString("SETTINGS");
@@ -618,7 +581,6 @@ void initMainMenu(int width, int height, RenderWindow& window) {
     mainMenu.background.setPosition(0.f, 0.f);
 
 }
-
 void initGameMenu(int width, int height, RenderWindow& window) {
     gameMenu.font.loadFromFile("img/arcade.ttf");
     gameMenu.menuText[0].setFont(gameMenu.font);
@@ -628,7 +590,6 @@ void initGameMenu(int width, int height, RenderWindow& window) {
     gameMenu.menuText[0].setFillColor(Color(255, 255, 255));
     gameMenu.menuText[0].setPosition(Vector2f(200.f, height / 4.f + 200.f));
 }
-
 void initMusic() {
 
     // Music
@@ -639,7 +600,6 @@ void initMusic() {
     settingsMenu.menuMusic.setLoop(true);
     settingsMenu.menuMusic.play();
 }
-
 void initSettingsMenu(int width, int height, RenderWindow& window) {
     settingsMenu.backgroundTexture.loadFromFile("img/menu.png");
     settingsMenu.background.setTexture(settingsMenu.backgroundTexture);
@@ -676,14 +636,12 @@ void initSettingsMenu(int width, int height, RenderWindow& window) {
     settingsMenu.menuText[2].setFillColor(Color::White);
     settingsMenu.menuText[2].setPosition(Vector2f(1000.f, height / 4.f + 800));
 }
-
 void drawMenu(RenderWindow& window, Menu& menu) {
     window.draw(menu.background);
     for (int i = 0; i < 3; i++) {
         window.draw(menu.menuText[i]);
     }
 }
-
 void moveUp(Menu& menu) {
     if (menu.selected - 1 >= -1) {
         menu.menuText[menu.selected].setOutlineThickness(0);
@@ -700,7 +658,6 @@ void moveUp(Menu& menu) {
         menu.menuText[menu.selected].setFillColor(Color(255, 255, 255));
     }
 }
-
 void moveDown(Menu& menu) {
     if (menu.selected + 1 <= 3) {
         // Reset current button's appearance
@@ -719,7 +676,6 @@ void moveDown(Menu& menu) {
         menu.menuText[menu.selected].setFillColor(Color(255, 255, 255));
     }
 }
-
 void fullscreenMode(RenderWindow& window) {
     fullscreen = !fullscreen;
 
@@ -834,6 +790,43 @@ void init_Map1()
 {
     DUCK_SCALE = 2.5f;
     GUN_SCALE = 2.f;
+    init();
+    // pistol
+    pistol.fix_X = -6.f;
+    pistol.fix_Y = -28.f;
+    pistol.fix_hold_x = 31.f;
+    pistol.fix_hold_y = -16.f;
+    pistol.rev = 9.f;
+    //sniper
+    sniper.fix_X = 25.f;
+    sniper.fix_Y = -23.f;
+    sniper.fix_hold_x = 18.f;
+    sniper.fix_hold_y = -22.f;
+    sniper.rev = 24.f;
+    //pewpew
+    pewpew.fix_X = 3.f;
+    pewpew.fix_Y = -16.f;
+    pewpew.fix_hold_x = 28.f;
+    pewpew.fix_hold_y = -20.f;
+    pewpew.rev = 13.f;
+    //sword
+    sword.fix_hold_x = 48.f;
+    sword.fix_hold_y = -20.f;
+    //bull1
+    bull[1].scalex = 0.06f;
+    bull[1].scaley = 0.06f;
+    //bull2
+    bull[2].scalex = 0.2f;
+    bull[2].scaley = 0.2f;
+    //grave
+    Grave.setScale(0.16f, 0.1f);
+
+    //spawn weaps
+    weaps.push_back(pistol);
+    weaps.push_back(sniper);
+    weaps.push_back(pewpew);
+    weaps.push_back(sword);
+
     background_texture.loadFromFile("img/BG.png");
     skeleton_texture.loadFromFile("img/skeleton.png");
     ground_texture.loadFromFile("img/ground.png");
@@ -854,7 +847,6 @@ void init_Map1()
     grass();
     stoneblock();
     background.setScale(1, 0.75);
-    init();
 }
 void update_Map1()
 {
@@ -1316,8 +1308,8 @@ void Map3() {
     draw3();
 }
 
-// Abdullah
 
+// Abdullah
 void initBackground()
 {
     ground.loadFromFile("img/Lv7nNS.png");
@@ -1333,11 +1325,11 @@ void init_Map4()
     initBackground();
     tileCount = 0;  // track how many tiles we've added
     DUCK_SCALE = 2.f;
+    GUN_SCALE = 1.5f;
+    init();
     ice.loadFromFile("img/iceBlocks.png");
     snow.loadFromFile("img/snowBlocks.png");
     wood.loadFromFile("img/woodBlocks.png");
-
-
     // Define a 2D map
     string snowMap[23] = {
     "........................................",
@@ -1459,9 +1451,6 @@ void init_Map4()
             tileCount++;
         }
     }
-    //for(int i = 0; i < 918; i++) cout << mapTiles[i].bounds.left << endl;;
-    //cout << tileCount;
-    init();
 }
 
 void draw4() {
@@ -1526,6 +1515,7 @@ void blocks5(Sprite blocks5[25]) {
 
 void init_Map5() {
     DUCK_SCALE = 2.f;
+    GUN_SCALE = 1.5f;
     init();
     backgroundTexture.loadFromFile("img/nature.png");
     blockTexture.loadFromFile("img/blocks.png");
@@ -1653,7 +1643,7 @@ void Map5() {
 
 
 int main() {
-    init_Map5();
+    init_Map1();
     window.setFramerateLimit(90);
     initMainMenu(Width, Height, window);
     initGameMenu(Width, Height, window);
@@ -1744,7 +1734,7 @@ int main() {
                 duck2.dead = false;
                 GameEnd = 0;
                 mapnum++;
-                mapnum %= 3;
+                mapnum %= 5;
                 if (mapnum == 0) init_Map1();
                 if (mapnum == 1) init_Map2();
                 if (mapnum == 2) init_Map3();
@@ -1752,6 +1742,7 @@ int main() {
                 if (mapnum == 4) init_Map5();
                 // show death, and screen between rounds
             }
+            cout << mapnum << endl;
             if (mapnum == 0) Map1();
             if (mapnum == 1) Map2();
             if (mapnum == 2) Map3();
