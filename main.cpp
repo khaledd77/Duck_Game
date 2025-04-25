@@ -46,7 +46,7 @@ float gravity = 0.5f;
 float jumpSpeed = -14.f;
 float velocityX = 5.f;
 bool GameEnd = 0;
-ll mapnum = 2;
+ll mapnum = 0;
 float DUCK_SCALE;
 float GUN_SCALE;
 float scalex, scaley;
@@ -829,6 +829,7 @@ void init_Map1()
     //sword
     sword.fix_hold_x = 48.f;
     sword.fix_hold_y = -20.f;
+    sword.rev = 2.f;
     //bull1
     bull[1].scalex = 0.06f;
     bull[1].scaley = 0.06f;
@@ -1294,32 +1295,33 @@ void init_Map3()
     fact = 3.f;
     init();
     // pistol
-    pistol.fix_X = -6.f;
-    pistol.fix_Y = -28.f;
-    pistol.fix_hold_x = 31.f;
-    pistol.fix_hold_y = -16.f;
-    pistol.rev = 9.f;
+    pistol.fix_X = -4.f;
+    pistol.fix_Y = -23.f;
+    pistol.fix_hold_x = 25.f;
+    pistol.fix_hold_y = -12.f;
+    pistol.rev = 10.f;
     //sniper
-    sniper.fix_X = 25.f;
-    sniper.fix_Y = -23.f;
-    sniper.fix_hold_x = 18.f;
-    sniper.fix_hold_y = -22.f;
-    sniper.rev = 24.f;
+    sniper.fix_X = 17.f;
+    sniper.fix_Y = -18.f;
+    sniper.fix_hold_x = 14.f;
+    sniper.fix_hold_y = -16.f;
+    sniper.rev = 23.f;
     //pewpew
-    pewpew.fix_X = 3.f;
-    pewpew.fix_Y = -16.f;
-    pewpew.fix_hold_x = 28.f;
-    pewpew.fix_hold_y = -20.f;
-    pewpew.rev = 13.f;
+    pewpew.fix_X = 7.f;
+    pewpew.fix_Y = -13.f;
+    pewpew.fix_hold_x = 18.f;
+    pewpew.fix_hold_y = -15.f;
+    pewpew.rev = 17.f;
     //sword
-    sword.fix_hold_x = 48.f;
-    sword.fix_hold_y = -20.f;
+    sword.fix_hold_x = 38.f;
+    sword.fix_hold_y = -14.f;
+    sword.rev = 2.f;
     //bull1
-    bull[1].scalex = 0.06f;
-    bull[1].scaley = 0.06f;
+    bull[1].scalex = 0.048f;
+    bull[1].scaley = 0.048f;
     //bull2
-    bull[2].scalex = 0.2f;
-    bull[2].scaley = 0.2f;
+    bull[2].scalex = 0.16f;
+    bull[2].scaley = 0.16f;
     //grave
     Grave.setScale(0.16f, 0.1f);
 
