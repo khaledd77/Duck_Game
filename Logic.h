@@ -73,6 +73,7 @@ struct ducks {
     Keyboard::Key fire;
     float velocityY = 0.f;
     float space;
+    float fact;
 };
 
 

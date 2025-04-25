@@ -38,6 +38,7 @@ bool fullscreen = false;
 int menuState = 0; // 1000 = main menu, 0 = game, 1 = settings
 bullets bull[3];
 ducks duck1, duck2;
+float fact;
 weapons sword, pistol, sniper, pewpew;
 vector<weapons> weaps;
 vector<bullets> bulls;
@@ -45,7 +46,7 @@ float gravity = 0.5f;
 float jumpSpeed = -14.f;
 float velocityX = 5.f;
 bool GameEnd = 0;
-ll mapnum = 1;
+ll mapnum = 2;
 float DUCK_SCALE;
 float GUN_SCALE;
 float scalex, scaley;
@@ -78,7 +79,7 @@ void init() {
     duck1.myarm.arm.setScale(DUCK_SCALE, DUCK_SCALE);
     duck1.myarm.arm.setPosition(
         duck1.myduck.getPosition().x + duck1.myduck.getGlobalBounds().width / 6,
-        duck1.myduck.getPosition().y - duck1.myduck.getGlobalBounds().height / 2 - 5.f
+        duck1.myduck.getPosition().y - duck1.myduck.getGlobalBounds().height / 2 - fact
     );
 
 
@@ -103,7 +104,7 @@ void init() {
     duck2.myarm.arm.setOrigin(22.f, 0.f);
     duck2.myarm.arm.setPosition(
         duck2.myduck.getPosition().x + duck2.myduck.getGlobalBounds().width / 6,
-        duck2.myduck.getPosition().y - duck2.myduck.getGlobalBounds().height / 2 - 5.f
+        duck2.myduck.getPosition().y - duck2.myduck.getGlobalBounds().height / 2 - fact
     );
 
 
@@ -284,8 +285,14 @@ void update_duck(ducks& duck) {
 
         if (duck.myduck.getPosition().x + velocityX <= 1280 - duckWidth * 2) {
             duck.myduck.move(velocityX, 0.f);
-            duck.myarm.arm.move(velocityX, 0.f);
-            duck.myweap.weapon.move(velocityX, 0.f);
+            duck.myarm.arm.setPosition(
+                duck.myduck.getPosition().x + duck.myduck.getGlobalBounds().width / 6,
+                duck.myduck.getPosition().y - duck.myduck.getGlobalBounds().height / 2 - fact
+            );
+            duck.myweap.weapon.setPosition(
+                duck.myduck.getPosition().x + duck.myweap.fix_hold_x,
+                duck.myduck.getPosition().y + duck.myweap.fix_hold_y
+            );
         }
 
     }
@@ -304,8 +311,14 @@ void update_duck(ducks& duck) {
         }
         if (duck.myduck.getPosition().x - velocityX >= -duckWidth) {
             duck.myduck.move(-velocityX, 0.f);
-            duck.myarm.arm.move(-velocityX, 0.f);
-            duck.myweap.weapon.move(-velocityX, 0.f);
+            duck.myarm.arm.setPosition(
+                duck.myduck.getPosition().x + duck.myduck.getGlobalBounds().width / 6,
+                duck.myduck.getPosition().y - duck.myduck.getGlobalBounds().height / 2 - fact
+            );
+            duck.myweap.weapon.setPosition(
+                duck.myduck.getPosition().x + duck.myweap.fix_hold_x,
+                duck.myduck.getPosition().y + duck.myweap.fix_hold_y
+            );
         }
     }
 
@@ -317,8 +330,14 @@ void update_duck(ducks& duck) {
     if (duck.isJumping) {
         duck.velocityY += gravity;
         duck.myduck.move(0.f, duck.velocityY);
-        duck.myarm.arm.move(0.f, duck.velocityY);
-        duck.myweap.weapon.move(0.f, duck.velocityY);
+        duck.myarm.arm.setPosition(
+            duck.myduck.getPosition().x + duck.myduck.getGlobalBounds().width / 6,
+            duck.myduck.getPosition().y - duck.myduck.getGlobalBounds().height / 2 - fact
+        );
+        duck.myweap.weapon.setPosition(
+            duck.myduck.getPosition().x + duck.myweap.fix_hold_x,
+            duck.myduck.getPosition().y + duck.myweap.fix_hold_y
+        );
 
         if (duck.velocityY < 0) {
             duck.myduck.setTextureRect(IntRect(0, 32, 32, 32));
@@ -787,6 +806,7 @@ void init_Map1()
 {
     DUCK_SCALE = 2.5f;
     GUN_SCALE = 2.f;
+    fact = 5.f;
     init();
     // pistol
     pistol.fix_X = -6.f;
@@ -923,6 +943,7 @@ vector<string> level;
 void init_Map2() {
     DUCK_SCALE = 1.5;
     GUN_SCALE = 1.2f;
+    fact = 3.f;
     init();
     // pistol
     pistol.fix_X = -2.f;
@@ -1268,8 +1289,9 @@ void windowcollison(ducks& player)
 }
 void init_Map3()
 {
-    DUCK_SCALE = 2.5f;
-    GUN_SCALE = 2.f;
+    DUCK_SCALE = 2.f;
+    GUN_SCALE = 1.6f;
+    fact = 3.f;
     init();
     // pistol
     pistol.fix_X = -6.f;
@@ -1316,13 +1338,6 @@ void init_Map3()
 
     obstacels_texture.loadFromFile("img/Block 2.png");
 
-    duck1.myduck.setPosition(200, 250);
-    duck1.myduck.setOrigin(duck1.myduck.getLocalBounds().width / 2, duck1.myduck.getLocalBounds().height / 2);
-
-
-    duck2.myduck.setPosition(600, 660);
-    duck2.myduck.setOrigin(duck2.myduck.getLocalBounds().width / 2, duck2.myduck.getLocalBounds().height / 2);
-
 
     b.map_blocks.setTexture(mapblock_Texture);
     b.map_blocks.setScale(0.45, 0.17);
@@ -1340,10 +1355,10 @@ void update3()
 {
     /* duck1.move(0, gravity * deltaTime);
      duck2.move(0, gravity * deltaTime);*/
-    windowcollison(duck1);
-    windowcollison(duck2);
-    collision(duck1);
-    collision(duck2);
+    //windowcollison(duck1);
+    //windowcollison(duck2);
+    //collision(duck1);
+    //collision(duck2);
     update_Logic();
 
 }
@@ -1385,6 +1400,8 @@ void init_Map4()
     tileCount = 0;  // track how many tiles we've added
     DUCK_SCALE = 2.f;
     GUN_SCALE = 1.5f;
+    duck1.fact = 5.f;
+    duck2.fact = 5.f;
     init();
     // pistol
     pistol.fix_X = -6.f;
@@ -1610,6 +1627,8 @@ void blocks5(Sprite blocks5[25]) {
 void init_Map5() {
     DUCK_SCALE = 2.f;
     GUN_SCALE = 1.5f;
+    duck1.fact = 5.f;
+    duck2.fact = 5.f;
     init();
     // pistol
     pistol.fix_X = -6.f;
