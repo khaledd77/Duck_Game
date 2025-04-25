@@ -44,13 +44,14 @@ vector<weapons> weaps;
 vector<bullets> bulls;
 float gravity = 0.5f;
 float jumpSpeed = -14.f;
-float velocityX = 5.f;
+float velocityX = 20.f;
 bool GameEnd = 0;
 ll mapnum = 4;
 float DUCK_SCALE;
 float GUN_SCALE;
 float scalex, scaley;
 const float Width = 1280, Height = 720;
+
 
 //Fady
 void init() {
@@ -807,6 +808,9 @@ void init_Map1()
     DUCK_SCALE = 2.5f;
     GUN_SCALE = 2.f;
     fact = 5.f;
+    //gravity = Put_your_val;
+    //jumpSpeed = Put_your_val;  //give it negative value
+    //velocityX = Put_your_val;   // the duck speed
     init();
     // pistol
     pistol.fix_X = -6.f;
@@ -945,6 +949,9 @@ void init_Map2() {
     DUCK_SCALE = 1.5;
     GUN_SCALE = 1.2f;
     fact = 3.f;
+    //gravity = Put_your_val;
+    //jumpSpeed = Put_your_val;  //give it negative value
+    //velocityX = Put_your_val;   // the duck speed
     init();
     // pistol
     pistol.fix_X = -2.f;
@@ -1293,6 +1300,9 @@ void init_Map3()
     DUCK_SCALE = 2.f;
     GUN_SCALE = 1.6f;
     fact = 3.f;
+    //gravity = Put_your_val;
+    //jumpSpeed = Put_your_val;  //give it negative value
+    //velocityX = Put_your_val;   // the duck speed
     init();
     // pistol
     pistol.fix_X = -4.f;
@@ -1403,6 +1413,9 @@ void init_Map4()
     DUCK_SCALE = 2.f;
     GUN_SCALE = 1.6f;
     fact = 3.f;
+    //gravity = Put_your_val;
+    //jumpSpeed = Put_your_val;  //give it negative value
+    //velocityX = Put_your_val;   // the duck speed
     init();
     // pistol
     pistol.fix_X = -4.f;
@@ -1630,6 +1643,9 @@ void init_Map5() {
     DUCK_SCALE = 2.f;
     GUN_SCALE = 1.6f;
     fact = 3.f;
+    //gravity = Put_your_val;
+    //jumpSpeed = Put_your_val;  //give it negative value
+    //velocityX = Put_your_val;   // the duck speed
     init();
     // pistol
     pistol.fix_X = -4.f;
