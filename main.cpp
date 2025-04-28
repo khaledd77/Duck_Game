@@ -709,44 +709,37 @@ void fullscreenMode(RenderWindow& window) {
 //Khaled's MAP
 Texture ground_texture, background_texture, skeleton_texture, stone_texture, tree_texture, cactus1, cactus2, cactus3, bushs_texture, grass_texture, stone_block_texture;
 Sprite blocks[25], skeletons[3], stones[2], tree, ccts[5], bush[3], grs[2], stone_block, background;
+RectangleShape player1_collider(Vector2f(40, 62)), player2_collider(Vector2f(40, 62));
+bool onground1,onground2;
 void grounds()
 {
-    blocks[0].setPosition(1000, 540);
+    blocks[0].setPosition(1030, 465);
     blocks[0].setScale(0.4, 0.35);
-    blocks[1].setPosition(700, 375);
+    blocks[1].setPosition(730, 300);
     blocks[1].setScale(0.4, 0.35);
-    blocks[2].setPosition(220, 280);
+    blocks[2].setPosition(250, 205);
     blocks[2].setScale(0.4, 0.35);
-    blocks[3].setPosition(0, 375);
+    blocks[3].setPosition(30, 300);
     blocks[3].setScale(0.4, 0.35);
-    blocks[4].setPosition(920, 300);
+    blocks[4].setPosition(950, 225);
     blocks[4].setScale(0.4, 0.35);
-    blocks[5].setPosition(415, 190);
+    blocks[5].setPosition(445, 115);
     blocks[5].setScale(0.4, 0.35);
-    blocks[6].setPosition(325, 585);
+    blocks[6].setPosition(355, 510);
     blocks[6].setScale(0.4, 0.35);
-    blocks[7].setPosition(0, 1040);
+    blocks[7].setPosition(580, 570);
     blocks[7].setScale(0.4, 0.35);
-    blocks[8].setPosition(550, 645);
-    blocks[8].setScale(0.4, 0.35);
-    blocks[9].setPosition(1120, 375);
-    blocks[9].setScale(0.25, 0.35);
-    blocks[10].setPosition(100, 500);
-    blocks[10].setScale(0.55, 0.35);
-    blocks[11].setPosition(435, 440);
-    blocks[11].setScale(0.4, 0.35);
-    blocks[12].setPosition(800, 585);
-    blocks[12].setScale(0.25, 0.35);
-    blocks[13].setPosition(670, 220);
-    blocks[13].setScale(0.4, 0.35);
-    Vector2f pos, sc;
-    for (int i = 0;i < 14;i++)
-    {
-        pos = blocks[i].getPosition();
-        int x = pos.x;
-        int y = pos.y;
-        blocks[i].setPosition(x + 30, y - 150);
-    }
+    blocks[8].setPosition(1150, 300);
+    blocks[8].setScale(0.25, 0.35);
+    blocks[9].setPosition(130, 425);
+    blocks[9].setScale(0.55, 0.35);
+    blocks[10].setPosition(465, 365);
+    blocks[10].setScale(0.4, 0.35);
+    blocks[11].setPosition(830, 510);
+    blocks[11].setScale(0.25, 0.35);
+    blocks[12].setPosition(700, 145);
+    blocks[12].setScale(0.4, 0.35);
+    
 }
 void skeleton()
 {
@@ -803,14 +796,87 @@ void stoneblock()
     stone_block.setPosition(380, 478);
     stone_block.setScale(0.35, 0.35);
 }
+void collision1()
+{
+    FloatRect box, wall, intersection;
+    box = player1_collider.getGlobalBounds();
+    for (int i = 0;i < 13;i++)
+    {
+        wall = blocks[i].getGlobalBounds();
+        if (box.intersects(wall))
+        {
+            box.intersects(wall, intersection);
+            if (intersection.width > intersection.height)
+            {
+                if (box.top < wall.top)
+                {
+                    onground1 = true;
+                    duck1.myduck.setPosition(duck1.myduck.getPosition().x, blocks[i].getPosition().y);
+                }
+                else
+                {
+                    duck1.myduck.move(0, intersection.height);
+                }
+            }
+            else
+            {
+                if (box.left < wall.left)
+                {
+                    duck1.myduck.move(-velocityX, 0);
+                }
+                else
+                {
+                    duck1.myduck.move(-velocityX, 0);
+                }
+            }
+        }
+    }
+}
+void collision2()
+{
+    FloatRect box, wall, intersection;
+    box = player2_collider.getGlobalBounds();
+    for (int i = 0;i < 13;i++)
+    {
+        wall = blocks[i].getGlobalBounds();
+        if (box.intersects(wall))
+        {
+            box.intersects(wall, intersection);
+            if (intersection.width > intersection.height)
+            {
+                if (box.top < wall.top)
+                {
+                    onground2 = true;
+                    duck2.myduck.setPosition(duck2.myduck.getPosition().x, blocks[i].getPosition().y);
+                }
+                else
+                {
+                    duck2.myduck.move(0, intersection.height);
+                }
+            }
+            else
+            {
+                if (box.left < wall.left) 
+                {
+                    duck2.myduck.move(-velocityX, 0);
+                }
+                else
+                {
+                    duck2.myduck.move(-velocityX, 0);
+                }
+            }
+        }
+    }
+}
+
 void init_Map1()
 {
     DUCK_SCALE = 2.5f;
     GUN_SCALE = 2.f;
     fact = 5.f;
-    //gravity = Put_your_val;
-    //jumpSpeed = Put_your_val;  //give it negative value
-    //velocityX = Put_your_val;   // the duck speed
+    gravity = 0.3f;
+    jumpSpeed = -9.f; 
+    velocityX = 5;
     init();
     // pistol
     pistol.fix_X = -6.f;
@@ -860,6 +926,8 @@ void init_Map1()
     bushs_texture.loadFromFile("img/Bush (2).png");
     grass_texture.loadFromFile("img/Grass (1).png");
     stone_block_texture.loadFromFile("img/Stoneblock.png");
+    player1_collider.setOrigin(player1_collider.getLocalBounds().width / 2, player1_collider.getLocalBounds().height / 2);
+    player2_collider.setOrigin(player2_collider.getLocalBounds().width / 2, player2_collider.getLocalBounds().height / 2);
     tre();
     grounds();
     skeleton();
@@ -869,11 +937,16 @@ void init_Map1()
     grass();
     stoneblock();
     background.setScale(1, 0.75);
+    duck1.myduck.setPosition(250, 210);
+    duck2.myduck.setPosition(950, 225);
+    cout << blocks[3].getGlobalBounds().width <<" "<< blocks[3].getGlobalBounds().height << endl;
 }
 void update_Map1()
 {
+    onground1 = false;
+    onground2 = false;
     background.setTexture(background_texture);
-    for (int i = 0;i < 14;i++) blocks[i].setTexture(ground_texture);
+    for (int i = 0;i < 13;i++) blocks[i].setTexture(ground_texture);
     for (int i = 0;i < 3;i++) skeletons[i].setTexture(skeleton_texture);
     for (int i = 0;i < 2;i++) stones[i].setTexture(stone_texture);
     tree.setTexture(tree_texture);
@@ -883,23 +956,44 @@ void update_Map1()
     for (int i = 0;i < 3;i++) bush[i].setTexture(bushs_texture);
     for (int i = 0;i < 2;i++) grs[i].setTexture(grass_texture);
     stone_block.setTexture(stone_block_texture);
+    player1_collider.setPosition(duck1.myduck.getPosition().x + 38, duck1.myduck.getPosition().y - 30);
+    player2_collider.setPosition(duck2.myduck.getPosition().x + 38, duck2.myduck.getPosition().y - 30);
+    collision1();
+    collision2();
+    if (onground1)
+    {
+        duck1.isJumping = 0;
+    }
+    else
+    {
+        duck1.isJumping = 1;
+    }
+    if (onground2)
+    {
+        duck2.isJumping = 0;
+    }
+    else
+    {
+        duck2.isJumping = 1;
+    }
+    if (duck1.myduck.getPosition().y >= 620)
+    {
+        duck1.dead = true;
+    }
+    if (duck2.myduck.getPosition().y >= 620)
+    {
+        duck2.dead = true;
+    }
     update_Logic();
 }
 void draw_Map1()
 {
-    window.draw(background);
-    for (int i = 0;i < 14;i++)
-    {
-        if (i == 7) continue;
-        window.draw(blocks[i]);
-    }
+   window.draw(background);
+    for (int i = 0;i < 13;i++)  window.draw(blocks[i]);
     for (int i = 0;i < 2;i++) window.draw(stones[i]);
     for (int i = 0;i < 3;i++) window.draw(skeletons[i]);
     window.draw(tree);
-    for (int i = 0;i < 2;i++) window.draw(ccts[i]);
-    for (int i = 2;i < 3;i++) window.draw(ccts[i]);
-    for (int i = 3;i < 5;i++) window.draw(ccts[i]);
-    for (int i = 0;i < 3;i++) window.draw(bush[i]);
+    for (int i = 0;i < 5;i++) window.draw(ccts[i]);
     for (int i = 0;i < 2;i++) window.draw(grs[i]);
     window.draw(stone_block);
     draw_Logic();
@@ -1910,7 +2004,7 @@ int main() {
                 if (mapnum == 4) init_Map5();
                 // show death, and screen between rounds
             }
-            cout << mapnum << endl;
+            //cout << mapnum << endl;
             if (mapnum == 0) Map1();
             if (mapnum == 1) Map2();
             if (mapnum == 2) Map3();
