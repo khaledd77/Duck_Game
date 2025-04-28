@@ -45,12 +45,14 @@ vector<bullets> bulls;
 float gravity = 0.5f;
 float jumpSpeed = -14.f;
 float velocityX = 5.f;
+float MaxiVelocityY;
 bool GameEnd = 0;
-ll mapnum = 0;
+ll mapnum = 3;
 float DUCK_SCALE;
 float GUN_SCALE;
 float scalex, scaley;
 const float Width = 1280, Height = 720;
+float duck1posx, duck1posy, duck2posx, duck2posy;
 
 
 //Fady
@@ -66,7 +68,7 @@ void init() {
     duck1.myduck.setTextureRect(IntRect(0, 0, 32, 32));
     duck1.myduck.setScale(DUCK_SCALE, DUCK_SCALE);
     duck1.myduck.setOrigin(0.f, duck1.myduck.getLocalBounds().height);
-    duck1.myduck.setPosition(0.f, 680.f);
+    duck1.myduck.setPosition(duck1posx, duck1posy);
     duck1.up = Keyboard::W;
     duck1.right = Keyboard::D;
     duck1.left = Keyboard::A;
@@ -89,7 +91,7 @@ void init() {
     duck2.myduck.setTextureRect(IntRect(0, 0, 32, 32));
     duck2.myduck.setScale(-DUCK_SCALE, DUCK_SCALE);
     duck2.myduck.setOrigin(duck2.myduck.getLocalBounds().width, duck2.myduck.getLocalBounds().height);
-    duck2.myduck.setPosition(1200.f, 680.f);
+    duck2.myduck.setPosition(duck2posx, duck2posy);
     duck2.up = Keyboard::Up;
     duck2.right = Keyboard::Right;
     duck2.left = Keyboard::Left;
@@ -321,14 +323,26 @@ void update_duck(ducks& duck) {
             );
         }
     }
-
-    if (!duck.isJumping && Keyboard::isKeyPressed(duck.up)) {
-        duck.isJumping = true;
-        duck.velocityY = jumpSpeed;
+    bool pressed = Keyboard::isKeyPressed(duck.up);
+    if (duck.isJumping && !pressed) {
+        duck.velocityY = max(duck.velocityY, -1.f);
+    }
+    if (!duck.isJumping && duck.onGround) {
+        if (pressed) {
+            if (!duck.holdingJump) {
+                duck.isJumping = true;
+                duck.velocityY = jumpSpeed;
+                duck.holdingJump = true;
+            }
+        }
+        else {
+            duck.holdingJump = false;
+        }
     }
 
-    if (duck.isJumping) {
+    if (duck.isJumping || !duck.onGround) {
         duck.velocityY += gravity;
+        duck.velocityY = min(duck.velocityY, MaxiVelocityY);
         duck.myduck.move(0.f, duck.velocityY);
         duck.myarm.arm.setPosition(
             duck.myduck.getPosition().x + duck.myduck.getGlobalBounds().width / 6,
@@ -349,6 +363,7 @@ void update_duck(ducks& duck) {
         if (duck.myduck.getPosition().y >= 680.f) {
             duck.myduck.setPosition(duck.myduck.getPosition().x, 680.f);
             duck.isJumping = false;
+            duck.onGround = true;
             duck.velocityY = 0.f;
         }
     }
@@ -1490,6 +1505,31 @@ void Map3() {
 }
 
 // Abdullah
+string snowMap[23] = {
+    "........................................",
+    "........................................",
+    "........................................",
+    "........................................",
+    "........................................",
+    "........................................",
+    "........................................",
+    ".._..1...........................2..._..",
+    "..|____....._......*......_......____|..",
+    "......|....<|.....<=>.....|>.....|......",
+    "......|.....|.............|......|......",
+    "......|.....|.............|......|......",
+    "......|....*|.............|*.....|......",
+    "......|...<~|++++.._..++++|=>....|......",
+    "......|..........................|......",
+    "......|..........................|......",
+    "......|............*.............|......",
+    "......|++++++++++++++++++++++++++|......",
+    "........................................",
+    "........................................",
+    "........................................",
+    "........................................",
+    "........................................"
+};
 void initBackground()
 {
     ground.loadFromFile("img/Lv7nNS.png");
@@ -1506,9 +1546,22 @@ void init_Map4()
     DUCK_SCALE = 2.f;
     GUN_SCALE = 1.6f;
     fact = 3.f;
-    //gravity = Put_your_val;
-    //jumpSpeed = Put_your_val;  //give it negative value
-    //velocityX = Put_your_val;   // the duck speed
+    gravity = 0.5;
+    MaxiVelocityY = 10.f;
+    jumpSpeed = -12.f;  //give it negative value
+    velocityX = 3.5f;   // the duck speed
+    for (int y = 0; y < 23; y++) {
+        for (int x = 0; x < snowMap[y].length(); x++) {
+            if (snowMap[y][x] == '1') {
+                duck1posx = x * TILE_SIZEE;
+                duck1posy = (y - 1.2) * TILE_SIZEE;
+            }
+            else if (snowMap[y][x] == '2') {
+                duck2posx = x * TILE_SIZEE;
+                duck2posy = (y - 1.2) * TILE_SIZEE;
+            }
+        }
+    }
     init();
     // pistol
     pistol.fix_X = -4.f;
@@ -1547,37 +1600,9 @@ void init_Map4()
     weaps.push_back(pewpew);
     weaps.push_back(sword);
 
-
-
     ice.loadFromFile("img/iceBlocks.png");
     snow.loadFromFile("img/snowBlocks.png");
     wood.loadFromFile("img/woodBlocks.png");
-    // Define a 2D map
-    string snowMap[23] = {
-    "........................................",
-    "........................................",
-    "........................................",
-    "........................................",
-    "........................................",
-    "........................................",
-    "........................................",
-    ".__...1..........................2...__.",
-    "..|____....._............._......____|..",
-    "......|....<|.....<=>.....|>.....|......",
-    "......|.....|.............|......|......",
-    "......|.....|.............|......|......",
-    "......|.....|.............|......|......",
-    "......|...<~|++++.._..++++|=>....|......",
-    "......|..........................|......",
-    "......|..........................|......",
-    "......|..........................|......",
-    "......|++++++++++++++++++++++++++|......",
-    "........................................",
-    "........................................",
-    "........................................",
-    "........................................",
-    "........................................"
-    };
 
     int scaleX = 0, scaleY = 0;
     bool isSnow = false;
@@ -1640,6 +1665,8 @@ void init_Map4()
                 break;
             case '2':
                 break;
+            case '*':
+                break;
             default:
                 valid = false;
                 break;
@@ -1655,7 +1682,7 @@ void init_Map4()
                     static_cast<float>(TILE_SIZEE) / scaleY   // scale Y down to 32px
                 );
                 mapTiles[tileCount].tileSprite.setPosition(x * TILE_SIZEE, y * TILE_SIZEE);
-                if (tileChar == '.' || tileChar == '1' || tileChar == '2')
+                if (tileChar == '.' || tileChar == '1' || tileChar == '2' || tileChar == '*')
                 {
                     mapTiles[tileCount].tileSprite.setScale(
                         static_cast<float>(TILE_SIZEE),  // scale X down to 32px
@@ -1665,7 +1692,7 @@ void init_Map4()
                 }
                 else mapTiles[tileCount].isCollidable = true;
                 mapTiles[tileCount].bounds = mapTiles[tileCount].tileSprite.getGlobalBounds();
-                if (tileChar == '.' || tileChar == '1' || tileChar == '2') {
+                if (tileChar == '.' || tileChar == '1' || tileChar == '2' || tileChar == '*') {
                     mapTiles[tileCount].bounds.width = 32;
                     mapTiles[tileCount].bounds.height = 32;
                 }
@@ -1674,8 +1701,90 @@ void init_Map4()
         }
     }
 }
-void draw4() {
+void collision_Map4(ducks& duck)
+{
+    FloatRect duckBound = duck.myduck.getGlobalBounds();
+    if (duck.facingRight) {
+        duckBound.left += 16;
+        duckBound.top += 19;
+        duckBound.width -= 37;
+        duckBound.height -= 19;
+    }
+    else {
+        duckBound.left += 22;
+        duckBound.top += 19;
+        duckBound.width -= 37;
+        duckBound.height -= 19;
+    }
+
+    duck.onGround = false; // to make duck fall when walk on unCollidable block
+
+    for (int i = 0; i < tileCount; i++) {
+        if (!mapTiles[i].isCollidable) continue;
+        else {
+            if (duckBound.intersects(mapTiles[i].bounds)) {
+                FloatRect intersection;
+                duckBound.intersects(mapTiles[i].bounds, intersection);
+                //cout << intersection.width << " " << intersection.height << endl;
+                if (intersection.width < intersection.height - 4) {
+                    if (duckBound.left < mapTiles[i].bounds.left) {
+                        // Right collision
+                        duck.myduck.setPosition(
+                            mapTiles[i].bounds.left - duckBound.width - (duck.facingRight ? 16 : 22),
+                            duck.myduck.getPosition().y
+                        );
+                    }
+                    else {
+                        // Left collision
+                        cout << "left" << endl;
+                        duck.myduck.setPosition(
+                            mapTiles[i].bounds.left + mapTiles[i].bounds.width - (duck.facingRight ? 16 : 22),
+                            duck.myduck.getPosition().y
+                        );
+                    }
+                }
+                else if(intersection.width - 4 > intersection.height) { // Vertical collision
+                    //cout << "top : " << duckBound.top << "   MAP TILE BOTTOM : " << mapTiles[i].bounds.top + mapTiles[i].bounds.height << endl;
+                    //cout << mapTiles[i].bounds.top << endl;
+                    if (duckBound.top < mapTiles[i].bounds.top) {
+                        // Landing on ground (from above)
+                        //cout << "from above" << endl;
+                        duck.myduck.setPosition(
+                            duck.myduck.getPosition().x,
+                            mapTiles[i].bounds.top - duckBound.height + 46
+                        );
+                        duck.onGround = true;
+                        duck.isJumping = false;
+                        duck.velocityY = 0;
+                    }
+                    else {
+                        // Hitting ceiling (from below)
+                        cout << "from below" << endl;
+                        duck.myduck.setPosition(
+                            duck.myduck.getPosition().x,
+                            mapTiles[i].bounds.top + mapTiles[i].bounds.height + 46
+                        );
+                        duck.velocityY = 0;
+                    }
+                }
+            }
+        }
+    }
+    duck.myarm.arm.setPosition(
+        duck.myduck.getPosition().x + duck.myduck.getGlobalBounds().width / 6,
+        duck.myduck.getPosition().y - duck.myduck.getGlobalBounds().height / 2 - fact
+    );
+    duck.myweap.weapon.setPosition(
+        duck.myduck.getPosition().x + duck.myweap.fix_hold_x,
+        duck.myduck.getPosition().y + duck.myweap.fix_hold_y
+    );
+}
+void update_Map4() {
     update_Logic();
+    collision_Map4(duck1);
+    collision_Map4(duck2);
+}
+void draw4() {
     window.draw(background);
     for (int i = 0; i < tileCount; i++) {
         window.draw(mapTiles[i].tileSprite);
@@ -1683,6 +1792,7 @@ void draw4() {
     draw_Logic();
 }
 void Map4() {
+    update_Map4();
     draw4();
 }
 

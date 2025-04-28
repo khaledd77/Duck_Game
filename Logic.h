@@ -64,6 +64,8 @@ struct ducks {
     bool holding = false;
     bool firing = false;
     bool dead = false;
+    bool onGround = false;
+    bool holdingJump = false;
     weapons myweap;
     arm myarm;
     Keyboard::Key up;
