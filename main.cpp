@@ -1546,9 +1546,9 @@ void init_Map4()
     DUCK_SCALE = 2.f;
     GUN_SCALE = 1.6f;
     fact = 3.f;
-    gravity = 0.5;
-    MaxiVelocityY = 10.f;
-    jumpSpeed = -12.f;  //give it negative value
+    gravity = 0.4;
+    MaxiVelocityY = 12.f;
+    jumpSpeed = -10.5f;  //give it negative value
     velocityX = 3.5f;   // the duck speed
     for (int y = 0; y < 23; y++) {
         for (int x = 0; x < snowMap[y].length(); x++) {
