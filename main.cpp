@@ -44,9 +44,9 @@ vector<weapons> weaps;
 vector<bullets> bulls;
 float gravity = 0.5f;
 float jumpSpeed = -14.f;
-float velocityX = 20.f;
+float velocityX = 5.f;
 bool GameEnd = 0;
-ll mapnum = 4;
+ll mapnum = 0;
 float DUCK_SCALE;
 float GUN_SCALE;
 float scalex, scaley;
@@ -55,7 +55,6 @@ const float Width = 1280, Height = 720;
 
 //Fady
 void init() {
-
     //init the first duck
     ducks duck;
     duck1 = duck;
