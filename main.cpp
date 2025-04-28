@@ -52,7 +52,7 @@ float DUCK_SCALE;
 float GUN_SCALE;
 float scalex, scaley;
 const float Width = 1280, Height = 720;
-float duck1posx, duck1posy, duck2posx, duck2posy;
+float duck1posx=100.f, duck1posy=680.f, duck2posx=1000.f, duck2posy=680.f;
 
 
 //Fady
