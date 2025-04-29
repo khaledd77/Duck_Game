@@ -47,7 +47,7 @@ float jumpSpeed = -14.f;
 float velocityX = 5.f;
 float MaxiVelocityY = 10.f;
 bool GameEnd = 0;
-ll mapnum = 1;
+ll mapnum = 2;
 float DUCK_SCALE;
 float GUN_SCALE;
 float scalex, scaley;
@@ -360,8 +360,8 @@ void update_duck(ducks& duck) {
             duck.myduck.setTextureRect(IntRect(32, 32, 32, 32));
         }
 
-        if (duck.myduck.getPosition().y >= 680.f) {
-            duck.myduck.setPosition(duck.myduck.getPosition().x, 680.f);
+        if (duck.myduck.getPosition().y >= 720.f) {
+            duck.myduck.setPosition(duck.myduck.getPosition().x, 720.f);
             duck.isJumping = false;
             duck.onGround = true;
             duck.velocityY = 0.f;
@@ -1253,8 +1253,8 @@ struct block
 {
     Sprite map_blocks;
 };
-
 block b; block obs;
+
 const int MAX_BLOCKS = 100;
 block finalground[MAX_BLOCKS];
 block finalblock[MAX_BLOCKS];
@@ -1268,6 +1268,9 @@ Texture backgroundtexture;
 
 Texture mapblock_Texture;
 Texture obstacels_texture;
+
+RectangleShape playercollider1(Vector2f(32.5, 56));
+RectangleShape playercollider2(Vector2f(32.5, 56));
 
 void groundd()
 {
@@ -1323,140 +1326,59 @@ void blocksGhareeb()
     obstacels_position(98, 431);
     obstacels_position(1130, 390);
     obstacels_position(1130, 427);
-    obstacels_position(750, 331);
+    obstacels_position(950, 331);
     obstacels_position(460, 161);
 }
-void collision(ducks& player)
+void handleCollision3(RectangleShape& player, block& obj, ducks& duck)
 {
-    for (block& b : finalblock)
-    {
-        FloatRect playerbounds = player.myduck.getGlobalBounds();
-        FloatRect wallbound = b.map_blocks.getGlobalBounds();
-        if (playerbounds.intersects(wallbound))
-        {
-            FloatRect intersection;
-            playerbounds.intersects(wallbound, intersection);
+    FloatRect duckBounds = player.getGlobalBounds();
+    FloatRect objBounds = obj.map_blocks.getGlobalBounds();
 
-            if (intersection.width < intersection.height) // left & right
+    if (duckBounds.intersects(objBounds))
+    {
+        FloatRect intersection;
+        duckBounds.intersects(objBounds, intersection);
+
+        if (intersection.width < intersection.height)
+        {
+            if (duckBounds.left < objBounds.left)
+                duck.myduck.setPosition(duck.myduck.getPosition().x - intersection.width, duck.myduck.getPosition().y);
+            else
+                duck.myduck.setPosition(duck.myduck.getPosition().x + intersection.width, duck.myduck.getPosition().y);
+        }
+        else
+        {
+            if (duckBounds.top < objBounds.top)
             {
-                if (playerbounds.left < wallbound.left) // right collision
-                {
-                    player.myduck.setPosition(player.myduck.getPosition().x - intersection.width, player.myduck.getPosition().y);
-                }
-                else // left collision
-                {
-                    player.myduck.setPosition(player.myduck.getPosition().x + intersection.width, player.myduck.getPosition().y);
-                }
+                duck.myduck.setPosition(duck.myduck.getPosition().x, obj.map_blocks.getPosition().y+1.f);
+                duck.onGround = 1;
+                duck.isJumping = 0;
             }
-            else // up & down
-            {
-                if (playerbounds.top < wallbound.top) // down collision
-                {
-                    player.myduck.setPosition(player.myduck.getPosition().x, player.myduck.getPosition().y - intersection.height);
-                }
-                else // up collision
-                {
-                    player.myduck.setPosition(player.myduck.getPosition().x, player.myduck.getPosition().y + intersection.height);
-                }
-            }
+            else
+                duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
+            duck.velocityY = 0;
         }
     }
-
-
-    for (block& bb : finalground)
-    {
-        FloatRect playerbounds = player.myduck.getGlobalBounds();
-        FloatRect wallbound = bb.map_blocks.getGlobalBounds();
-        if (playerbounds.intersects(wallbound))
-        {
-            FloatRect intersection;
-            playerbounds.intersects(wallbound, intersection);
-
-            if (intersection.width < intersection.height) // left & right
-            {
-                if (playerbounds.left < wallbound.left) // right collision
-                {
-                    player.myduck.setPosition(player.myduck.getPosition().x - intersection.width, player.myduck.getPosition().y);
-                }
-                else // left collision
-                {
-                    player.myduck.setPosition(player.myduck.getPosition().x + intersection.width, player.myduck.getPosition().y);
-                }
-            }
-            else // up & down
-            {
-                if (playerbounds.top < wallbound.top) // down collision
-                {
-                    player.myduck.setPosition(player.myduck.getPosition().x, player.myduck.getPosition().y - intersection.height);
-                }
-                else // up collision
-                {
-                    player.myduck.setPosition(player.myduck.getPosition().x, player.myduck.getPosition().y + intersection.height);
-                }
-            }
-        }
-    }
-
-
-    for (block& bbb : finalobs)
-    {
-        FloatRect playerbounds = player.myduck.getGlobalBounds();
-        FloatRect wallbound = bbb.map_blocks.getGlobalBounds();
-        if (playerbounds.intersects(wallbound))
-        {
-            FloatRect intersection;
-            playerbounds.intersects(wallbound, intersection);
-
-            if (intersection.width < intersection.height) // left & right
-            {
-                if (playerbounds.left < wallbound.left) // right collision
-                {
-                    player.myduck.setPosition(player.myduck.getPosition().x - intersection.width, player.myduck.getPosition().y);
-                }
-                else // left collision
-                {
-                    player.myduck.setPosition(player.myduck.getPosition().x + intersection.width, player.myduck.getPosition().y);
-                }
-            }
-            else // up & down
-            {
-                if (playerbounds.top < wallbound.top) // down collision
-                {
-                    player.myduck.setPosition(player.myduck.getPosition().x, player.myduck.getPosition().y - intersection.height);
-                }
-                else // up collision
-                {
-                    player.myduck.setPosition(player.myduck.getPosition().x, player.myduck.getPosition().y + intersection.height);
-                }
-            }
-        }
-    }
-
-
 }
-void windowcollison(ducks& player)
+void collision3(RectangleShape& player, ducks& duck)
 {
+    for (int i = 0; i < blockCount; i++)
+        handleCollision3(player, finalblock[i], duck);
 
-    FloatRect playerBounds = player.myduck.getGlobalBounds();
+    for (int i = 0; i < groundCount; i++)
+        handleCollision3(player, finalground[i], duck);
 
-    if (playerBounds.left < 0) // Left
-        player.myduck.setPosition(playerBounds.width / 2, player.myduck.getPosition().y);
-
-    if (playerBounds.left + playerBounds.width > 1280) // Right
-        player.myduck.setPosition(1280 - playerBounds.width / 2, player.myduck.getPosition().y);
-
-    if (playerBounds.top < 0)// Top
-        player.myduck.setPosition(player.myduck.getPosition().x, playerBounds.height / 2);
-
+    for (int i = 0; i < obsCount; i++)
+        handleCollision3(player, finalobs[i], duck);
 }
 void init_Map3()
 {
     DUCK_SCALE = 2.f;
     GUN_SCALE = 1.6f;
     fact = 3.f;
-    //gravity = Put_your_val;
-    //jumpSpeed = Put_your_val;  //give it negative value
-    //velocityX = Put_your_val;   // the duck speed
+    gravity = 0.189f;
+    jumpSpeed = -7.f;  //give it negative value
+    velocityX = 3;   // the duck speed
     init();
     // pistol
     pistol.fix_X = -4.f;
@@ -1508,23 +1430,42 @@ void init_Map3()
     b.map_blocks.setTexture(mapblock_Texture);
     b.map_blocks.setScale(0.45, 0.17);
 
-
     obs.map_blocks.setTexture(obstacels_texture);
     obs.map_blocks.setScale(0.035, 0.035);
 
+    duck1.myduck.setPosition(180, 250);
+    duck2.myduck.setPosition(530, 660);
+
+    playercollider1.setOrigin(duck1.myduck.getLocalBounds().width / 2 - 40, duck1.myduck.getLocalBounds().height / 2 + 40);
+    playercollider2.setOrigin(duck2.myduck.getLocalBounds().width / 2 - 40, duck2.myduck.getLocalBounds().height / 2 + 40);
+
     blocksGhareeb();
-
-
 
 }
 void update3()
 {
-    /* duck1.move(0, gravity * deltaTime);
-     duck2.move(0, gravity * deltaTime);*/
-    //windowcollison(duck1);
-    //windowcollison(duck2);
-    //collision(duck1);
-    //collision(duck2);
+
+
+    duck1.onGround = false;
+    duck2.onGround = false;
+
+    playercollider1.setPosition(duck1.myduck.getPosition());
+    playercollider2.setPosition(duck2.myduck.getPosition());
+
+
+    collision3(playercollider1, duck1);
+    collision3(playercollider2, duck2);
+
+    duck1.myarm.arm.setPosition(
+        duck1.myduck.getPosition().x + duck1.myduck.getGlobalBounds().width / 6,
+        duck1.myduck.getPosition().y - duck1.myduck.getGlobalBounds().height / 2 - fact
+    );
+    duck2.myarm.arm.setPosition(
+        duck2.myduck.getPosition().x + duck2.myduck.getGlobalBounds().width / 6,
+        duck2.myduck.getPosition().y - duck2.myduck.getGlobalBounds().height / 2 - fact
+    );
+
+
     update_Logic();
 
 }
@@ -1540,7 +1481,7 @@ void draw3()
 
     for (int i = 0; i < obsCount; i++)
         window.draw(finalobs[i].map_blocks);
-
+    //window.draw(playercollider1);
     draw_Logic();
 
 
