@@ -47,7 +47,7 @@ float jumpSpeed = -14.f;
 float velocityX = 5.f;
 float MaxiVelocityY = 10.f;
 bool GameEnd = 0;
-ll mapnum = 0, duck1Score=0, duck2Score=0;
+ll mapnum = 4, duck1Score=0, duck2Score=0;
 float DUCK_SCALE;
 float GUN_SCALE;
 float scalex, scaley;
@@ -1865,49 +1865,33 @@ void Map4() {
 
 
 //Hekal
-CircleShape player(30,4);
 Texture backgroundTexture;
 Texture blockTexture;
 Texture groundTexture;
-Sprite blockse[25];
+Sprite blockse[9];
 Sprite backgroundSprite;
 RectangleShape blockscollider[8];
+RectangleShape player1_colliderh(Vector2f(27, 50)), player2_colliderh(Vector2f(27, 50));
 
-void blocks5(Sprite blocks5[25]) {
-    //Bottom-Left Block:
-    blocks5[0].setPosition(120, 520);
-    blocks5[0].setScale(2.25, 1);
-    //Middle-Left Block:
-    blocks5[1].setPosition(-10, 320);
-    blocks5[1].setScale(2, 1);
-    //Bottom-Middle Block:
-    blocks5[2].setPosition(380, 390);
-    blocks5[2].setScale(3.5, 1);
-    //Top-Left Block
-    blocks5[3].setPosition(20, 90);
-    blocks5[3].setScale(2, 1);
-    //Center Block:
-    blocks5[4].setPosition(360, 175);
-    blocks5[4].setScale(1.7, 1);
-    //middle-Right Block:
-    blocks5[5].setPosition(950, 300);
-    blocks5[5].setScale(2, 1);
-    //Top-Right Block:
-    blocks5[6].setPosition(1000, 90);
-    blocks5[6].setScale(2, 1);
-    //top middle
-    blocks5[7].setPosition(710, 175);
-    blocks5[7].setScale(1.7, 1);
-
-    //ground
-    for (int i = 1;i <= 15;i++) {
-        blocks5[i + 7].setPosition((i - 1) * 100, 675);
-        blocks5[i + 7].setScale(0.5, 0.25);
-    }
-    // bottom right
-    blocks5[23].setPosition(810, 520);
-    blocks5[23].setScale(2.25, 1);
-
+void blocks5() {
+    blockse[0].setPosition(155, 520);
+    blockse[0].setScale(2.25, 1);
+    blockse[1].setPosition(25, 320);
+    blockse[1].setScale(2, 1);
+    blockse[2].setPosition(415, 390);
+    blockse[2].setScale(3.5, 1);
+    blockse[3].setPosition(55, 90);
+    blockse[3].setScale(2, 1);
+    blockse[4].setPosition(395, 175);
+    blockse[4].setScale(1.7, 1);
+    blockse[5].setPosition(985, 300);
+    blockse[5].setScale(2, 1);
+    blockse[6].setPosition(1035, 90);
+    blockse[6].setScale(2, 1);
+    blockse[7].setPosition(745, 175);
+    blockse[7].setScale(1.7, 1);
+    blockse[8].setPosition(845, 520);
+    blockse[8].setScale(2.25, 1);
 }
 void init_Map5() {
     DUCK_SCALE = 2.f;
@@ -1957,116 +1941,92 @@ void init_Map5() {
 
     backgroundTexture.loadFromFile("img/nature.png");
     blockTexture.loadFromFile("img/blocks.png");
-    ground.loadFromFile("img/ground2.png");
-    //set the photo in sprites
-    blocks5(blockse);
-    for (int i = 0;i < 24;i++) {
-        if (i > 7 && i < 23) {
-            blockse[i].setTexture(ground);
-        }
-        else
-            blockse[i].setTexture(blockTexture);
+    blocks5();
+    for (int i = 0;i < 9;i++) {
+        blockse[i].setTexture(blockTexture);
     }
-    //background set and scale
     backgroundSprite.setTexture(backgroundTexture);
     Vector2f windowSize = static_cast<sf::Vector2f>(window.getSize());
     Vector2f textureSize = static_cast<sf::Vector2f>(backgroundTexture.getSize());
     backgroundSprite.setScale(windowSize.x / textureSize.x, windowSize.y / textureSize.y);
-    for (int i = 0;i < 8;i++) {
-        blockscollider[i].setOrigin(blockse[i].getOrigin());
-        FloatRect bounds = blockse[i].getGlobalBounds();
-
-        // Create a rectangle shape and match its size
-        blockscollider[i].setSize(Vector2f(bounds.width / 2, bounds.height / 2));
-    }
+    player1_colliderh.setOrigin(player1_colliderh.getLocalBounds().width / 2, player1_colliderh.getLocalBounds().height / 2);
+    player2_colliderh.setOrigin(player2_colliderh.getLocalBounds().width / 2, player2_colliderh.getLocalBounds().height / 2);
+    duck1.myduck.setPosition(30, 320);
+    duck2.myduck.setPosition(1030, 90);
 }
-void collisions() {
-    for (int i = 0; i < 24; i++) {
-        if (player.getGlobalBounds().intersects(blockse[i].getGlobalBounds())) {
-            for (int i = 0; i < 24; i++) {
-                if (!(i > 7 && i < 23)) {
-                    blockse[i].setTexture(blockTexture);
-                    FloatRect playerBounds = player.getGlobalBounds();
-                    FloatRect blockBounds = blockse[i].getGlobalBounds();
-
-                    if (playerBounds.intersects(blockBounds)) {
-                        FloatRect intersection;
-                        playerBounds.intersects(blockBounds, intersection);
-
-                        if (intersection.width < intersection.height) {
-                            if (playerBounds.left < blockBounds.left) {
-                                // Right collision
-                                player.setPosition(playerBounds.left - intersection.width, playerBounds.top);
-                            }
-                            else {
-                                // Left collision
-                                player.setPosition(playerBounds.left + intersection.width, playerBounds.top);
-                            }
-                        }
-                        else {
-                            if (playerBounds.top < blockBounds.top) {
-                                // Down collision
-                                player.setPosition(playerBounds.left, playerBounds.top - intersection.height);
-                            }
-                            else {
-                                // Up collision
-                                player.setPosition(playerBounds.left, playerBounds.top + intersection.height);
-                            }
-                        }
-                    }
+void collision_Map5(RectangleShape& player_collider, ducks& duck)
+{
+    FloatRect box, wall, intersection;
+    box = player_collider.getGlobalBounds();
+    for (int i = 0;i < 9;i++)
+    {
+        wall = blockse[i].getGlobalBounds();
+        if (box.intersects(wall))
+        {
+            box.intersects(wall, intersection);
+            if (intersection.width > intersection.height)
+            {
+                if (box.top < wall.top)
+                {
+                    duck.onGround = true;
+                    duck.isJumping = false;
+                    duck.velocityY = 0.f;
+                    duck.myduck.setPosition(duck.myduck.getPosition().x, blockse[i].getPosition().y + 1);
+                }
+                else
+                {
+                    duck.velocityY = 0.f;
+                    duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
+                }
+            }
+            else
+            {
+                if (box.left < wall.left)
+                {
+                    duck.myduck.setPosition(duck.myduck.getPosition().x - intersection.width, duck.myduck.getPosition().y);
+                }
+                else
+                {
+                    duck.myduck.setPosition(duck.myduck.getPosition().x + intersection.width, duck.myduck.getPosition().y);
                 }
             }
         }
-        //left
-        if (player.getPosition().x < 0) {
-            player.setPosition(0, player.getPosition().y);
-        }
-        //top
-        if (player.getPosition().y < 0) {
-            player.setPosition(player.getPosition().x, 0);
-        }
-        //right
-        if (player.getPosition().x + player.getGlobalBounds().width > window.getSize().x) {
-            player.setPosition(window.getSize().x - player.getGlobalBounds().width, player.getPosition().y);
-        }
-        //bottom
-        if (player.getPosition().y + player.getGlobalBounds().height > window.getSize().y) {
-            player.setPosition(player.getPosition().x, window.getSize().y - player.getGlobalBounds().height);
-        }
-
-
-        //left
-        if (player.getPosition().x < 0) {
-            player.setPosition(0, player.getPosition().y);
-        }
-        //top
-        if (player.getPosition().y < 0) {
-            player.setPosition(player.getPosition().x, 0);
-        }
-        //right
-        if (player.getPosition().x + player.getGlobalBounds().width > window.getSize().x) {
-            player.setPosition(window.getSize().x - player.getGlobalBounds().width, player.getPosition().y);
-        }
-        //bottom
-        if (player.getPosition().y + player.getGlobalBounds().height > window.getSize().y) {
-            player.setPosition(player.getPosition().x, window.getSize().y - player.getGlobalBounds().height);
-        }
-
     }
 }
+
 void update_Map5() {
-    collisions();
+    player1_colliderh.setPosition(duck1.myduck.getPosition().x + 32, duck1.myduck.getPosition().y - 25);
+    player2_colliderh.setPosition(duck2.myduck.getPosition().x + 32, duck2.myduck.getPosition().y - 25);
+    duck1.onGround = 0;
+    duck2.onGround = 0;
+    collision_Map5(player1_colliderh, duck1);
+    collision_Map5(player2_colliderh, duck2);
     update_Logic();
+    if (duck1.onGround)
+    {
+        duck1.isJumping = 0;
+    }
+    else
+    {
+        duck1.isJumping = 1;
+    }
+    if (duck2.onGround)
+    {
+        duck2.isJumping = 0;
+    }
+    else
+    {
+        duck2.isJumping = 1;
+    }
 }
 void draw_Map5() {
-    FloatRect bounds = blockse[23].getGlobalBounds();
 
     for (int i = 0;i < 8;i++) {
         window.draw(blockscollider[i]);
     }
 
     window.draw(backgroundSprite);
-    for (int i = 0;i < 24;i++)
+    for (int i = 0;i < 9;i++)
         window.draw(blockse[i]);
     draw_Logic();
 }
