@@ -45,9 +45,9 @@ vector<bullets> bulls;
 float gravity = 0.5f;
 float jumpSpeed = -14.f;
 float velocityX = 5.f;
-float MaxiVelocityY;
+float MaxiVelocityY = 10.f;
 bool GameEnd = 0;
-ll mapnum = 3;
+ll mapnum = 1;
 float DUCK_SCALE;
 float GUN_SCALE;
 float scalex, scaley;
@@ -377,6 +377,14 @@ void update_duck(ducks& duck) {
     else {
         duck.myduck.setTextureRect(IntRect(0, 0, 32, 32));
     }
+    duck.myarm.arm.setPosition(
+        duck.myduck.getPosition().x + duck.myduck.getGlobalBounds().width / 6,
+        duck.myduck.getPosition().y - duck.myduck.getGlobalBounds().height / 2 - fact
+    );
+    duck.myweap.weapon.setPosition(
+        duck.myduck.getPosition().x + duck.myweap.fix_hold_x,
+        duck.myduck.getPosition().y + duck.myweap.fix_hold_y
+    );
 }   
 void drop_weapon(ducks& duck) {
     duck.haveWeapon = false;
@@ -724,7 +732,6 @@ void fullscreenMode(RenderWindow& window) {
 Texture ground_texture, background_texture, skeleton_texture, stone_texture, tree_texture, cactus1, cactus2, cactus3, bushs_texture, grass_texture, stone_block_texture;
 Sprite blocks[25], skeletons[3], stones[2], tree, ccts[5], bush[3], grs[2], stone_block, background;
 RectangleShape player1_collider(Vector2f(40, 62)), player2_collider(Vector2f(40, 62));
-bool onground1,onground2;
 void grounds()
 {
     blocks[0].setPosition(1030, 465);
@@ -753,7 +760,7 @@ void grounds()
     blocks[11].setScale(0.25, 0.35);
     blocks[12].setPosition(700, 145);
     blocks[12].setScale(0.4, 0.35);
-    
+
 }
 void skeleton()
 {
@@ -810,10 +817,10 @@ void stoneblock()
     stone_block.setPosition(380, 478);
     stone_block.setScale(0.35, 0.35);
 }
-void collision1()
+void collision_Map1(RectangleShape& player_collider, ducks& duck)
 {
     FloatRect box, wall, intersection;
-    box = player1_collider.getGlobalBounds();
+    box = player_collider.getGlobalBounds();
     for (int i = 0;i < 13;i++)
     {
         wall = blocks[i].getGlobalBounds();
@@ -824,59 +831,25 @@ void collision1()
             {
                 if (box.top < wall.top)
                 {
-                    onground1 = true;
-                    duck1.myduck.setPosition(duck1.myduck.getPosition().x, blocks[i].getPosition().y);
+                    duck.onGround = true;
+                    duck.isJumping = false;
+                    duck.velocityY = 0.f;
+                    duck.myduck.setPosition(duck.myduck.getPosition().x, blocks[i].getPosition().y);
                 }
                 else
                 {
-                    duck1.myduck.move(0, intersection.height);
+                    duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
                 }
             }
             else
             {
                 if (box.left < wall.left)
                 {
-                    duck1.myduck.move(-velocityX, 0);
+                    duck.myduck.setPosition(duck.myduck.getPosition().x - intersection.width, duck.myduck.getPosition().y);
                 }
                 else
                 {
-                    duck1.myduck.move(-velocityX, 0);
-                }
-            }
-        }
-    }
-}
-void collision2()
-{
-    FloatRect box, wall, intersection;
-    box = player2_collider.getGlobalBounds();
-    for (int i = 0;i < 13;i++)
-    {
-        wall = blocks[i].getGlobalBounds();
-        if (box.intersects(wall))
-        {
-            box.intersects(wall, intersection);
-            if (intersection.width > intersection.height)
-            {
-                if (box.top < wall.top)
-                {
-                    onground2 = true;
-                    duck2.myduck.setPosition(duck2.myduck.getPosition().x, blocks[i].getPosition().y);
-                }
-                else
-                {
-                    duck2.myduck.move(0, intersection.height);
-                }
-            }
-            else
-            {
-                if (box.left < wall.left) 
-                {
-                    duck2.myduck.move(-velocityX, 0);
-                }
-                else
-                {
-                    duck2.myduck.move(-velocityX, 0);
+                    duck.myduck.setPosition(duck.myduck.getPosition().x + intersection.width, duck.myduck.getPosition().y);
                 }
             }
         }
@@ -889,7 +862,7 @@ void init_Map1()
     GUN_SCALE = 2.f;
     fact = 5.f;
     gravity = 0.3f;
-    jumpSpeed = -9.f; 
+    jumpSpeed = -9.f;
     velocityX = 5;
     init();
     // pistol
@@ -929,6 +902,14 @@ void init_Map1()
     weaps.push_back(pewpew);
     weaps.push_back(sword);
 
+    //weaps colliders
+    /*vector<RectangleShape> colliders;
+    for (int i = 0;i < weaps.size();i++)
+    {
+        colliders[i].setOrigin(colliders[i].getLocalBounds().width / 2, colliders[i].getLocalBounds().height / 2);
+
+    }*/
+
     background_texture.loadFromFile("img/BG.png");
     skeleton_texture.loadFromFile("img/skeleton.png");
     ground_texture.loadFromFile("img/ground.png");
@@ -953,12 +934,12 @@ void init_Map1()
     background.setScale(1, 0.75);
     duck1.myduck.setPosition(250, 210);
     duck2.myduck.setPosition(950, 225);
-    cout << blocks[3].getGlobalBounds().width <<" "<< blocks[3].getGlobalBounds().height << endl;
+    //cout << blocks[3].getGlobalBounds().width << " " << blocks[3].getGlobalBounds().height << endl;
 }
 void update_Map1()
 {
-    onground1 = false;
-    onground2 = false;
+    duck1.onGround = false;
+    duck2.onGround = false;
     background.setTexture(background_texture);
     for (int i = 0;i < 13;i++) blocks[i].setTexture(ground_texture);
     for (int i = 0;i < 3;i++) skeletons[i].setTexture(skeleton_texture);
@@ -972,24 +953,9 @@ void update_Map1()
     stone_block.setTexture(stone_block_texture);
     player1_collider.setPosition(duck1.myduck.getPosition().x + 38, duck1.myduck.getPosition().y - 30);
     player2_collider.setPosition(duck2.myduck.getPosition().x + 38, duck2.myduck.getPosition().y - 30);
-    collision1();
-    collision2();
-    if (onground1)
-    {
-        duck1.isJumping = 0;
-    }
-    else
-    {
-        duck1.isJumping = 1;
-    }
-    if (onground2)
-    {
-        duck2.isJumping = 0;
-    }
-    else
-    {
-        duck2.isJumping = 1;
-    }
+    collision_Map1(player1_collider, duck1);
+    collision_Map1(player2_collider, duck2);
+    
     if (duck1.myduck.getPosition().y >= 620)
     {
         duck1.dead = true;
@@ -1002,7 +968,7 @@ void update_Map1()
 }
 void draw_Map1()
 {
-   window.draw(background);
+    window.draw(background);
     for (int i = 0;i < 13;i++)  window.draw(blocks[i]);
     for (int i = 0;i < 2;i++) window.draw(stones[i]);
     for (int i = 0;i < 3;i++) window.draw(skeletons[i]);
@@ -1010,6 +976,7 @@ void draw_Map1()
     for (int i = 0;i < 5;i++) window.draw(ccts[i]);
     for (int i = 0;i < 2;i++) window.draw(grs[i]);
     window.draw(stone_block);
+    window.draw(player1_collider);
     draw_Logic();
 }
 void Map1() {
@@ -1019,6 +986,12 @@ void Map1() {
 
 
 //Fawzy's MAP
+RectangleShape player1(Vector2f(24, 35)), player2(Vector2f(24, 35));
+int spawnX = 25;
+int spawnY = 27;
+set<GameTile::TileType> solidTiles = {
+        GameTile::Stone, GameTile::Cement, GameTile::Ground, GameTile::Branch, GameTile::Weapon
+};
 GameTile::GameTile() {
     loadTexture(Ground, "img/ground2.png");
     loadTexture(Tree, "img/tree2.png");
@@ -1057,9 +1030,11 @@ void init_Map2() {
     DUCK_SCALE = 1.5;
     GUN_SCALE = 1.2f;
     fact = 3.f;
-    //gravity = Put_your_val;
-    //jumpSpeed = Put_your_val;  //give it negative value
-    //velocityX = Put_your_val;   // the duck speed
+    gravity = 0.5f;
+    jumpSpeed = -10.0f;  //give it negative value
+    velocityX = 2.5f;   // the duck speed
+    duck1posx = 25 * TILE_SIZE;
+    duck1posy = 27 * TILE_SIZE - 16;
     init();
     // pistol
     pistol.fix_X = -2.f;
@@ -1181,8 +1156,77 @@ void init_Map2() {
     "                                                   cccccc                                                                           ",
     "                                                                                                                            "
     };
+
+    player1_collider.setOrigin(player1_collider.getLocalBounds().width / 2, player1_collider.getLocalBounds().height / 2);
+    player2_collider.setOrigin(player2_collider.getLocalBounds().width / 2, player2_collider.getLocalBounds().height / 2);
+    duck1.myduck.setPosition(250, 210);
+    duck2.myduck.setPosition(950, 225);
+}
+void collision_Map2(RectangleShape& player, ducks& duck)
+{
+    FloatRect box, wall, intersection;
+    box = player.getGlobalBounds();
+    for (size_t y = 0; y < level.size(); ++y) {
+        for (size_t x = 0; x < level[y].size(); ++x) {
+            GameTile::TileType tileType = charToTileType(level[y][x]);
+            if (!solidTiles.count(tileType)) continue;
+
+            Sprite tile = gameTiles.getTileSprite(tileType);
+            tile.setScale(1.125, 1.125);
+            tile.setPosition(x * TILE_SIZE, y * TILE_SIZE);
+            wall = tile.getGlobalBounds();
+
+            if (box.intersects(wall))
+            {
+                box.intersects(wall, intersection);
+                if (intersection.width > intersection.height)
+                {
+                    if (box.top < wall.top)
+                    {
+                        duck.onGround = true;
+                        duck.isJumping = false;
+                        duck.velocityY = 0.f;
+                        duck.myduck.setPosition(duck.myduck.getPosition().x, tile.getPosition().y + 1.f);
+                    }
+                    else
+                    {
+                        duck.velocityY = 0;
+                        duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
+                    }
+                }
+                else
+                {
+                    if (box.left <= wall.left)
+                    {
+                        duck.myduck.setPosition(duck.myduck.getPosition().x - velocityX, duck.myduck.getPosition().y);
+                    }
+                    else
+                    {
+                        duck.myduck.setPosition(duck.myduck.getPosition().x + velocityX, duck.myduck.getPosition().y);
+                    }
+                }
+            }
+        }
+    }
 }
 void update_Map2() {
+    update_Logic();
+    duck1.onGround = false;
+    duck2.onGround = false;
+    player1.setPosition(duck1.myduck.getPosition().x + 10, duck1.myduck.getPosition().y - 35);
+    player2.setPosition(duck2.myduck.getPosition().x + 10, duck2.myduck.getPosition().y - 35);
+    collision_Map2(player1, duck1);
+    collision_Map2(player2, duck2);
+    if (duck1.myduck.getPosition().y >= 620)
+    {
+        duck1.dead = false; //edit later
+    }
+    if (duck2.myduck.getPosition().y >= 620)
+    {
+        duck2.dead = false; //edit later
+    }
+}
+void draw_Map2() {
     for (size_t y = 0; y < level.size(); ++y) {
         for (size_t x = 0; x < level[y].size(); ++x) {
             char tileChar = level[y][x];
@@ -1194,11 +1238,13 @@ void update_Map2() {
             }
         }
     }
-    update_Logic();
+    cout << duck1.myduck.getPosition().x << " " << duck1.myduck.getPosition().y << endl;
+    window.draw(player1);
     draw_Logic();
 }
 void Map2() {
     update_Map2();
+    draw_Map2();
 }
 
 
