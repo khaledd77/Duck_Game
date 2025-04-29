@@ -47,7 +47,7 @@ float jumpSpeed = -14.f;
 float velocityX = 5.f;
 float MaxiVelocityY = 10.f;
 bool GameEnd = 0;
-ll mapnum = 0;
+ll mapnum = 1;
 float DUCK_SCALE;
 float GUN_SCALE;
 float scalex, scaley;
@@ -1197,11 +1197,11 @@ void collision_Map2(RectangleShape& player, ducks& duck)
                 {
                     if (box.left <= wall.left)
                     {
-                        duck.myduck.setPosition(duck.myduck.getPosition().x - velocityX, duck.myduck.getPosition().y);
+                        duck.myduck.setPosition(duck.myduck.getPosition().x - intersection.width, duck.myduck.getPosition().y);
                     }
                     else
                     {
-                        duck.myduck.setPosition(duck.myduck.getPosition().x + velocityX, duck.myduck.getPosition().y);
+                        duck.myduck.setPosition(duck.myduck.getPosition().x + intersection.width, duck.myduck.getPosition().y);
                     }
                 }
             }
@@ -1209,7 +1209,6 @@ void collision_Map2(RectangleShape& player, ducks& duck)
     }
 }
 void update_Map2() {
-    update_Logic();
     duck1.onGround = false;
     duck2.onGround = false;
     player1.setPosition(duck1.myduck.getPosition().x + 10, duck1.myduck.getPosition().y - 35);
@@ -1224,6 +1223,7 @@ void update_Map2() {
     {
         duck2.dead = false; //edit later
     }
+    update_Logic();
 }
 void draw_Map2() {
     for (size_t y = 0; y < level.size(); ++y) {
