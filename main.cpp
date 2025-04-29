@@ -47,7 +47,7 @@ float jumpSpeed = -14.f;
 float velocityX = 5.f;
 float MaxiVelocityY = 10.f;
 bool GameEnd = 0;
-ll mapnum = 2;
+ll mapnum = 0;
 float DUCK_SCALE;
 float GUN_SCALE;
 float scalex, scaley;
@@ -976,7 +976,6 @@ void draw_Map1()
     for (int i = 0;i < 5;i++) window.draw(ccts[i]);
     for (int i = 0;i < 2;i++) window.draw(grs[i]);
     window.draw(stone_block);
-    window.draw(player1_collider);
     draw_Logic();
 }
 void Map1() {
