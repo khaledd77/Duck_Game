@@ -58,6 +58,7 @@ struct ducks {
     Clock myclock;
     Sprite myduck;
     int frame = 0;
+    int score = 0;
     bool facingRight = true;
     bool isJumping = false;
     bool haveWeapon = false;
@@ -66,6 +67,7 @@ struct ducks {
     bool dead = false;
     bool onGround = false;
     bool holdingJump = false;
+    bool ready = false;
     weapons myweap;
     arm myarm;
     Keyboard::Key up;
