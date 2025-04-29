@@ -41,6 +41,7 @@ struct weapons {
     bool hit = 0;
     bool onGround = false;
     ll fact = 1;
+    RectangleShape collider;
 };
 
 struct bullets {
