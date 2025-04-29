@@ -39,6 +39,7 @@ struct weapons {
     float rev;
     float angle;
     bool hit = 0;
+    bool onGround = false;
     ll fact = 1;
 };
 
