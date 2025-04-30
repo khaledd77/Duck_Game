@@ -119,7 +119,7 @@ void init() {
     pistol.weapon.setScale(GUN_SCALE, GUN_SCALE);
     pistol.empty = false;
     pistol.bullets = 10;
-    pistol.velocity = 10;
+    pistol.velocity = 25;
     pistol.range = 500.f;
     pistol.bull_type = 1;
     pistol.weapon.setOrigin(0, pistol.weapon.getLocalBounds().height);
@@ -136,7 +136,7 @@ void init() {
     sniper.weapon.setScale(GUN_SCALE, GUN_SCALE);
     sniper.empty = false;
     sniper.bullets = 4;
-    sniper.velocity = 0;
+    sniper.velocity = 40;
     sniper.range = 100000.f;
     sniper.bull_type = 1;
     sniper.weapon.setOrigin(0, sniper.weapon.getLocalBounds().height);
@@ -152,7 +152,7 @@ void init() {
     pewpew.weapon.setScale(GUN_SCALE, GUN_SCALE);
     pewpew.empty = false;
     pewpew.bullets = 20;
-    pewpew.velocity = 0;
+    pewpew.velocity = 15;
     pewpew.range = 100000.f;
     pewpew.bull_type = 2;
     pewpew.weapon.setOrigin(0, pewpew.weapon.getLocalBounds().height);
@@ -899,7 +899,7 @@ void stoneblock()
     stone_block.setScale(0.35, 0.35);
 }
 void Bullet_Collision1() {
-    for (int i = bulls.size() - 1;i >= 0; i++)
+    for (int i = bulls.size() - 1;i >= 0; i--)
     {
 
         for (int j = 0; j < 25; j++)
@@ -1543,7 +1543,7 @@ void collision3(RectangleShape& player, ducks& duck)
 }
 void handle_BulletCollision3(block& obj)
 {
-    for (int i = bulls.size()-1;i>=0; i++)
+    for (int i = bulls.size()-1;i>=0; i--)
     {
 
         for (int j = 0; j < MAX_BLOCKS; j++)
@@ -2192,7 +2192,7 @@ RectangleShape player1_colliderh(Vector2f(27, 50)), player2_colliderh(Vector2f(2
 RectangleShape pistol_colliderh(Vector2f(25, 20)), sniper_colliderh(Vector2f(55, 20)), pewpew_colliderh(Vector2f(45, 25)), swrd_colliderh(Vector2f(40, 20));
 
 void Bullet_Collision5() {
-    for (int i = bulls.size() - 1;i >= 0; i++)
+    for (int i = bulls.size() - 1;i >= 0; i--)
     {
 
         for (int j = 0; j < 9; j++)
