@@ -47,7 +47,7 @@ float jumpSpeed = -14.f;
 float velocityX = 5.f;
 float MaxiVelocityY = 10.f;
 bool GameEnd = 0;
-ll mapnum = 3, duck1Score=0, duck2Score=0;
+ll mapnum = 0, duck1Score=0, duck2Score=0;
 float DUCK_SCALE;
 float GUN_SCALE;
 float scalex, scaley;
@@ -812,6 +812,7 @@ void fullscreenMode(RenderWindow& window) {
 Texture ground_texture, background_texture, skeleton_texture, stone_texture, tree_texture, cactus1, cactus2, cactus3, bushs_texture, grass_texture, stone_block_texture;
 Sprite blocks[25], skeletons[3], stones[2], tree, ccts[5], bush[3], grs[2], stone_block, background;
 RectangleShape player1_collider(Vector2f(40, 62)), player2_collider(Vector2f(40, 62));
+RectangleShape pistol_collider(Vector2f(35, 25)), sniper_collider(Vector2f(70, 20)), pewpew_collider(Vector2f(55, 25)), swrd_collider(Vector2f(50, 20));
 void grounds()
 {
     blocks[0].setPosition(1030, 465);
@@ -918,6 +919,7 @@ void collision_Map1(RectangleShape& player_collider, ducks& duck)
                 }
                 else
                 {
+                    duck.velocityY = 0.f;
                     duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
                 }
             }
@@ -930,6 +932,46 @@ void collision_Map1(RectangleShape& player_collider, ducks& duck)
                 else
                 {
                     duck.myduck.setPosition(duck.myduck.getPosition().x + intersection.width, duck.myduck.getPosition().y);
+                }
+            }
+        }
+    }
+}
+void collision_weaps_Map1(RectangleShape& collider, weapons& weap)
+{
+    FloatRect box, wall, intersection;
+    box = weap.weapon.getGlobalBounds();
+    for (int i = 0;i < 13;i++)
+    {
+        wall = blocks[i].getGlobalBounds();
+        if (box.intersects(wall))
+        {
+            box.intersects(wall, intersection);
+            if (intersection.width > intersection.height)
+            {
+                if (box.top < wall.top)
+                {
+                    weap.onGround = true;
+                    weap.velocityY = 0.f;
+                    weap.velocityX = 0.f;
+                    weap.weapon.setPosition(weap.weapon.getPosition().x, blocks[i].getPosition().y);
+                }
+                else
+                {
+                    weap.weapon.setPosition(weap.weapon.getPosition().x, weap.weapon.getPosition().y + intersection.height);
+                    weap.velocityY = 0.f;
+                }
+            }
+            else
+            {
+                weap.velocityX = 0.f;
+                if (box.left < wall.left)
+                {
+                    weap.weapon.setPosition(weap.weapon.getPosition().x - intersection.width, weap.weapon.getPosition().y);
+                }
+                else
+                {
+                    weap.weapon.setPosition(weap.weapon.getPosition().x + intersection.width, weap.weapon.getPosition().y);
                 }
             }
         }
@@ -975,20 +1017,6 @@ void init_Map1()
     //grave
     Grave.setScale(0.16f, 0.1f);
 
-    //spawn weaps
-    weaps.push_back(pistol);
-    weaps.push_back(sniper);
-    weaps.push_back(pewpew);
-    weaps.push_back(sword);
-
-    //weaps colliders
-    /*vector<RectangleShape> colliders;
-    for (int i = 0;i < weaps.size();i++)
-    {
-        colliders[i].setOrigin(colliders[i].getLocalBounds().width / 2, colliders[i].getLocalBounds().height / 2);
-
-    }*/
-
     background_texture.loadFromFile("img/BG.png");
     skeleton_texture.loadFromFile("img/skeleton.png");
     ground_texture.loadFromFile("img/ground.png");
@@ -1002,6 +1030,10 @@ void init_Map1()
     stone_block_texture.loadFromFile("img/Stoneblock.png");
     player1_collider.setOrigin(player1_collider.getLocalBounds().width / 2, player1_collider.getLocalBounds().height / 2);
     player2_collider.setOrigin(player2_collider.getLocalBounds().width / 2, player2_collider.getLocalBounds().height / 2);
+    sniper_collider.setOrigin(sniper_collider.getLocalBounds().width / 2, sniper_collider.getLocalBounds().height / 2);
+    pistol_collider.setOrigin(pistol_collider.getLocalBounds().width / 2, pistol_collider.getLocalBounds().height / 2);
+    pewpew_collider.setOrigin(pewpew_collider.getLocalBounds().width / 2, pewpew_collider.getLocalBounds().height / 2);
+    swrd_collider.setOrigin(swrd_collider.getLocalBounds().width / 2, swrd_collider.getLocalBounds().height / 2);
     tre();
     grounds();
     skeleton();
@@ -1011,9 +1043,23 @@ void init_Map1()
     grass();
     stoneblock();
     background.setScale(1, 0.75);
+    pistol.collider = pistol_collider;
+    sniper.collider = sniper_collider;
+    pewpew.collider = pewpew_collider;
+    sword.collider = swrd_collider;
+
     duck1.myduck.setPosition(250, 210);
     duck2.myduck.setPosition(950, 225);
-    //cout << blocks[3].getGlobalBounds().width << " " << blocks[3].getGlobalBounds().height << endl;
+
+    sniper.weapon.setPosition(450.f, 415);
+    pistol.weapon.setPosition(720.f, 145);
+    pewpew.weapon.setPosition(360.f, 510);
+    sword.weapon.setPosition(1035.f, 465);
+    //spawn weaps
+    weaps.push_back(pistol);
+    weaps.push_back(sniper);
+    weaps.push_back(pewpew);
+    weaps.push_back(sword);
 }
 void update_Map1()
 {
@@ -1032,18 +1078,40 @@ void update_Map1()
     stone_block.setTexture(stone_block_texture);
     player1_collider.setPosition(duck1.myduck.getPosition().x + 38, duck1.myduck.getPosition().y - 30);
     player2_collider.setPosition(duck2.myduck.getPosition().x + 38, duck2.myduck.getPosition().y - 30);
+
+    for (int i = 0;i < weaps.size();i++)
+    {
+        if (weaps[i].type == "pistol")
+        {
+            weaps[i].collider.setPosition(weaps[i].weapon.getPosition().x + 17, weaps[i].weapon.getPosition().y - 10);
+        }
+        else if (weaps[i].type == "sniper")
+        {
+            weaps[i].collider.setPosition(weaps[i].weapon.getPosition().x + 33, weaps[i].weapon.getPosition().y - 10);
+        }
+        else if (weaps[i].type == "pewpew")
+        {
+            weaps[i].collider.setPosition(weaps[i].weapon.getPosition().x + 25, weaps[i].weapon.getPosition().y - 10);
+        }
+        else
+        {
+            weaps[i].collider.setPosition(weaps[i].weapon.getPosition().x + 23, weaps[i].weapon.getPosition().y - 8);
+        }
+    }
+
     collision_Map1(player1_collider, duck1);
     collision_Map1(player2_collider, duck2);
-    
+    for (int i = 0;i < weaps.size();i++)
+    {
+        collision_weaps_Map1(weaps[i].collider, weaps[i]);
+    }
     if (duck1.myduck.getPosition().y >= 620)
     {
         duck1.dead = true;
-        GameEnd = 1;
     }
     if (duck2.myduck.getPosition().y >= 620)
     {
         duck2.dead = true;
-        GameEnd = 1;
     }
     update_Logic();
 }
@@ -2090,8 +2158,8 @@ Texture blockTexture;
 Texture groundTexture;
 Sprite blockse[9];
 Sprite backgroundSprite;
-RectangleShape blockscollider[8];
 RectangleShape player1_colliderh(Vector2f(27, 50)), player2_colliderh(Vector2f(27, 50));
+RectangleShape pistol_colliderh(Vector2f(25, 20)), sniper_colliderh(Vector2f(55, 20)), pewpew_colliderh(Vector2f(45, 25)), swrd_colliderh(Vector2f(40, 20));
 
 void blocks5() {
     blockse[0].setPosition(155, 520);
@@ -2112,67 +2180,6 @@ void blocks5() {
     blockse[7].setScale(1.7, 1);
     blockse[8].setPosition(845, 520);
     blockse[8].setScale(2.25, 1);
-}
-void init_Map5() {
-    DUCK_SCALE = 2.f;
-    GUN_SCALE = 1.6f;
-    fact = 3.f;
-    //gravity = Put_your_val;
-    //jumpSpeed = Put_your_val;  //give it negative value
-    //velocityX = Put_your_val;   // the duck speed
-    init();
-    // pistol
-    pistol.fix_X = -4.f;
-    pistol.fix_Y = -23.f;
-    pistol.fix_hold_x = 25.f;
-    pistol.fix_hold_y = -12.f;
-    pistol.rev = 10.f;
-    //sniper
-    sniper.fix_X = 17.f;
-    sniper.fix_Y = -18.f;
-    sniper.fix_hold_x = 14.f;
-    sniper.fix_hold_y = -16.f;
-    sniper.rev = 23.f;
-    //pewpew
-    pewpew.fix_X = 7.f;
-    pewpew.fix_Y = -13.f;
-    pewpew.fix_hold_x = 18.f;
-    pewpew.fix_hold_y = -15.f;
-    pewpew.rev = 17.f;
-    //sword
-    sword.fix_hold_x = 38.f;
-    sword.fix_hold_y = -14.f;
-    sword.rev = 2.f;
-    //bull1
-    bull[1].scalex = 0.048f;
-    bull[1].scaley = 0.048f;
-    //bull2
-    bull[2].scalex = 0.16f;
-    bull[2].scaley = 0.16f;
-    //grave
-    Grave.setScale(0.16f, 0.1f);
-
-    //spawn weaps
-    weaps.push_back(pistol);
-    weaps.push_back(sniper);
-    weaps.push_back(pewpew);
-    weaps.push_back(sword);
-
-
-    backgroundTexture.loadFromFile("img/nature.png");
-    blockTexture.loadFromFile("img/blocks.png");
-    blocks5();
-    for (int i = 0;i < 9;i++) {
-        blockse[i].setTexture(blockTexture);
-    }
-    backgroundSprite.setTexture(backgroundTexture);
-    Vector2f windowSize = static_cast<sf::Vector2f>(window.getSize());
-    Vector2f textureSize = static_cast<sf::Vector2f>(backgroundTexture.getSize());
-    backgroundSprite.setScale(windowSize.x / textureSize.x, windowSize.y / textureSize.y);
-    player1_colliderh.setOrigin(player1_colliderh.getLocalBounds().width / 2, player1_colliderh.getLocalBounds().height / 2);
-    player2_colliderh.setOrigin(player2_colliderh.getLocalBounds().width / 2, player2_colliderh.getLocalBounds().height / 2);
-    duck1.myduck.setPosition(30, 320);
-    duck2.myduck.setPosition(1030, 90);
 }
 void collision_Map5(RectangleShape& player_collider, ducks& duck)
 {
@@ -2213,15 +2220,149 @@ void collision_Map5(RectangleShape& player_collider, ducks& duck)
         }
     }
 }
+void collision_weaps_Map5(RectangleShape& collider, weapons& weap)
+{
+    FloatRect box, wall, intersection;
+    box = weap.weapon.getGlobalBounds();
+    for (int i = 0;i < 9;i++)
+    {
+        wall = blockse[i].getGlobalBounds();
+        if (box.intersects(wall))
+        {
+            box.intersects(wall, intersection);
+            if (intersection.width > intersection.height)
+            {
+                if (box.top < wall.top)
+                {
+                    weap.onGround = true;
+                    weap.velocityY = 0.f;
+                    weap.weapon.setPosition(weap.weapon.getPosition().x, blockse[i].getPosition().y + 1.f);
+                }
+                else
+                {
+                    weap.weapon.setPosition(weap.weapon.getPosition().x, weap.weapon.getPosition().y + intersection.height);
+                }
+            }
+            else
+            {
+                if (box.left < wall.left)
+                {
+                    weap.weapon.setPosition(weap.weapon.getPosition().x - intersection.width, weap.weapon.getPosition().y);
+                }
+                else
+                {
+                    weap.weapon.setPosition(weap.weapon.getPosition().x + intersection.width, weap.weapon.getPosition().y);
+                }
+            }
+        }
+    }
+}
+void init_Map5() {
+    DUCK_SCALE = 2.f;
+    GUN_SCALE = 1.6f;
+    fact = 3.f;
+    //gravity = Put_your_val;
+    //jumpSpeed = Put_your_val;  //give it negative value
+    //velocityX = Put_your_val;   // the duck speed
+    init();
+    // pistol
+    pistol.fix_X = -4.f;
+    pistol.fix_Y = -23.f;
+    pistol.fix_hold_x = 25.f;
+    pistol.fix_hold_y = -12.f;
+    pistol.rev = 10.f;
+    //sniper
+    sniper.fix_X = 17.f;
+    sniper.fix_Y = -18.f;
+    sniper.fix_hold_x = 14.f;
+    sniper.fix_hold_y = -16.f;
+    sniper.rev = 23.f;
+    //pewpew
+    pewpew.fix_X = 7.f;
+    pewpew.fix_Y = -13.f;
+    pewpew.fix_hold_x = 18.f;
+    pewpew.fix_hold_y = -15.f;
+    pewpew.rev = 17.f;
+    //sword
+    sword.fix_hold_x = 38.f;
+    sword.fix_hold_y = -14.f;
+    sword.rev = 2.f;
+    //bull1
+    bull[1].scalex = 0.048f;
+    bull[1].scaley = 0.048f;
+    //bull2
+    bull[2].scalex = 0.16f;
+    bull[2].scaley = 0.16f;
+    //grave
+    Grave.setScale(0.16f, 0.1f);
 
+
+
+    backgroundTexture.loadFromFile("img/nature.png");
+    blockTexture.loadFromFile("img/blocks.png");
+    blocks5();
+    for (int i = 0;i < 9;i++) {
+        blockse[i].setTexture(blockTexture);
+    }
+    backgroundSprite.setTexture(backgroundTexture);
+    Vector2f windowSize = static_cast<sf::Vector2f>(window.getSize());
+    Vector2f textureSize = static_cast<sf::Vector2f>(backgroundTexture.getSize());
+    backgroundSprite.setScale(windowSize.x / textureSize.x, windowSize.y / textureSize.y);
+    player1_colliderh.setOrigin(player1_colliderh.getLocalBounds().width / 2, player1_colliderh.getLocalBounds().height / 2);
+    player2_colliderh.setOrigin(player2_colliderh.getLocalBounds().width / 2, player2_colliderh.getLocalBounds().height / 2);
+    sniper_collider.setOrigin(sniper_collider.getLocalBounds().width / 2, sniper_collider.getLocalBounds().height / 2);
+    pistol_collider.setOrigin(pistol_collider.getLocalBounds().width / 2, pistol_collider.getLocalBounds().height / 2);
+    pewpew_collider.setOrigin(pewpew_collider.getLocalBounds().width / 2, pewpew_collider.getLocalBounds().height / 2);
+    swrd_collider.setOrigin(swrd_collider.getLocalBounds().width / 2, swrd_collider.getLocalBounds().height / 2);
+    pistol.collider = pistol_colliderh;
+    sniper.collider = sniper_colliderh;
+    pewpew.collider = pewpew_colliderh;
+    sword.collider = swrd_colliderh;
+
+    duck1.myduck.setPosition(30, 320);
+    duck2.myduck.setPosition(1030, 90);
+
+    sniper.weapon.setPosition(200, 390);
+    pistol.weapon.setPosition(850, 520);
+    pewpew.weapon.setPosition(750, 175);
+    sword.weapon.setPosition(400, 175);
+
+    //spawn weaps
+    weaps.push_back(pistol);
+    weaps.push_back(sniper);
+    weaps.push_back(pewpew);
+    weaps.push_back(sword);
+}
 void update_Map5() {
-    player1_colliderh.setPosition(duck1.myduck.getPosition().x + 32, duck1.myduck.getPosition().y - 25);
-    player2_colliderh.setPosition(duck2.myduck.getPosition().x + 32, duck2.myduck.getPosition().y - 25);
     duck1.onGround = 0;
     duck2.onGround = 0;
+    player1_colliderh.setPosition(duck1.myduck.getPosition().x + 32, duck1.myduck.getPosition().y - 25);
+    player2_colliderh.setPosition(duck2.myduck.getPosition().x + 32, duck2.myduck.getPosition().y - 25);
+    for (int i = 0;i < weaps.size();i++)
+    {
+        if (weaps[i].type == "pistol")
+        {
+            weaps[i].collider.setPosition(weaps[i].weapon.getPosition().x, weaps[i].weapon.getPosition().y - 20);
+        }
+        else if (weaps[i].type == "sniper")
+        {
+            weaps[i].collider.setPosition(weaps[i].weapon.getPosition().x, weaps[i].weapon.getPosition().y - 20);
+        }
+        else if (weaps[i].type == "pewpew")
+        {
+            weaps[i].collider.setPosition(weaps[i].weapon.getPosition().x, weaps[i].weapon.getPosition().y - 20);
+        }
+        else
+        {
+            weaps[i].collider.setPosition(weaps[i].weapon.getPosition().x, weaps[i].weapon.getPosition().y - 15);
+        }
+    }
     collision_Map5(player1_colliderh, duck1);
     collision_Map5(player2_colliderh, duck2);
-    update_Logic();
+    for (int i = 0;i < weaps.size();i++)
+    {
+        collision_weaps_Map5(weaps[i].collider, weaps[i]);
+    }
     if (duck1.onGround)
     {
         duck1.isJumping = 0;
@@ -2238,12 +2379,9 @@ void update_Map5() {
     {
         duck2.isJumping = 1;
     }
+    update_Logic();
 }
 void draw_Map5() {
-
-    for (int i = 0;i < 8;i++) {
-        window.draw(blockscollider[i]);
-    }
 
     window.draw(backgroundSprite);
     for (int i = 0;i < 9;i++)
