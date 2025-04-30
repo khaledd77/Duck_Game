@@ -31,7 +31,7 @@ Texture grave;
 Sprite Grave;
 splashScreen intro;
 
-Clock trans;
+Clock trans, SPAWN;
 
 bool fullscreen = false;
 
@@ -47,7 +47,7 @@ float jumpSpeed = -14.f;
 float velocityX = 5.f;
 float MaxiVelocityY = 10.f;
 bool GameEnd = 0;
-ll mapnum = 0, duck1Score=0, duck2Score=0;
+ll mapnum = 4, duck1Score=0, duck2Score=0;
 float DUCK_SCALE;
 float GUN_SCALE;
 float scalex, scaley;
@@ -712,9 +712,9 @@ void initGameMenu(int width, int height, RenderWindow& window) {
 void initMusic() {
 
     // Music
-    //if (!settingsMenu.menuMusic.openFromFile("img/music.wav")) {
-    //    cout << "Error loading menu music.\n";
-    //}
+    if (!settingsMenu.menuMusic.openFromFile("img/music.wav")) {
+        cout << "Error loading menu music.\n";
+    }
 
     settingsMenu.menuMusic.setLoop(true);
     settingsMenu.menuMusic.play();
@@ -810,7 +810,7 @@ void fullscreenMode(RenderWindow& window) {
 
 //Khaled's MAP
 Texture ground_texture, background_texture, skeleton_texture, stone_texture, tree_texture, cactus1, cactus2, cactus3, bushs_texture, grass_texture, stone_block_texture;
-Sprite blocks[25], skeletons[3], stones[2], tree, ccts[5], bush[3], grs[2], stone_block, background;
+Sprite blocks[25], skeletons[3], stones[2], tree, ccts[5], bush[3], grs[2], stone_block[2], background;
 RectangleShape player1_collider(Vector2f(40, 62)), player2_collider(Vector2f(40, 62));
 RectangleShape pistol_collider(Vector2f(35, 25)), sniper_collider(Vector2f(70, 20)), pewpew_collider(Vector2f(55, 25)), swrd_collider(Vector2f(50, 20));
 void grounds()
@@ -831,7 +831,7 @@ void grounds()
     blocks[6].setScale(0.4, 0.35);
     blocks[7].setPosition(580, 570);
     blocks[7].setScale(0.4, 0.35);
-    blocks[8].setPosition(1150, 300);
+    blocks[8].setPosition(1180, 300);
     blocks[8].setScale(0.25, 0.35);
     blocks[9].setPosition(130, 425);
     blocks[9].setScale(0.55, 0.35);
@@ -895,8 +895,10 @@ void grass()
 }
 void stoneblock()
 {
-    stone_block.setPosition(380, 478);
-    stone_block.setScale(0.35, 0.35);
+    stone_block[0].setPosition(1125, 432);
+    stone_block[0].setScale(0.35, 0.35);
+    stone_block[1].setPosition(1125, 400);
+    stone_block[1].setScale(0.35, 0.35);
 }
 void Bullet_Collision1() {
     for (int i = bulls.size() - 1;i >= 0; i--)
@@ -905,6 +907,19 @@ void Bullet_Collision1() {
         for (int j = 0; j < 25; j++)
         {
             if (bulls[i].bullet.getGlobalBounds().intersects(blocks[j].getGlobalBounds()))
+            {
+
+                bulls.erase(bulls.begin() + i);
+                break;
+            }
+        }
+    }
+    for (int i = bulls.size() - 1;i >= 0; i--)
+    {
+
+        for (int j = 0; j < 2; j++)
+        {
+            if (bulls[i].bullet.getGlobalBounds().intersects(stone_block[i].getGlobalBounds()))
             {
 
                 bulls.erase(bulls.begin() + i);
@@ -951,6 +966,39 @@ void collision_Map1(RectangleShape& player_collider, ducks& duck)
             }
         }
     }
+    for (int i = 0;i < 2;i++)
+    {
+        wall = stone_block[i].getGlobalBounds();
+        if (box.intersects(wall))
+        {
+            box.intersects(wall, intersection);
+            if (intersection.width > intersection.height)
+            {
+                if (box.top < wall.top)
+                {
+                    duck.onGround = true;
+                    duck.isJumping = false;
+                    duck.velocityY = 0.f;
+                    duck.myduck.setPosition(duck.myduck.getPosition().x, stone_block[i].getPosition().y);
+                }
+                else
+                {
+                    duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
+                }
+            }
+            else
+            {
+                if (box.left < wall.left)
+                {
+                    duck.myduck.setPosition(duck.myduck.getPosition().x - intersection.width, duck.myduck.getPosition().y);
+                }
+                else
+                {
+                    duck.myduck.setPosition(duck.myduck.getPosition().x + intersection.width, duck.myduck.getPosition().y);
+                }
+            }
+        }
+    }
 }
 void collision_weaps_Map1(RectangleShape& collider, weapons& weap)
 {
@@ -969,7 +1017,7 @@ void collision_weaps_Map1(RectangleShape& collider, weapons& weap)
                     weap.onGround = true;
                     weap.velocityY = 0.f;
                     weap.velocityX = 0.f;
-                    weap.weapon.setPosition(weap.weapon.getPosition().x, blocks[i].getPosition().y);
+                    weap.weapon.setPosition(weap.weapon.getPosition().x, blocks[i].getPosition().y+1);
                 }
                 else
                 {
@@ -991,6 +1039,82 @@ void collision_weaps_Map1(RectangleShape& collider, weapons& weap)
             }
         }
     }
+    for (int i = 0;i < 2;i++)
+    {
+        wall = stone_block[i].getGlobalBounds();
+        if (box.intersects(wall))
+        {
+            box.intersects(wall, intersection);
+            if (intersection.width > intersection.height)
+            {
+                if (box.top < wall.top)
+                {
+                    weap.onGround = true;
+                    weap.velocityY = 0.f;
+                    weap.weapon.setPosition(weap.weapon.getPosition().x, stone_block[i].getPosition().y);
+                }
+                else
+                {
+                    weap.weapon.setPosition(weap.weapon.getPosition().x, weap.weapon.getPosition().y + intersection.height);
+                }
+            }
+            else
+            {
+                if (box.left < wall.left)
+                {
+                    weap.weapon.setPosition(weap.weapon.getPosition().x - intersection.width, weap.weapon.getPosition().y);
+                }
+                else
+                {
+                    weap.weapon.setPosition(weap.weapon.getPosition().x + intersection.width, weap.weapon.getPosition().y);
+                }
+            }
+        }
+    }
+}
+void SPAWN1() {
+    sniper_collider.setOrigin(sniper_collider.getLocalBounds().width / 2, sniper_collider.getLocalBounds().height / 2);
+    pistol_collider.setOrigin(pistol_collider.getLocalBounds().width / 2, pistol_collider.getLocalBounds().height / 2);
+    pewpew_collider.setOrigin(pewpew_collider.getLocalBounds().width / 2, pewpew_collider.getLocalBounds().height / 2);
+    swrd_collider.setOrigin(swrd_collider.getLocalBounds().width / 2, swrd_collider.getLocalBounds().height / 2);
+    sniper.weapon.setPosition(450.f, 510);
+    pistol.weapon.setPosition(720.f, 145);
+    pewpew.weapon.setPosition(360.f, 510);
+    sword.weapon.setPosition(1035.f, 465);
+    pistol.collider = pistol_collider;
+    sniper.collider = sniper_collider;
+    pewpew.collider = pewpew_collider;
+    sword.collider = swrd_collider;
+    //spawn weaps
+    bool flag = 1;
+    for (ll i = 0;i < weaps.size();++i) {
+        if (abs(weaps[i].weapon.getPosition().x - pistol.weapon.getPosition().x) <= 20 && abs(weaps[i].weapon.getPosition().y - pistol.weapon.getPosition().y) <= 20) {
+            flag = 0;
+        }
+    }
+    if(flag) weaps.push_back(pistol);
+    flag = 1;
+    for (ll i = 0;i < weaps.size();++i) {
+        if (abs(weaps[i].weapon.getPosition().x - sniper.weapon.getPosition().x) <= 20 && abs(weaps[i].weapon.getPosition().y - sniper.weapon.getPosition().y) <= 20) {
+            flag = 0;
+        }
+    }
+    if(flag) weaps.push_back(sniper);
+    flag = 1;
+    for (ll i = 0;i < weaps.size();++i) {
+        if (abs(weaps[i].weapon.getPosition().x - pewpew.weapon.getPosition().x) <= 20 && abs(weaps[i].weapon.getPosition().y - pewpew.weapon.getPosition().y) <= 20) {
+            flag = 0;
+        }
+    }
+    if(flag) weaps.push_back(pewpew);
+    flag = 1;
+    for (ll i = 0;i < weaps.size();++i) {
+        if (abs(weaps[i].weapon.getPosition().x - sword.weapon.getPosition().x) <= 20 && abs(weaps[i].weapon.getPosition().y - sword.weapon.getPosition().y) <= 20) {
+            flag = 0;
+        }
+    }
+    if(flag) weaps.push_back(sword);
+    SPAWN.restart();
 }
 void init_Map1()
 {
@@ -1043,12 +1167,6 @@ void init_Map1()
     bushs_texture.loadFromFile("img/Bush (2).png");
     grass_texture.loadFromFile("img/Grass (1).png");
     stone_block_texture.loadFromFile("img/Stoneblock.png");
-    player1_collider.setOrigin(player1_collider.getLocalBounds().width / 2, player1_collider.getLocalBounds().height / 2);
-    player2_collider.setOrigin(player2_collider.getLocalBounds().width / 2, player2_collider.getLocalBounds().height / 2);
-    sniper_collider.setOrigin(sniper_collider.getLocalBounds().width / 2, sniper_collider.getLocalBounds().height / 2);
-    pistol_collider.setOrigin(pistol_collider.getLocalBounds().width / 2, pistol_collider.getLocalBounds().height / 2);
-    pewpew_collider.setOrigin(pewpew_collider.getLocalBounds().width / 2, pewpew_collider.getLocalBounds().height / 2);
-    swrd_collider.setOrigin(swrd_collider.getLocalBounds().width / 2, swrd_collider.getLocalBounds().height / 2);
     tre();
     grounds();
     skeleton();
@@ -1057,24 +1175,12 @@ void init_Map1()
     bushs();
     grass();
     stoneblock();
+    player1_collider.setOrigin(player1_collider.getLocalBounds().width / 2, player1_collider.getLocalBounds().height / 2);
+    player2_collider.setOrigin(player2_collider.getLocalBounds().width / 2, player2_collider.getLocalBounds().height / 2);
     background.setScale(1, 0.75);
-    pistol.collider = pistol_collider;
-    sniper.collider = sniper_collider;
-    pewpew.collider = pewpew_collider;
-    sword.collider = swrd_collider;
-
     duck1.myduck.setPosition(250, 210);
     duck2.myduck.setPosition(950, 225);
-
-    sniper.weapon.setPosition(450.f, 415);
-    pistol.weapon.setPosition(720.f, 145);
-    pewpew.weapon.setPosition(360.f, 510);
-    sword.weapon.setPosition(1035.f, 465);
-    //spawn weaps
-    weaps.push_back(pistol);
-    weaps.push_back(sniper);
-    weaps.push_back(pewpew);
-    weaps.push_back(sword);
+    SPAWN1();
 }
 void update_Map1()
 {
@@ -1090,7 +1196,7 @@ void update_Map1()
     for (int i = 3;i < 5;i++) ccts[i].setTexture(cactus3);
     for (int i = 0;i < 3;i++) bush[i].setTexture(bushs_texture);
     for (int i = 0;i < 2;i++) grs[i].setTexture(grass_texture);
-    stone_block.setTexture(stone_block_texture);
+    for (int i = 0;i < 2;i++) stone_block[i].setTexture(stone_block_texture);
     player1_collider.setPosition(duck1.myduck.getPosition().x + 38, duck1.myduck.getPosition().y - 30);
     player2_collider.setPosition(duck2.myduck.getPosition().x + 38, duck2.myduck.getPosition().y - 30);
 
@@ -1130,17 +1236,20 @@ void update_Map1()
         duck2.dead = true;
     }
     update_Logic();
+    if (SPAWN.getElapsedTime().asSeconds() >= 10) {
+        SPAWN1();
+    }
 }
 void draw_Map1()
 {
     window.draw(background);
     for (int i = 0;i < 13;i++)  window.draw(blocks[i]);
+    for (int i = 0;i < 2;i++) window.draw(stone_block[i]);
     for (int i = 0;i < 2;i++) window.draw(stones[i]);
     for (int i = 0;i < 3;i++) window.draw(skeletons[i]);
     window.draw(tree);
     for (int i = 0;i < 5;i++) window.draw(ccts[i]);
     for (int i = 0;i < 2;i++) window.draw(grs[i]);
-    window.draw(stone_block);
     draw_Logic();
 }
 void Map1() {
@@ -1441,7 +1550,61 @@ RectangleShape snipercollider3(Vector2f(40, 25));
 RectangleShape pewpewcollider3(Vector2f(40, 25));
 RectangleShape swordcollider3(Vector2f(36, 20));
 
+void SPAWN3() {
+    playercollider1.setOrigin(duck1.myduck.getLocalBounds().width / 2 - 34, duck1.myduck.getLocalBounds().height / 2 + 30);
+    playercollider2.setOrigin(duck2.myduck.getLocalBounds().width / 2 - 34, duck2.myduck.getLocalBounds().height / 2 + 30);
 
+    pistolcollider3.setOrigin(pistol.weapon.getLocalBounds().width / 2 - 8, pistol.weapon.getLocalBounds().height / 2 + 13);
+    snipercollider3.setOrigin(sniper.weapon.getLocalBounds().width / 2 - 18, sniper.weapon.getLocalBounds().height / 2 + 11);
+    pewpewcollider3.setOrigin(pewpew.weapon.getLocalBounds().width / 2 - 13, pewpew.weapon.getLocalBounds().height / 2 + 12);
+    swordcollider3.setOrigin(sword.weapon.getLocalBounds().width / 2 - 4, sword.weapon.getLocalBounds().height / 2);
+
+    pistolcollider3.setFillColor(Color::Green);
+    snipercollider3.setFillColor(Color::Green);
+    pewpewcollider3.setFillColor(Color::Green);
+    swordcollider3.setFillColor(Color::Green);
+
+    pistol.collider = pistolcollider3;
+    sniper.collider = snipercollider3;
+    pewpew.collider = pewpewcollider3;
+    sword.collider = swordcollider3;
+
+    pistol.weapon.setPosition(60, 466);
+    pewpew.weapon.setPosition(1240, 460);
+    sniper.weapon.setPosition(750, 366);
+    sword.weapon.setPosition(875, 535);
+
+    //spawn weaps
+    bool flag = 1;
+    for (ll i = 0;i < weaps.size();++i) {
+        if (abs(weaps[i].weapon.getPosition().x - pistol.weapon.getPosition().x) <= 20 && abs(weaps[i].weapon.getPosition().y - pistol.weapon.getPosition().y) <= 20) {
+            flag = 0;
+        }
+    }
+    if (flag) weaps.push_back(pistol);
+    flag = 1;
+    for (ll i = 0;i < weaps.size();++i) {
+        if (abs(weaps[i].weapon.getPosition().x - sniper.weapon.getPosition().x) <= 20 && abs(weaps[i].weapon.getPosition().y - sniper.weapon.getPosition().y) <= 20) {
+            flag = 0;
+        }
+    }
+    if (flag) weaps.push_back(sniper);
+    flag = 1;
+    for (ll i = 0;i < weaps.size();++i) {
+        if (abs(weaps[i].weapon.getPosition().x - pewpew.weapon.getPosition().x) <= 20 && abs(weaps[i].weapon.getPosition().y - pewpew.weapon.getPosition().y) <= 20) {
+            flag = 0;
+        }
+    }
+    if (flag) weaps.push_back(pewpew);
+    flag = 1;
+    for (ll i = 0;i < weaps.size();++i) {
+        if (abs(weaps[i].weapon.getPosition().x - sword.weapon.getPosition().x) <= 20 && abs(weaps[i].weapon.getPosition().y - sword.weapon.getPosition().y) <= 20) {
+            flag = 0;
+        }
+    }
+    if (flag) weaps.push_back(sword);
+    SPAWN.restart();
+}
 void groundd()
 {
     for (int i = 0; i < 10; i++)
@@ -1622,7 +1785,6 @@ void init_Map3()
     jumpSpeed = -9.5f;  //give it negative value
     velocityX = 3;   // the duck speed
     init();
-    pistol.weapon.setPosition(1000, 250);
     // pistol
     pistol.fix_X = -4.f;
     pistol.fix_Y = -23.f;
@@ -1674,30 +1836,8 @@ void init_Map3()
 
     duck1.myduck.setPosition(180, 250);
     duck2.myduck.setPosition(530, 660);
-
-    playercollider1.setOrigin(duck1.myduck.getLocalBounds().width / 2 - 34, duck1.myduck.getLocalBounds().height / 2 + 30);
-    playercollider2.setOrigin(duck2.myduck.getLocalBounds().width / 2 - 34, duck2.myduck.getLocalBounds().height / 2 + 30);
-
-    pistolcollider3.setOrigin(pistol.weapon.getLocalBounds().width / 2 - 8, pistol.weapon.getLocalBounds().height / 2 + 13);
-    snipercollider3.setOrigin(sniper.weapon.getLocalBounds().width / 2 - 18, sniper.weapon.getLocalBounds().height / 2 + 11);
-    pewpewcollider3.setOrigin(pewpew.weapon.getLocalBounds().width / 2 - 13, pewpew.weapon.getLocalBounds().height / 2 + 12);
-    swordcollider3.setOrigin(sword.weapon.getLocalBounds().width / 2 - 4, sword.weapon.getLocalBounds().height / 2);
-
-    pistolcollider3.setFillColor(Color::Green);
-    snipercollider3.setFillColor(Color::Green);
-    pewpewcollider3.setFillColor(Color::Green);
-    swordcollider3.setFillColor(Color::Green);
-
-    pistol.collider = pistolcollider3;
-    sniper.collider = snipercollider3;
-    pewpew.collider = pewpewcollider3;
-    sword.collider = swordcollider3;
-
     
-    weaps.push_back(pistol);
-    weaps.push_back(sniper);
-    weaps.push_back(pewpew);
-    weaps.push_back(sword);
+    SPAWN3();
     blocksGhareeb();
 
 }
@@ -1731,6 +1871,9 @@ void update3()
 
 
     update_Logic();
+    if (SPAWN.getElapsedTime().asSeconds() >= 10) {
+        SPAWN3();
+    }
 
 }
 void draw3()
@@ -1792,6 +1935,60 @@ string snowMap[23] = {
     "........................................",
     "........................................"
 };
+void SPAWN4() {
+
+    for (int y = 0; y < 23; y++) {
+        for (int x = 0; x < snowMap[y].length(); x++) {
+            bool flag = 1;
+            if (snowMap[y][x] == 'S') {
+                weapPos.x = x * TILE_SIZEE;
+                weapPos.y = (y + .9) * TILE_SIZEE;
+                sniper.weapon.setPosition(weapPos.x, weapPos.y);
+                for (ll i = 0;i < weaps.size();++i) {
+                    if (abs(weaps[i].weapon.getPosition().x - sniper.weapon.getPosition().x) <= 20 && abs(weaps[i].weapon.getPosition().y - sniper.weapon.getPosition().y) <= 20) {
+                        flag = 0;
+                    }
+                }
+                if (flag) weaps.push_back(sniper);
+            }
+            else if (snowMap[y][x] == 'W') {
+                weapPos.x = x * TILE_SIZEE;
+                weapPos.y = (y + .9) * TILE_SIZEE;
+                sword.weapon.setPosition(weapPos.x, weapPos.y);
+                for (ll i = 0;i < weaps.size();++i) {
+                    if (abs(weaps[i].weapon.getPosition().x - sword.weapon.getPosition().x) <= 20 && abs(weaps[i].weapon.getPosition().y - sword.weapon.getPosition().y) <= 20) {
+                        flag = 0;
+                    }
+                }
+                if (flag) weaps.push_back(sword);
+            }
+            else if (snowMap[y][x] == 'E') {
+                weapPos.x = (x - .3) * TILE_SIZEE;
+                weapPos.y = (y + .9) * TILE_SIZEE;
+                pewpew.weapon.setPosition(weapPos.x, weapPos.y);
+                for (ll i = 0;i < weaps.size();++i) {
+                    if (abs(weaps[i].weapon.getPosition().x - pewpew.weapon.getPosition().x) <= 20 && abs(weaps[i].weapon.getPosition().y - pewpew.weapon.getPosition().y) <= 20) {
+                        flag = 0;
+                    }
+                }
+                if (flag) weaps.push_back(pewpew);
+            }
+            else if (snowMap[y][x] == 'P') {
+                weapPos.x = x * TILE_SIZEE;
+                weapPos.y = (y + .9) * TILE_SIZEE;
+                pistol.weapon.setPosition(weapPos.x, weapPos.y);
+                for (ll i = 0;i < weaps.size();++i) {
+                    if (abs(weaps[i].weapon.getPosition().x - pistol.weapon.getPosition().x) <= 20 && abs(weaps[i].weapon.getPosition().y - pistol.weapon.getPosition().y) <= 20) {
+                        flag = 0;
+                    }
+                }
+                if (flag) weaps.push_back(pistol);
+            }
+        }
+    }
+    
+    SPAWN.restart();
+}
 void initBackground()
 {
     ground.loadFromFile("img/Lv7nNS.png");
@@ -1860,37 +2057,7 @@ void init_Map4()
     //grave
     Grave.setScale(0.16f, 0.1f);
 
-    // SET WEAPONS POSITION
-    for (int y = 0; y < 23; y++) {
-        for (int x = 0; x < snowMap[y].length(); x++) {
-            if (snowMap[y][x] == 'S') {
-                weapPos.x = x * TILE_SIZEE;
-                weapPos.y = (y + .9) * TILE_SIZEE;
-                sniper.weapon.setPosition(weapPos.x, weapPos.y);
-            }
-            else if (snowMap[y][x] == 'W') {
-                weapPos.x = x * TILE_SIZEE;
-                weapPos.y = (y + .9) * TILE_SIZEE;
-                sword.weapon.setPosition(weapPos.x, weapPos.y);
-            }
-            else if (snowMap[y][x] == 'E') {
-                weapPos.x = (x - .3) * TILE_SIZEE;
-                weapPos.y = (y + .9) * TILE_SIZEE;
-                pewpew.weapon.setPosition(weapPos.x, weapPos.y);
-            }
-            else if (snowMap[y][x] == 'P') {
-                weapPos.x = x * TILE_SIZEE;
-                weapPos.y = (y + .9) * TILE_SIZEE;
-                pistol.weapon.setPosition(weapPos.x, weapPos.y);
-            }
-        }
-    }
-
-    //spawn weaps
-    weaps.push_back(pistol);
-    weaps.push_back(sniper);
-    weaps.push_back(pewpew);
-    weaps.push_back(sword);
+    SPAWN4();
 
     ice.loadFromFile("img/iceBlocks.png");
     snow.loadFromFile("img/snowBlocks.png");
@@ -2162,6 +2329,9 @@ void update_Map4() {
     collision_Map4(duck1);
     collision_Map4(duck2);
     bullet_collision4();
+    if (SPAWN.getElapsedTime().asSeconds() >= 10) {
+        SPAWN4();
+    }
 }
 void draw4() {
     window.draw(background);
@@ -2281,6 +2451,7 @@ void collision_weaps_Map5(RectangleShape& collider, weapons& weap)
                 {
                     weap.onGround = true;
                     weap.velocityY = 0.f;
+                    weap.velocityX = 0.f;
                     weap.weapon.setPosition(weap.weapon.getPosition().x, blockse[i].getPosition().y + 1.f);
                 }
                 else
@@ -2290,6 +2461,7 @@ void collision_weaps_Map5(RectangleShape& collider, weapons& weap)
             }
             else
             {
+                weap.velocityX = 0.f;
                 if (box.left < wall.left)
                 {
                     weap.weapon.setPosition(weap.weapon.getPosition().x - intersection.width, weap.weapon.getPosition().y);
@@ -2301,6 +2473,52 @@ void collision_weaps_Map5(RectangleShape& collider, weapons& weap)
             }
         }
     }
+}
+void SPAWN5() {
+
+    sniper_collider.setOrigin(sniper_collider.getLocalBounds().width / 2, sniper_collider.getLocalBounds().height / 2);
+    pistol_collider.setOrigin(pistol_collider.getLocalBounds().width / 2, pistol_collider.getLocalBounds().height / 2);
+    pewpew_collider.setOrigin(pewpew_collider.getLocalBounds().width / 2, pewpew_collider.getLocalBounds().height / 2);
+    swrd_collider.setOrigin(swrd_collider.getLocalBounds().width / 2, swrd_collider.getLocalBounds().height / 2);
+    sniper.weapon.setPosition(200, 510);
+    pistol.weapon.setPosition(850, 520);
+    pewpew.weapon.setPosition(750, 175);
+    sword.weapon.setPosition(400, 175);
+    pistol.collider = pistol_colliderh;
+    sniper.collider = sniper_colliderh;
+    pewpew.collider = pewpew_colliderh;
+    sword.collider = swrd_colliderh;
+
+    //spawn weaps
+    bool flag = 1;
+    for (ll i = 0;i < weaps.size();++i) {
+        if (abs(weaps[i].weapon.getPosition().x - pistol.weapon.getPosition().x) <= 20 && abs(weaps[i].weapon.getPosition().y - pistol.weapon.getPosition().y) <= 20) {
+            flag = 0;
+        }
+    }
+    if (flag) weaps.push_back(pistol);
+    flag = 1;
+    for (ll i = 0;i < weaps.size();++i) {
+        if (abs(weaps[i].weapon.getPosition().x - sniper.weapon.getPosition().x) <= 20 && abs(weaps[i].weapon.getPosition().y - sniper.weapon.getPosition().y) <= 20) {
+            flag = 0;
+        }
+    }
+    if (flag) weaps.push_back(sniper);
+    flag = 1;
+    for (ll i = 0;i < weaps.size();++i) {
+        if (abs(weaps[i].weapon.getPosition().x - pewpew.weapon.getPosition().x) <= 20 && abs(weaps[i].weapon.getPosition().y - pewpew.weapon.getPosition().y) <= 20) {
+            flag = 0;
+        }
+    }
+    if (flag) weaps.push_back(pewpew);
+    flag = 1;
+    for (ll i = 0;i < weaps.size();++i) {
+        if (abs(weaps[i].weapon.getPosition().x - sword.weapon.getPosition().x) <= 20 && abs(weaps[i].weapon.getPosition().y - sword.weapon.getPosition().y) <= 20) {
+            flag = 0;
+        }
+    }
+    if (flag) weaps.push_back(sword);
+    SPAWN.restart();
 }
 void init_Map5() {
     DUCK_SCALE = 2.f;
@@ -2355,28 +2573,10 @@ void init_Map5() {
     backgroundSprite.setScale(windowSize.x / textureSize.x, windowSize.y / textureSize.y);
     player1_colliderh.setOrigin(player1_colliderh.getLocalBounds().width / 2, player1_colliderh.getLocalBounds().height / 2);
     player2_colliderh.setOrigin(player2_colliderh.getLocalBounds().width / 2, player2_colliderh.getLocalBounds().height / 2);
-    sniper_collider.setOrigin(sniper_collider.getLocalBounds().width / 2, sniper_collider.getLocalBounds().height / 2);
-    pistol_collider.setOrigin(pistol_collider.getLocalBounds().width / 2, pistol_collider.getLocalBounds().height / 2);
-    pewpew_collider.setOrigin(pewpew_collider.getLocalBounds().width / 2, pewpew_collider.getLocalBounds().height / 2);
-    swrd_collider.setOrigin(swrd_collider.getLocalBounds().width / 2, swrd_collider.getLocalBounds().height / 2);
-    pistol.collider = pistol_colliderh;
-    sniper.collider = sniper_colliderh;
-    pewpew.collider = pewpew_colliderh;
-    sword.collider = swrd_colliderh;
-
     duck1.myduck.setPosition(30, 320);
     duck2.myduck.setPosition(1030, 90);
+    SPAWN5();
 
-    sniper.weapon.setPosition(200, 390);
-    pistol.weapon.setPosition(850, 520);
-    pewpew.weapon.setPosition(750, 175);
-    sword.weapon.setPosition(400, 175);
-
-    //spawn weaps
-    weaps.push_back(pistol);
-    weaps.push_back(sniper);
-    weaps.push_back(pewpew);
-    weaps.push_back(sword);
 }
 void update_Map5() {
     duck1.onGround = 0;
@@ -2426,6 +2626,9 @@ void update_Map5() {
         duck2.isJumping = 1;
     }
     update_Logic();
+    if (SPAWN.getElapsedTime().asSeconds() >= 10) {
+        SPAWN5();
+    }
 }
 void draw_Map5() {
 
