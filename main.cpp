@@ -2670,9 +2670,9 @@ void init_Map5() {
     DUCK_SCALE = 2.f;
     GUN_SCALE = 1.6f;
     fact = 3.f;
-    //gravity = Put_your_val;
-    //jumpSpeed = -14;  //give it negative value
-    //velocityX = Put_your_val;   // the duck speed
+    gravity = 0.5;
+    jumpSpeed = -14;  //give it negative value
+    velocityX = 5;   // the duck speed
     init();
     // pistol
     pistol.fix_X = -4.f;
