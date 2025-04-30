@@ -1498,6 +1498,7 @@ void weapon_handleCollision3(RectangleShape& weapcoll, weapons& weapon, block& o
                 weapon.weapon.setPosition(weapon.weapon.getPosition().x - intersection.width, weapon.weapon.getPosition().y);
             else
                 weapon.weapon.setPosition(weapon.weapon.getPosition().x + intersection.width, weapon.weapon.getPosition().y);
+            weapon.velocityX = 0;
         }
 
         {
@@ -1505,6 +1506,7 @@ void weapon_handleCollision3(RectangleShape& weapcoll, weapons& weapon, block& o
             {
                 weapon.weapon.setPosition(weapon.weapon.getPosition().x, obj.map_blocks.getPosition().y + 1.f);
                 weapon.velocityY = 0;
+                weapon.velocityX = 0;
                 weapon.onGround = true;
 
             }

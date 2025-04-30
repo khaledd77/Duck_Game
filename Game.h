@@ -26,6 +26,8 @@ struct mapTile {
 
 mapTile mapTiles[1000];
 int tileCount = 0;
+int weapCount = 0;
+Vector2f weapPos;
 Texture ground;
 Texture ice;
 Texture snow;
