@@ -214,8 +214,8 @@ void update_weapons() {
     for (auto& weap : weaps) {
         weap.weapon.move(weap.velocityX, weap.velocityY);
         weap.velocityY += gravity;
-        if (weap.weapon.getPosition().y >= 680.f) {
-            weap.weapon.setPosition(weap.weapon.getPosition().x, 680.f);
+        if (weap.weapon.getPosition().y >= 780.f) {
+            weap.weapon.setPosition(weap.weapon.getPosition().x, 780.f);
             weap.velocityX = 0.f;
             weap.velocityY = 0.f;
         }
@@ -898,6 +898,21 @@ void stoneblock()
     stone_block.setPosition(380, 478);
     stone_block.setScale(0.35, 0.35);
 }
+void Bullet_Collision1() {
+    for (int i = bulls.size() - 1;i >= 0; i++)
+    {
+
+        for (int j = 0; j < 25; j++)
+        {
+            if (bulls[i].bullet.getGlobalBounds().intersects(blocks[j].getGlobalBounds()))
+            {
+
+                bulls.erase(bulls.begin() + i);
+                break;
+            }
+        }
+    }
+}
 void collision_Map1(RectangleShape& player_collider, ducks& duck)
 {
     FloatRect box, wall, intersection;
@@ -1101,6 +1116,7 @@ void update_Map1()
 
     collision_Map1(player1_collider, duck1);
     collision_Map1(player2_collider, duck2);
+    Bullet_Collision1();
     for (int i = 0;i < weaps.size();i++)
     {
         collision_weaps_Map1(weaps[i].collider, weaps[i]);
@@ -1527,7 +1543,7 @@ void collision3(RectangleShape& player, ducks& duck)
 }
 void handle_BulletCollision3(block& obj)
 {
-    for (int i = 0; i < bulls.size(); i++)
+    for (int i = bulls.size()-1;i>=0; i++)
     {
 
         for (int j = 0; j < MAX_BLOCKS; j++)
@@ -1552,7 +1568,7 @@ void BulletCollision3()
 }
 void weapon_handleCollision3(RectangleShape& weapcoll, weapons& weapon, block& obj)
 {
-    FloatRect weapBounds = weapcoll.getGlobalBounds();
+    FloatRect weapBounds = weapon.weapon.getGlobalBounds();
     FloatRect objBounds = obj.map_blocks.getGlobalBounds();
 
     if (weapBounds.intersects(objBounds))
@@ -1729,8 +1745,6 @@ void draw3()
 
     for (int i = 0; i < obsCount; i++)
         window.draw(finalobs[i].map_blocks);
-    for(ll i=0;i<weaps.size();++i)
-        window.draw(weaps[i].collider);
 
     /*window.draw(pistol.weapon);
     window.draw(pistolcollider3);
@@ -2087,7 +2101,7 @@ void weap_collision_Map4(weapons& Gun) {
                             Gun.weapon.getPosition().y
                         );
                     }
-                    else if(weaponBounds.left > mapTiles[i].bounds.left){
+                    else if (weaponBounds.left > mapTiles[i].bounds.left) {
                         // Left collision
                         cout << "left" << endl;
                         //cout << intersection.width << " " << intersection.height << endl;
@@ -2125,6 +2139,21 @@ void weap_collision_Map4(weapons& Gun) {
     }
 
 }
+void bullet_collision4() {
+    for (int i = bulls.size() - 1;i >= 0;--i) {
+        for (int j = 0; j < tileCount; j++) {
+            if (!mapTiles[j].isCollidable) continue;
+            else {
+                cout << bulls.size() << endl;
+                if (bulls[i].bullet.getGlobalBounds().intersects(mapTiles[j].bounds)) {
+                    cout << "FOUND !!" << endl;
+                    bulls.erase(bulls.begin() + i);
+                    break;
+                }
+            }
+        }
+    }
+}
 void update_Map4() {
     update_Logic();
     for (auto& weap : weaps) {
@@ -2132,6 +2161,7 @@ void update_Map4() {
     }
     collision_Map4(duck1);
     collision_Map4(duck2);
+    bullet_collision4();
 }
 void draw4() {
     window.draw(background);
@@ -2161,6 +2191,21 @@ Sprite backgroundSprite;
 RectangleShape player1_colliderh(Vector2f(27, 50)), player2_colliderh(Vector2f(27, 50));
 RectangleShape pistol_colliderh(Vector2f(25, 20)), sniper_colliderh(Vector2f(55, 20)), pewpew_colliderh(Vector2f(45, 25)), swrd_colliderh(Vector2f(40, 20));
 
+void Bullet_Collision5() {
+    for (int i = bulls.size() - 1;i >= 0; i++)
+    {
+
+        for (int j = 0; j < 9; j++)
+        {
+            if (bulls[i].bullet.getGlobalBounds().intersects(blockse[j].getGlobalBounds()))
+            {
+
+                bulls.erase(bulls.begin() + i);
+                break;
+            }
+        }
+    }
+}
 void blocks5() {
     blockse[0].setPosition(155, 520);
     blockse[0].setScale(2.25, 1);
@@ -2359,6 +2404,7 @@ void update_Map5() {
     }
     collision_Map5(player1_colliderh, duck1);
     collision_Map5(player2_colliderh, duck2);
+    Bullet_Collision5();
     for (int i = 0;i < weaps.size();i++)
     {
         collision_weaps_Map5(weaps[i].collider, weaps[i]);
@@ -2542,6 +2588,7 @@ int main() {
                 duck2.dead = false;
                 GameEnd = 0;
                 mapnum++;
+                if (mapnum == 1) mapnum++;
                 mapnum %= 5;
                 menuState = 3;
                 trans.restart();
