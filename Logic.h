@@ -82,4 +82,62 @@ struct ducks {
     float fact;
 };
 
+template<typename T>
+struct MyVector {
+    T* data;
+    int capacity;
+    int length;
 
+    MyVector() {
+        capacity = 1;
+        length = 0;
+        data = new T[capacity];
+    }
+
+    void push_back(const T& value) {
+        if (length == capacity) {
+            capacity *= 2;
+            T* new_data = new T[capacity];
+            for (int i = 0; i < length; i++)
+                new_data[i] = data[i];
+            delete[] data;
+            data = new_data;
+        }
+        data[length++] = value;
+    }
+
+    void pop_back() {
+        if (length > 0) length--;
+    }
+
+    void erase(int index) {
+        if (index < 0 || index >= length) return;
+        for (int i = index; i + 1 < length; i++)
+            data[i] = data[i + 1];
+        length--;
+    }
+
+    T& operator[](int index) {
+        return data[index];
+    }
+
+    const T& operator[](int index) const {
+        return data[index];
+    }
+
+    int size() const {
+        return length;
+    }
+
+    bool empty() const {
+        return length == 0;
+    }
+
+    void clear() {
+        length = 0;
+    }
+
+    ~MyVector() {
+        delete[] data;
+    }
+};

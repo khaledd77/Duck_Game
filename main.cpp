@@ -10,9 +10,7 @@
 #include <SFML/Config.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/WindowStyle.hpp>
-#include <iostream>
 #include <SFML/System.hpp>
-#include <vector>
 #include <ctime>
 #include <cmath>
 #include <algorithm>
@@ -40,14 +38,14 @@ bullets bull[3];
 ducks duck1, duck2;
 float fact;
 weapons sword, pistol, sniper, pewpew;
-vector<weapons> weaps;
-vector<bullets> bulls;
+MyVector<weapons> weaps;
+MyVector<bullets> bulls;
 float gravity = 0.5f;
 float jumpSpeed = -14.f;
 float velocityX = 5.f;
 float MaxiVelocityY = 10.f;
 bool GameEnd = 0;
-ll mapnum = 4, duck1Score=0, duck2Score=0;
+ll mapnum = 0, duck1Score=0, duck2Score=0;
 float DUCK_SCALE;
 float GUN_SCALE;
 float scalex, scaley;
@@ -211,7 +209,8 @@ void Fire(ducks& duck, ll shooter) {
     }
 }
 void update_weapons() {
-    for (auto& weap : weaps) {
+    for (int i = 0;i < weaps.size();++i) {
+        weapons &weap = weaps[i];
         weap.weapon.move(weap.velocityX, weap.velocityY);
         weap.velocityY += gravity;
         if (weap.weapon.getPosition().y >= 780.f) {
@@ -449,7 +448,7 @@ void get_weapon(ducks& duck) {
                 weap.angle = 0;
             }
             duck.myweap = weap;
-            weaps.erase(weaps.begin() + i);
+            weaps.erase(i);
             break;
         }
     }
@@ -468,7 +467,7 @@ void update_bullets() {
             if (bulls[i].duck == 1) {
                 continue;
             }
-            bulls.erase(bulls.begin() + i);
+            bulls.erase(i);
             Grave.setPosition(duck1.myduck.getPosition().x, 660.f);
             GameEnd = 1;
             duck1.dead = true;
@@ -478,7 +477,7 @@ void update_bullets() {
             if (bulls[i].duck == 2) {
                 continue;
             }
-            bulls.erase(bulls.begin() + i);
+            bulls.erase(i);
             Grave.setPosition(duck2.myduck.getPosition().x, 660.f);
             GameEnd = 1;
             duck2.dead = true;
@@ -486,7 +485,7 @@ void update_bullets() {
         }
 
         if (bulls[i].bullet.getPosition().x <= 0 || bulls[i].bullet.getPosition().x >= 1280 || abs(bulls[i].bullet.getPosition().x - bulls[i].startX) >= bulls[i].range) {
-            bulls.erase(bulls.begin() + i);
+            bulls.erase(i);
         }
     }
 }
@@ -538,11 +537,11 @@ void update_Logic() {
     update_sword(duck2, 2);
 }
 void draw_Logic() {
-    for (auto weap : weaps) {
-        window.draw(weap.weapon);
+    for (int i = 0;i < weaps.size() ; ++i) {
+        window.draw(weaps[i].weapon);
     }
-    for (auto bull : bulls) {
-        window.draw(bull.bullet);
+    for (int i = 0;i < bulls.size();++i) {
+        window.draw(bulls[i].bullet);
     }
     if (!duck1.dead) {
         window.draw(duck1.myduck);
@@ -909,7 +908,7 @@ void Bullet_Collision1() {
             if (bulls[i].bullet.getGlobalBounds().intersects(blocks[j].getGlobalBounds()))
             {
 
-                bulls.erase(bulls.begin() + i);
+                bulls.erase(i);
                 break;
             }
         }
@@ -922,7 +921,7 @@ void Bullet_Collision1() {
             if (bulls[i].bullet.getGlobalBounds().intersects(stone_block[i].getGlobalBounds()))
             {
 
-                bulls.erase(bulls.begin() + i);
+                bulls.erase(i);
                 break;
             }
         }
@@ -1445,7 +1444,7 @@ void collision_Map2(RectangleShape& player, ducks& duck)
             if (!solidTiles.count(tileType)) continue;
 
             Sprite tile = gameTiles.getTileSprite(tileType);
-            tile.setScale(1.125, 1.125);
+           
             tile.setPosition(x * TILE_SIZE, y * TILE_SIZE);
             wall = tile.getGlobalBounds();
 
@@ -1714,7 +1713,7 @@ void handle_BulletCollision3(block& obj)
             if (bulls[i].bullet.getGlobalBounds().intersects(obj.map_blocks.getGlobalBounds()))
             {
 
-                bulls.erase(bulls.begin() + i);
+                bulls.erase(i);
                 break;
             }
         }
@@ -2314,7 +2313,7 @@ void bullet_collision4() {
                 cout << bulls.size() << endl;
                 if (bulls[i].bullet.getGlobalBounds().intersects(mapTiles[j].bounds)) {
                     cout << "FOUND !!" << endl;
-                    bulls.erase(bulls.begin() + i);
+                    bulls.erase(i);
                     break;
                 }
             }
@@ -2323,7 +2322,8 @@ void bullet_collision4() {
 }
 void update_Map4() {
     update_Logic();
-    for (auto& weap : weaps) {
+    for (int i = 0;i < weaps.size();++i) {
+        weapons& weap = weaps[i];
         weap_collision_Map4(weap);
     }
     collision_Map4(duck1);
@@ -2370,7 +2370,7 @@ void Bullet_Collision5() {
             if (bulls[i].bullet.getGlobalBounds().intersects(blockse[j].getGlobalBounds()))
             {
 
-                bulls.erase(bulls.begin() + i);
+                bulls.erase(i);
                 break;
             }
         }
