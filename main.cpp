@@ -47,7 +47,7 @@ float jumpSpeed = -14.f;
 float velocityX = 5.f;
 float MaxiVelocityY = 10.f;
 bool GameEnd = 0;
-ll mapnum = 2, duck1Score=0, duck2Score=0;
+ll mapnum = 3, duck1Score=0, duck2Score=0;
 float DUCK_SCALE;
 float GUN_SCALE;
 float scalex, scaley;
@@ -1694,15 +1694,15 @@ string snowMap[23] = {
     "........................................",
     "........................................",
     ".._..1...........................2..._..",
-    "..|____....._......*......_......____|..",
+    "..|____....._......S......_......____|..",
     "......|....<|.....<=>.....|>.....|......",
     "......|.....|.............|......|......",
     "......|.....|.............|......|......",
-    "......|....*|.............|*.....|......",
+    "......|....W|.............|E.....|......",
     "......|...<~|++++.._..++++|=>....|......",
     "......|..........................|......",
     "......|..........................|......",
-    "......|............*.............|......",
+    "......|............P.............|......",
     "......|++++++++++++++++++++++++++|......",
     "........................................",
     "........................................",
@@ -1723,6 +1723,7 @@ void init_Map4()
 {
     initBackground();
     tileCount = 0;  // track how many tiles we've added
+    weapCount = 0;
     DUCK_SCALE = 2.f;
     GUN_SCALE = 1.6f;
     fact = 3.f;
@@ -1730,6 +1731,8 @@ void init_Map4()
     MaxiVelocityY = 12.f;
     jumpSpeed = -10.5f;  //give it negative value
     velocityX = 3.5f;   // the duck speed
+
+    // SET DUCKS POSISTIONS 
     for (int y = 0; y < 23; y++) {
         for (int x = 0; x < snowMap[y].length(); x++) {
             if (snowMap[y][x] == '1') {
@@ -1742,6 +1745,7 @@ void init_Map4()
             }
         }
     }
+
     init();
     // pistol
     pistol.fix_X = -4.f;
@@ -1773,6 +1777,32 @@ void init_Map4()
     bull[2].scaley = 0.16f;
     //grave
     Grave.setScale(0.16f, 0.1f);
+
+    // SET WEAPONS POSITION
+    for (int y = 0; y < 23; y++) {
+        for (int x = 0; x < snowMap[y].length(); x++) {
+            if (snowMap[y][x] == 'S') {
+                weapPos.x = x * TILE_SIZEE;
+                weapPos.y = (y + .9) * TILE_SIZEE;
+                sniper.weapon.setPosition(weapPos.x, weapPos.y);
+            }
+            else if (snowMap[y][x] == 'W') {
+                weapPos.x = x * TILE_SIZEE;
+                weapPos.y = (y + .9) * TILE_SIZEE;
+                sword.weapon.setPosition(weapPos.x, weapPos.y);
+            }
+            else if (snowMap[y][x] == 'E') {
+                weapPos.x = (x - .3) * TILE_SIZEE;
+                weapPos.y = (y + .9) * TILE_SIZEE;
+                pewpew.weapon.setPosition(weapPos.x, weapPos.y);
+            }
+            else if (snowMap[y][x] == 'P') {
+                weapPos.x = x * TILE_SIZEE;
+                weapPos.y = (y + .9) * TILE_SIZEE;
+                pistol.weapon.setPosition(weapPos.x, weapPos.y);
+            }
+        }
+    }
 
     //spawn weaps
     weaps.push_back(pistol);
@@ -1847,6 +1877,14 @@ void init_Map4()
                 break;
             case '*':
                 break;
+            case 'S':
+                break;
+            case 'W':
+                break;
+            case 'E':
+                break;
+            case 'P':
+                break;
             default:
                 valid = false;
                 break;
@@ -1862,7 +1900,8 @@ void init_Map4()
                     static_cast<float>(TILE_SIZEE) / scaleY   // scale Y down to 32px
                 );
                 mapTiles[tileCount].tileSprite.setPosition(x * TILE_SIZEE, y * TILE_SIZEE);
-                if (tileChar == '.' || tileChar == '1' || tileChar == '2' || tileChar == '*')
+                if (tileChar == '.' || tileChar == '1' || tileChar == '2' || tileChar == '*' ||
+                    tileChar == 'S' || tileChar == 'P' || tileChar == 'E' || tileChar == 'W')
                 {
                     mapTiles[tileCount].tileSprite.setScale(
                         static_cast<float>(TILE_SIZEE),  // scale X down to 32px
@@ -1872,7 +1911,8 @@ void init_Map4()
                 }
                 else mapTiles[tileCount].isCollidable = true;
                 mapTiles[tileCount].bounds = mapTiles[tileCount].tileSprite.getGlobalBounds();
-                if (tileChar == '.' || tileChar == '1' || tileChar == '2' || tileChar == '*') {
+                if (tileChar == '.' || tileChar == '1' || tileChar == '2' || tileChar == '*' ||
+                    tileChar == 'S' || tileChar == 'P' || tileChar == 'E' || tileChar == 'W') {
                     mapTiles[tileCount].bounds.width = 32;
                     mapTiles[tileCount].bounds.height = 32;
                 }
@@ -1916,14 +1956,14 @@ void collision_Map4(ducks& duck)
                     }
                     else {
                         // Left collision
-                        cout << "left" << endl;
+                        //cout << "left" << endl;
                         duck.myduck.setPosition(
                             mapTiles[i].bounds.left + mapTiles[i].bounds.width - (duck.facingRight ? 16 : 22),
                             duck.myduck.getPosition().y
                         );
                     }
                 }
-                else if(intersection.width - 4 > intersection.height) { // Vertical collision
+                else if (intersection.width - 4 > intersection.height) { // Vertical collision
                     //cout << "top : " << duckBound.top << "   MAP TILE BOTTOM : " << mapTiles[i].bounds.top + mapTiles[i].bounds.height << endl;
                     //cout << mapTiles[i].bounds.top << endl;
                     if (duckBound.top < mapTiles[i].bounds.top) {
@@ -1931,7 +1971,7 @@ void collision_Map4(ducks& duck)
                         //cout << "from above" << endl;
                         duck.myduck.setPosition(
                             duck.myduck.getPosition().x,
-                            mapTiles[i].bounds.top - duckBound.height + 46
+                            mapTiles[i].tileSprite.getPosition().y + 1
                         );
                         duck.onGround = true;
                         duck.isJumping = false;
@@ -1939,7 +1979,7 @@ void collision_Map4(ducks& duck)
                     }
                     else {
                         // Hitting ceiling (from below)
-                        cout << "from below" << endl;
+                        //cout << "from below" << endl;
                         duck.myduck.setPosition(
                             duck.myduck.getPosition().x,
                             mapTiles[i].bounds.top + mapTiles[i].bounds.height + 46
@@ -1959,8 +1999,69 @@ void collision_Map4(ducks& duck)
         duck.myduck.getPosition().y + duck.myweap.fix_hold_y
     );
 }
+void weap_collision_Map4(weapons& Gun) {
+    FloatRect weaponBounds = Gun.weapon.getGlobalBounds();
+    Gun.onGround = false;
+    for (int i = 0; i < tileCount; i++) {
+        if (!mapTiles[i].isCollidable) continue;
+        else {
+            if (weaponBounds.intersects(mapTiles[i].bounds)) {
+                FloatRect intersection;
+                weaponBounds.intersects(mapTiles[i].bounds, intersection);
+                //cout << intersection.width << " " << intersection.height << endl;
+                if (intersection.width < intersection.height) {
+                    if (weaponBounds.left < mapTiles[i].bounds.left) {
+                        // Right collision
+                        cout << "RIGHT " << endl;
+                        Gun.velocityX = 0;
+                        Gun.weapon.setPosition(
+                            Gun.weapon.getPosition().x - intersection.width - 1,
+                            Gun.weapon.getPosition().y
+                        );
+                    }
+                    else if(weaponBounds.left > mapTiles[i].bounds.left){
+                        // Left collision
+                        cout << "left" << endl;
+                        //cout << intersection.width << " " << intersection.height << endl;
+                        Gun.velocityX = 0;
+                        Gun.weapon.setPosition(
+                            Gun.weapon.getPosition().x + intersection.width + 1, // +16
+                            Gun.weapon.getPosition().y
+                        );
+                    }
+                }
+                else if (intersection.width > intersection.height) { // Vertical collision                    
+                    if (weaponBounds.top < mapTiles[i].bounds.top) {
+                        // Landing on ground (from above)
+                        //cout << "from above" << endl;
+                        Gun.weapon.setPosition(
+                            Gun.weapon.getPosition().x,
+                            mapTiles[i].tileSprite.getPosition().y + 1 // adjust accurate positioning
+                        );
+                        Gun.onGround = true;
+                        Gun.velocityY = 0;
+                        Gun.velocityX = 0;
+                    }
+                    else {
+                        // Hitting ceiling (from below)
+                        //cout << "from below" << endl;
+                        Gun.weapon.setPosition(
+                            Gun.weapon.getPosition().x,
+                            mapTiles[i].bounds.top + mapTiles[i].bounds.height + 47
+                        );
+                        Gun.velocityY = 0;
+                    }
+                }
+            }
+        }
+    }
+
+}
 void update_Map4() {
     update_Logic();
+    for (auto& weap : weaps) {
+        weap_collision_Map4(weap);
+    }
     collision_Map4(duck1);
     collision_Map4(duck2);
 }
@@ -1969,6 +2070,12 @@ void draw4() {
     for (int i = 0; i < tileCount; i++) {
         window.draw(mapTiles[i].tileSprite);
     }
+    //FloatRect weaponBounds = pewpew.weapon.getGlobalBounds();
+    //RectangleShape test;
+    //test.setSize(Vector2f(weaponBounds.width, weaponBounds.height));
+    //test.setFillColor(Color::Red);
+    //test.setPosition(weaponBounds.left, weaponBounds.top);  // Use the modified position
+    //window.draw(test);
     draw_Logic();
 }
 void Map4() {
