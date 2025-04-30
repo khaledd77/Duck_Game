@@ -45,7 +45,7 @@ float jumpSpeed = -14.f;
 float velocityX = 5.f;
 float MaxiVelocityY = 10.f;
 bool GameEnd = 0;
-ll mapnum = 0, duck1Score=0, duck2Score=0;
+ll mapnum = 4, duck1Score=0, duck2Score=0;
 float DUCK_SCALE;
 float GUN_SCALE;
 float scalex, scaley;
@@ -364,6 +364,8 @@ void update_duck(ducks& duck) {
             duck.isJumping = false;
             duck.onGround = true;
             duck.velocityY = 0.f;
+            duck.dead = 1;
+            GameEnd = 1;
         }
     }
     else if (moving) {
@@ -2391,7 +2393,7 @@ void blocks5() {
     blockse[5].setScale(2, 1);
     blockse[6].setPosition(1035, 90);
     blockse[6].setScale(2, 1);
-    blockse[7].setPosition(745, 175);
+    blockse[7].setPosition(645, 175);
     blockse[7].setScale(1.7, 1);
     blockse[8].setPosition(845, 520);
     blockse[8].setScale(2.25, 1);
@@ -2525,7 +2527,7 @@ void init_Map5() {
     GUN_SCALE = 1.6f;
     fact = 3.f;
     //gravity = Put_your_val;
-    //jumpSpeed = Put_your_val;  //give it negative value
+    //jumpSpeed = -14;  //give it negative value
     //velocityX = Put_your_val;   // the duck speed
     init();
     // pistol
