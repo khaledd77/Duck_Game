@@ -40,6 +40,9 @@ struct weapons {
     float angle;
     bool hit = 0;
     bool onGround = false;
+    bool ready = false;
+    bool boom = false;
+    float scale;
     ll fact = 1;
     RectangleShape collider;
 };

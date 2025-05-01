@@ -35,16 +35,17 @@ int fadeDirection = 0, fadeTargetState = 1000, fadeCurrentAlpha, fadeDuration = 
 RectangleShape fadeScreen;
 
 Texture gameBackgroundTexture;
+Texture smoke;
 Sprite gameBackground;
 Texture duck1AvatarTexture, duck2AvatarTexture, duck1AvatarReadyTexture, duck2AvatarReadyTexture;
 Sprite duck1Avatar, duck2Avatar, duck1AvatarReady, duck2AvatarReady;
 bool drawPaused = false;
 
-int menuState = 1000; // 1000 = main menu, 0 = game/levels, 1 = settings, 2 = game menu (& level selector), 3 = transition between games, 4 = end game
+int menuState = 0; // 1000 = main menu, 0 = game/levels, 1 = settings, 2 = game menu (& level selector), 3 = transition between games, 4 = end game
 bullets bull[3];
 ducks duck1, duck2;
 float fact;
-weapons sword, pistol, sniper, pewpew;
+weapons sword, pistol, sniper, pewpew, grenade;
 MyVector<weapons> weaps;
 MyVector<bullets> bulls;
 float gravity = 0.5f;
@@ -132,6 +133,20 @@ void init() {
     pistol.weapon.setPosition(600.f, 680);
     pistol.type = "pistol";
 
+    //init grenade
+    grenade.skin.loadFromFile("img/grenade.png");
+    smoke.loadFromFile("img/smoke.png");
+    grenade.weapon.setTexture(grenade.skin);
+    grenade.posx = 600;
+    grenade.posy = 660;
+    grenade.weapon.setTextureRect(IntRect(0, 0, 9, 11));
+    grenade.weapon.setScale(GUN_SCALE, GUN_SCALE);
+    grenade.empty = false;
+    grenade.bull_type = 1;
+    grenade.weapon.setOrigin(0, grenade.weapon.getLocalBounds().height);
+    grenade.weapon.setPosition(600.f, 680);
+    grenade.type = "grenade";
+
 
     //init sniper
     sniper.skin.loadFromFile("img/sniper.png");
@@ -189,12 +204,23 @@ void init() {
     grave.loadFromFile("img/rip.png");
     Grave.setTexture(grave);
 }
+void launch_grenade(weapons& weap) {
+    if (!weap.ready) {
+        weap.ready = 1;
+        weap.myclock.restart();
+        weap.weapon.setTextureRect(IntRect(16, 0, 10, 11));
+    }
+    return;
+}
 void Fire(ducks& duck, ll shooter) {
     ll idx = duck.myweap.bull_type;
     if (duck.myweap.type == "sword") {
         duck.myweap.hit = 1;
         duck.myweap.myclock.restart();
         return;
+    }
+    if (duck.myweap.type == "grenade") {
+        launch_grenade(duck.myweap);
     }
     if (duck.myweap.bullets > 0) {
         duck.myweap.bullets--;
@@ -216,11 +242,46 @@ void Fire(ducks& duck, ll shooter) {
         bulls.push_back(bull[idx]);
     }
 }
+void update_grenade(weapons& weap) {
+    if (!weap.boom && weap.myclock.getElapsedTime().asMilliseconds() >= 4000) {
+        weap.boom = 1;
+        weap.weapon.setTexture(smoke);
+        weap.weapon.setTextureRect(IntRect(0, 0, 44, 42));
+        weap.scale = 0.1f;
+        weap.weapon.setScale(weap.scale, weap.scale);
+        weap.weapon.setOrigin(weap.weapon.getLocalBounds().width / 2, weap.weapon.getLocalBounds().height / 2);
+    }
+    else if (weap.boom) {
+        if (weap.weapon.getGlobalBounds().intersects(duck1.myduck.getGlobalBounds())) {
+            duck1.dead = 1;
+            GameEnd = 1;
+        }
+        if (weap.weapon.getGlobalBounds().intersects(duck2.myduck.getGlobalBounds())) {
+            duck2.dead = 1;
+            GameEnd = 1;
+        }
+        weap.scale += 0.15;
+        weap.weapon.setScale(weap.scale, weap.scale);
+        if (weap.scale >= 5) {
+            weap.boom = 0;
+            weap.ready = 0;
+            weap.scale = 0;
+            weap.weapon.setScale(weap.scale, weap.scale);
+        }
+    }
+}
 void update_weapons() {
     for (int i = 0;i < weaps.size();++i) {
         weapons &weap = weaps[i];
+        if (weap.type == "grenade" && weap.ready) {
+            update_grenade(weap);
+            if (weap.boom) {
+                continue;
+            }
+        }
         weap.weapon.move(weap.velocityX, weap.velocityY);
         weap.velocityY += gravity;
+        weap.velocityY = min(weap.velocityY, MaxiVelocityY);
         if (weap.weapon.getPosition().y >= 780.f) {
             weap.weapon.setPosition(weap.weapon.getPosition().x, 780.f);
             weap.velocityX = 0.f;
@@ -500,6 +561,12 @@ void update_Logic() {
     if(!duck2.dead) update_duck(duck2);
     update_weapons();
     update_bullets();
+    if (duck1.haveWeapon && duck1.myweap.type == "grenade" && duck1.myweap.ready) {
+        update_grenade(duck1.myweap);
+    }
+    if (duck2.haveWeapon && duck2.myweap.type == "grenade" && duck2.myweap.ready) {
+        update_grenade(duck2.myweap);
+    }
 
     if (Keyboard::isKeyPressed(duck1.hold)) {
         if (!duck1.holding) {
@@ -575,7 +642,6 @@ void draw_Logic() {
 
 
 // Walid
-
 void initFade(int width, int height) {
     fadeScreen.setPosition(0.f, 0.f);
     fadeScreen.setSize(Vector2f(width, height));
@@ -1243,6 +1309,7 @@ void collision_Map1(RectangleShape& player_collider, ducks& duck)
 }
 void collision_weaps_Map1(RectangleShape& collider, weapons& weap)
 {
+    if (weap.type == "grenade" && weap.boom) return;
     FloatRect box, wall, intersection;
     box = weap.weapon.getGlobalBounds();
     for (int i = 0;i < 13;i++)
@@ -1320,6 +1387,7 @@ void SPAWN1() {
     swrd_collider.setOrigin(swrd_collider.getLocalBounds().width / 2, swrd_collider.getLocalBounds().height / 2);
     sniper.weapon.setPosition(450.f, 510);
     pistol.weapon.setPosition(720.f, 145);
+    grenade.weapon.setPosition(690.f, 145);
     pewpew.weapon.setPosition(360.f, 510);
     sword.weapon.setPosition(1035.f, 465);
     pistol.collider = pistol_collider;
@@ -1341,6 +1409,13 @@ void SPAWN1() {
         }
     }
     if(flag) weaps.push_back(sniper);
+    flag = 1;
+    for (ll i = 0;i < weaps.size();++i) {
+        if (abs(weaps[i].weapon.getPosition().x - grenade.weapon.getPosition().x) <= 20 && abs(weaps[i].weapon.getPosition().y - grenade.weapon.getPosition().y) <= 20) {
+            flag = 0;
+        }
+    }
+    if (flag) weaps.push_back(grenade);
     flag = 1;
     for (ll i = 0;i < weaps.size();++i) {
         if (abs(weaps[i].weapon.getPosition().x - pewpew.weapon.getPosition().x) <= 20 && abs(weaps[i].weapon.getPosition().y - pewpew.weapon.getPosition().y) <= 20) {
@@ -1372,6 +1447,10 @@ void init_Map1()
     pistol.fix_hold_x = 31.f;
     pistol.fix_hold_y = -16.f;
     pistol.rev = 9.f;
+    // grenade
+    grenade.fix_hold_x = 36.f;
+    grenade.fix_hold_y = -16.f;
+    grenade.rev = 6.f;
     //sniper
     sniper.fix_X = 25.f;
     sniper.fix_Y = -23.f;
@@ -1806,6 +1885,7 @@ void SPAWN3() {
     pewpew.weapon.setPosition(1240, 460);
     sniper.weapon.setPosition(750, 366);
     sword.weapon.setPosition(875, 535);
+    grenade.weapon.setPosition(350, 660);
 
     //spawn weaps
     bool flag = 1;
@@ -1836,6 +1916,13 @@ void SPAWN3() {
         }
     }
     if (flag) weaps.push_back(sword);
+    flag = 1;
+    for (ll i = 0;i < weaps.size();++i) {
+        if (abs(weaps[i].weapon.getPosition().x - grenade.weapon.getPosition().x) <= 20 && abs(weaps[i].weapon.getPosition().y - grenade.weapon.getPosition().y) <= 20) {
+            flag = 0;
+        }
+    }
+    if (flag) weaps.push_back(grenade);
     SPAWN.restart();
 }
 void groundd()
@@ -2001,6 +2088,7 @@ void weapon_handleCollision3(RectangleShape& weapcoll, weapons& weapon, block& o
 }
 void collision_Weapon3(RectangleShape& weap, weapons& weapon)
 {
+    if (weapon.type == "grenade" && weapon.boom) return;
     for (int i = 0; i < blockCount; i++)
         weapon_handleCollision3(weap, weapon, finalblock[i]);
     for (int i = 0; i < groundCount; i++)
@@ -2023,6 +2111,10 @@ void init_Map3()
     pistol.fix_hold_x = 25.f;
     pistol.fix_hold_y = -12.f;
     pistol.rev = 10.f;
+    // grenade
+    grenade.fix_hold_x = 29.f;
+    grenade.fix_hold_y = -12.f;
+    grenade.rev = 6.f;
     //sniper
     sniper.fix_X = 17.f;
     sniper.fix_Y = -18.f;
@@ -2717,6 +2809,7 @@ void SPAWN5() {
     pistol.weapon.setPosition(850, 520);
     pewpew.weapon.setPosition(750, 175);
     sword.weapon.setPosition(400, 175);
+    //grenade.weapon.setPosition(350, 175);
     pistol.collider = pistol_colliderh;
     sniper.collider = sniper_colliderh;
     pewpew.collider = pewpew_colliderh;
@@ -2767,6 +2860,10 @@ void init_Map5() {
     pistol.fix_hold_x = 25.f;
     pistol.fix_hold_y = -12.f;
     pistol.rev = 10.f;
+    // grenade
+    grenade.fix_hold_x = 25.f;
+    grenade.fix_hold_y = -12.f;
+    grenade.rev = 6.f;
     //sniper
     sniper.fix_X = 17.f;
     sniper.fix_Y = -18.f;
@@ -2965,6 +3062,11 @@ int main() {
                     else if (event.key.code == Keyboard::Return) {
                         if (gameMenu.selected == 0) {
                             startGame(gameMenu, duck1, duck2);
+                            if (mapnum == 0) init_Map1();
+                            if (mapnum == 1) init_Map2();
+                            if (mapnum == 2) init_Map3();
+                            if (mapnum == 3) init_Map4();
+                            if (mapnum == 4) init_Map5();
                         }
                     }
                     else if (event.key.code == Keyboard::Right) {
@@ -3006,6 +3108,7 @@ int main() {
             duck2Score = 0;
             duck1.ready = 0;
             duck2.ready = 0;
+            mapnum = 0;
             gameMenu.menuText[2].setString("PLAYER 1");
             gameMenu.menuText[3].setString("PLAYER 2");
         }
