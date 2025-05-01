@@ -51,12 +51,13 @@ float jumpSpeed = -14.f;
 float velocityX = 5.f;
 float MaxiVelocityY = 10.f;
 bool GameEnd = 0;
-ll mapnum = 1, duck1Score=0, duck2Score=0;
+ll mapnum = 3, duck1Score=0, duck2Score=0;
 float DUCK_SCALE;
 float GUN_SCALE;
 float scalex, scaley;
 const float Width = 1280, Height = 720;
 float duck1posx=100.f, duck1posy=680.f, duck2posx=1000.f, duck2posy=680.f;
+bool wait = 0;
 
 
 //Fady
@@ -559,6 +560,7 @@ void draw_Logic() {
         window.draw(duck1.myarm.arm);
     }
     else {
+        Grave.setPosition(duck1.myduck.getPosition().x,duck1.myduck.getPosition().y - duck2.myduck.getLocalBounds().height);
         window.draw(Grave);
     }
     if (!duck2.dead) {
@@ -569,6 +571,7 @@ void draw_Logic() {
         window.draw(duck2.myarm.arm);
     }
     else {
+        Grave.setPosition(duck2.myduck.getPosition().x, duck2.myduck.getPosition().y - duck2.myduck.getLocalBounds().height);
         window.draw(Grave);
     }
 }
@@ -1299,7 +1302,7 @@ void init_Map1()
     bull[2].scalex = 0.2f;
     bull[2].scaley = 0.2f;
     //grave
-    Grave.setScale(0.16f, 0.1f);
+    Grave.setScale(0.13f, 0.083f);
 
     background_texture.loadFromFile("img/BG.png");
     skeleton_texture.loadFromFile("img/skeleton.png");
@@ -1959,7 +1962,7 @@ void init_Map3()
     bull[2].scalex = 0.16f;
     bull[2].scaley = 0.16f;
     //grave
-    Grave.setScale(0.16f, 0.1f);
+    Grave.setScale(0.107f, 0.067f);
 
 
 
@@ -2200,7 +2203,7 @@ void init_Map4()
     bull[2].scalex = 0.16f;
     bull[2].scaley = 0.16f;
     //grave
-    Grave.setScale(0.16f, 0.1f);
+    Grave.setScale(0.107f, 0.067f);
 
     SPAWN4();
 
@@ -2703,7 +2706,7 @@ void init_Map5() {
     bull[2].scalex = 0.16f;
     bull[2].scaley = 0.16f;
     //grave
-    Grave.setScale(0.16f, 0.1f);
+    Grave.setScale(0.107f, 0.067f);
 
 
 
@@ -2932,19 +2935,10 @@ int main() {
                     duck1Score++;
                 }
 
-                duck1.dead = false;
-                duck2.dead = false;
                 GameEnd = 0;
-                mapnum++;
-                if (mapnum == 1) mapnum++;
-                mapnum %= 5;
                 menuState = 3;
+                cout << "DONE" << endl;
                 trans.restart();
-                if (mapnum == 0) init_Map1();
-                if (mapnum == 1) init_Map2();
-                if (mapnum == 2) init_Map3();
-                if (mapnum == 3) init_Map4();
-                if (mapnum == 4) init_Map5();
             }
             if (mapnum == 0) Map1();
             if (mapnum == 1) Map2();
@@ -2959,9 +2953,37 @@ int main() {
             drawMenu(window, gameMenu, 4);
         }
         else if (menuState == 3) {
-            drawTransition(Width, Height);
             if (trans.getElapsedTime().asMilliseconds() > 2000) {
+                drawTransition(Width, Height);
+                duck1.dead = false;
+                duck2.dead = false;
+                GameEnd = 0;
+            }
+            else {
+                if (mapnum == 0) Map1();
+                if (mapnum == 1) Map2();
+                if (mapnum == 2) Map3();
+                if (mapnum == 3) Map4();
+                if (mapnum == 4) Map5();
+                GameEnd = 0;
+            }
+            if (trans.getElapsedTime().asMilliseconds() > 4000) {
                 menuState = 0;
+                mapnum++;
+                if (mapnum == 1) mapnum++;
+                mapnum %= 5;
+                cout << "yalla" << endl;
+                GameEnd = 0;
+                if (mapnum == 0) init_Map1();
+                if (mapnum == 1) init_Map2();
+                if (mapnum == 2) init_Map3();
+                if (mapnum == 3) init_Map4();
+                if (mapnum == 4) init_Map5();
+                if (mapnum == 0) Map1();
+                if (mapnum == 1) Map2();
+                if (mapnum == 2) Map3();
+                if (mapnum == 3) Map4();
+                if (mapnum == 4) Map5();
             }
         }
 
