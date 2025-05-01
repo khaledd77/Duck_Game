@@ -39,7 +39,7 @@ Texture duck1AvatarTexture, duck2AvatarTexture, duck1AvatarReadyTexture, duck2Av
 Sprite duck1Avatar, duck2Avatar, duck1AvatarReady, duck2AvatarReady;
 bool fullscreen = false;
 
-int menuState = 0; // 1000 = main menu, 0 = game/levels, 1 = settings, 2 = game menu (& level selector), 3 = transition between games 
+int menuState = 1000; // 1000 = main menu, 0 = game/levels, 1 = settings, 2 = game menu (& level selector), 3 = transition between games 
 bullets bull[3];
 ducks duck1, duck2;
 float fact;
@@ -51,7 +51,7 @@ float jumpSpeed = -14.f;
 float velocityX = 5.f;
 float MaxiVelocityY = 10.f;
 bool GameEnd = 0;
-ll mapnum = 3, duck1Score=0, duck2Score=0;
+ll mapnum = 0, duck1Score=0, duck2Score=0;
 float DUCK_SCALE;
 float GUN_SCALE;
 float scalex, scaley;
@@ -230,12 +230,10 @@ void update_weapons() {
 void update_sword(ducks& duck, ll shooter) {
     if (duck.myweap.type == "sword" && duck.myweap.hit) {
         if (duck.myweap.weapon.getGlobalBounds().intersects(duck2.myduck.getGlobalBounds()) && shooter == 1) {
-            Grave.setPosition(duck2.myduck.getPosition().x, 640.f);
             GameEnd = 1;
             duck2.dead = true;
         }
         if (duck.myweap.weapon.getGlobalBounds().intersects(duck1.myduck.getGlobalBounds()) && shooter == 2) {
-            Grave.setPosition(duck1.myduck.getPosition().x, 640.f);
             GameEnd = 1;
             duck1.dead = true;
         }
@@ -477,7 +475,6 @@ void update_bullets() {
                 continue;
             }
             bulls.erase(i);
-            Grave.setPosition(duck1.myduck.getPosition().x, 660.f);
             GameEnd = 1;
             duck1.dead = true;
             continue;
@@ -487,7 +484,6 @@ void update_bullets() {
                 continue;
             }
             bulls.erase(i);
-            Grave.setPosition(duck2.myduck.getPosition().x, 660.f);
             GameEnd = 1;
             duck2.dead = true;
             continue;
@@ -499,8 +495,8 @@ void update_bullets() {
     }
 }
 void update_Logic() {
-    update_duck(duck1);
-    update_duck(duck2);
+    if(!duck1.dead) update_duck(duck1);
+    if(!duck2.dead) update_duck(duck2);
     update_weapons();
     update_bullets();
 
@@ -1378,13 +1374,15 @@ void update_Map1()
     if (duck1.myduck.getPosition().y >= 620)
     {
         duck1.dead = true;
+        GameEnd = 1;
     }
     if (duck2.myduck.getPosition().y >= 620)
     {
         duck2.dead = true;
+        GameEnd = 1;
     }
     update_Logic();
-    if (SPAWN.getElapsedTime().asSeconds() >= 10) {
+    if (SPAWN.getElapsedTime().asSeconds() >= 60) {
         SPAWN1();
     }
 }
@@ -2019,7 +2017,7 @@ void update3()
 
 
     update_Logic();
-    if (SPAWN.getElapsedTime().asSeconds() >= 10) {
+    if (SPAWN.getElapsedTime().asSeconds() >= 60) {
         SPAWN3();
     }
 
@@ -2478,7 +2476,7 @@ void update_Map4() {
     collision_Map4(duck1);
     collision_Map4(duck2);
     bullet_collision4();
-    if (SPAWN.getElapsedTime().asSeconds() >= 10) {
+    if (SPAWN.getElapsedTime().asSeconds() >= 60) {
         SPAWN4();
     }
 }
@@ -2775,7 +2773,7 @@ void update_Map5() {
         duck2.isJumping = 1;
     }
     update_Logic();
-    if (SPAWN.getElapsedTime().asSeconds() >= 10) {
+    if (SPAWN.getElapsedTime().asSeconds() >= 60) {
         SPAWN5();
     }
 }
@@ -2817,6 +2815,10 @@ int main() {
             }
             if (event.type == Event::KeyPressed) {
                 if (menuState == 1000) {
+                    duck1Score = 0;
+                    duck2Score = 0;
+                    duck1.ready = 0;
+                    duck2.ready = 0;
                     if (event.key.code == Keyboard::Up) {
                         moveUp(mainMenu, 3);
                     }
@@ -2925,6 +2927,12 @@ int main() {
         window.clear();
         if (menuState == 1000) {
             drawMenu(window, mainMenu, 3);
+            duck1Score = 0;
+            duck2Score = 0;
+            duck1.ready = 0;
+            duck2.ready = 0;
+            gameMenu.menuText[2].setString("PLAYER 1");
+            gameMenu.menuText[3].setString("PLAYER 2");
         }
         else if (menuState == 0) {
             if (GameEnd) {
