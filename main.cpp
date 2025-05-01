@@ -1404,7 +1404,7 @@ void Map1() {
 
 
 //Fawzy's MAP
-RectangleShape player1(Vector2f(24, 35)), player2(Vector2f(24, 35));
+RectangleShape player1(Vector2f(30, 35)), player2(Vector2f(30, 35));
 int spawnX = 25;
 int spawnY = 27;
 set<GameTile::TileType> solidTiles = {
@@ -1576,8 +1576,6 @@ void init_Map2() {
     "                                                                                                                            "
     };
 
-    player1_collider.setOrigin(player1_collider.getLocalBounds().width / 2, player1_collider.getLocalBounds().height / 2);
-    player2_collider.setOrigin(player2_collider.getLocalBounds().width / 2, player2_collider.getLocalBounds().height / 2);
     duck1.myduck.setPosition(250, 300);
     duck2.myduck.setPosition(950, 225);
 }
@@ -1621,7 +1619,8 @@ void collision_Map2(RectangleShape& player, ducks& duck)
                     }
                     else
                     {
-                       duck.myduck.setPosition(duck.myduck.getPosition().x + intersection.width+1, duck.myduck.getPosition().y);
+                        //cout << "a7a" << endl;
+                       duck.myduck.setPosition(duck.myduck.getPosition().x + intersection.width, duck.myduck.getPosition().y);
                     }
                 }
             }
@@ -1629,6 +1628,7 @@ void collision_Map2(RectangleShape& player, ducks& duck)
     }
 }
 void update_Map2() {
+    update_Logic();
     duck1.onGround = false;
     duck2.onGround = false;
     player1.setPosition(duck1.myduck.getPosition().x + 10, duck1.myduck.getPosition().y - 35);
@@ -1643,7 +1643,6 @@ void update_Map2() {
     {
         duck2.dead = false; //edit later
     }
-    update_Logic();
 }
 void draw_Map2() {
     for (size_t y = 0; y < level.size(); ++y) {
