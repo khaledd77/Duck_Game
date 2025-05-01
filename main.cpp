@@ -39,7 +39,7 @@ Texture duck1AvatarTexture, duck2AvatarTexture, duck1AvatarReadyTexture, duck2Av
 Sprite duck1Avatar, duck2Avatar, duck1AvatarReady, duck2AvatarReady;
 bool fullscreen = false;
 
-int menuState = 1000; // 1000 = main menu, 0 = game/levels, 1 = settings, 2 = game menu (& level selector), 3 = transition between games 
+int menuState = 0; // 1000 = main menu, 0 = game/levels, 1 = settings, 2 = game menu (& level selector), 3 = transition between games 
 bullets bull[3];
 ducks duck1, duck2;
 float fact;
@@ -51,7 +51,7 @@ float jumpSpeed = -14.f;
 float velocityX = 5.f;
 float MaxiVelocityY = 10.f;
 bool GameEnd = 0;
-ll mapnum = 0, duck1Score=0, duck2Score=0;
+ll mapnum = 1, duck1Score=0, duck2Score=0;
 float DUCK_SCALE;
 float GUN_SCALE;
 float scalex, scaley;
@@ -1453,6 +1453,7 @@ void init_Map2() {
     velocityX = 2.5f;   // the duck speed
     duck1posx = 25 * TILE_SIZE;
     duck1posy = 27 * TILE_SIZE - 16;
+    MaxiVelocityY = 7;
     init();
     // pistol
     pistol.fix_X = -2.f;
@@ -1577,7 +1578,7 @@ void init_Map2() {
 
     player1_collider.setOrigin(player1_collider.getLocalBounds().width / 2, player1_collider.getLocalBounds().height / 2);
     player2_collider.setOrigin(player2_collider.getLocalBounds().width / 2, player2_collider.getLocalBounds().height / 2);
-    duck1.myduck.setPosition(250, 210);
+    duck1.myduck.setPosition(250, 300);
     duck2.myduck.setPosition(950, 225);
 }
 void collision_Map2(RectangleShape& player, ducks& duck)
@@ -1604,7 +1605,7 @@ void collision_Map2(RectangleShape& player, ducks& duck)
                         duck.onGround = true;
                         duck.isJumping = false;
                         duck.velocityY = 0.f;
-                        duck.myduck.setPosition(duck.myduck.getPosition().x, tile.getPosition().y + 1.f);
+                        duck.myduck.setPosition(duck.myduck.getPosition().x, tile.getPosition().y+1);
                     }
                     else
                     {
@@ -1620,7 +1621,7 @@ void collision_Map2(RectangleShape& player, ducks& duck)
                     }
                     else
                     {
-                        duck.myduck.setPosition(duck.myduck.getPosition().x + intersection.width, duck.myduck.getPosition().y);
+                       duck.myduck.setPosition(duck.myduck.getPosition().x + intersection.width+1, duck.myduck.getPosition().y);
                     }
                 }
             }
