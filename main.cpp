@@ -39,7 +39,7 @@ Texture duck1AvatarTexture, duck2AvatarTexture, duck1AvatarReadyTexture, duck2Av
 Sprite duck1Avatar, duck2Avatar, duck1AvatarReady, duck2AvatarReady;
 bool fullscreen = false;
 
-int menuState = 0; // 1000 = main menu, 0 = game/levels, 1 = settings, 2 = game menu (& level selector), 3 = transition between games 
+int menuState = 1000; // 1000 = main menu, 0 = game/levels, 1 = settings, 2 = game menu (& level selector), 3 = transition between games 
 bullets bull[3];
 ducks duck1, duck2;
 float fact;
@@ -49,7 +49,7 @@ MyVector<bullets> bulls;
 float gravity = 0.5f;
 float jumpSpeed = -14.f;
 float velocityX = 5.f;
-float MaxiVelocityY = 10.f;
+float MaxiVelocityY = 9.f;
 bool GameEnd = 0;
 ll mapnum = 3, duck1Score=0, duck2Score=0;
 float DUCK_SCALE;
@@ -953,8 +953,8 @@ void fullscreenMode(RenderWindow& window) {
 
 
 //Khaled's MAP
-Texture ground_texture, background_texture, skeleton_texture, stone_texture, tree_texture, cactus1, cactus2, cactus3, bushs_texture, grass_texture, stone_block_texture;
-Sprite blocks[25], skeletons[3], stones[2], tree, ccts[5], bush[3], grs[2], stone_block[2], background;
+Texture ground_texture, background1_texture, skeleton_texture, stone_texture, tree_texture, cactus1, cactus2, cactus3, bushs_texture, grass_texture, stone_block_texture;
+Sprite blocks[25], skeletons[3], stones[2], tree, ccts[5], bush[3], grs[2], stone_block[2], background1;
 RectangleShape player1_collider(Vector2f(40, 62)), player2_collider(Vector2f(40, 62));
 RectangleShape pistol_collider(Vector2f(35, 25)), sniper_collider(Vector2f(70, 20)), pewpew_collider(Vector2f(55, 25)), swrd_collider(Vector2f(50, 20));
 void grounds()
@@ -1300,7 +1300,7 @@ void init_Map1()
     //grave
     Grave.setScale(0.13f, 0.083f);
 
-    background_texture.loadFromFile("img/BG.png");
+    background1_texture.loadFromFile("img/BG.png");
     skeleton_texture.loadFromFile("img/skeleton.png");
     ground_texture.loadFromFile("img/ground.png");
     stone_texture.loadFromFile("img/Stone.png");
@@ -1311,6 +1311,7 @@ void init_Map1()
     bushs_texture.loadFromFile("img/Bush (2).png");
     grass_texture.loadFromFile("img/Grass (1).png");
     stone_block_texture.loadFromFile("img/Stoneblock.png");
+    background1.setTexture(background1_texture);
     tre();
     grounds();
     skeleton();
@@ -1321,7 +1322,7 @@ void init_Map1()
     stoneblock();
     player1_collider.setOrigin(player1_collider.getLocalBounds().width / 2, player1_collider.getLocalBounds().height / 2);
     player2_collider.setOrigin(player2_collider.getLocalBounds().width / 2, player2_collider.getLocalBounds().height / 2);
-    background.setScale(1, 0.75);
+    background1.setScale(1, 0.75);
     duck1.myduck.setPosition(250, 210);
     duck2.myduck.setPosition(950, 225);
     SPAWN1();
@@ -1330,7 +1331,6 @@ void update_Map1()
 {
     duck1.onGround = false;
     duck2.onGround = false;
-    background.setTexture(background_texture);
     for (int i = 0;i < 13;i++) blocks[i].setTexture(ground_texture);
     for (int i = 0;i < 3;i++) skeletons[i].setTexture(skeleton_texture);
     for (int i = 0;i < 2;i++) stones[i].setTexture(stone_texture);
@@ -1388,7 +1388,7 @@ void update_Map1()
 }
 void draw_Map1()
 {
-    window.draw(background);
+    window.draw(background1);
     for (int i = 0;i < 13;i++)  window.draw(blocks[i]);
     for (int i = 0;i < 2;i++) window.draw(stone_block[i]);
     for (int i = 0;i < 2;i++) window.draw(stones[i]);
@@ -2081,6 +2081,7 @@ string snowMap[23] = {
     "........................................",
     "........................................"
 };
+Sprite background;
 void SPAWN4() {
 
     for (int y = 0; y < 23; y++) {
@@ -2672,7 +2673,7 @@ void init_Map5() {
     fact = 3.f;
     gravity = 0.5;
     jumpSpeed = -14;  //give it negative value
-    velocityX = 5;   // the duck speed
+    velocityX = 3.5f;   // the duck speed
     init();
     // pistol
     pistol.fix_X = -4.f;
@@ -2959,7 +2960,7 @@ int main() {
             drawMenu(window, gameMenu, 4);
         }
         else if (menuState == 3) {
-            if (trans.getElapsedTime().asMilliseconds() > 2000) {
+            if (trans.getElapsedTime().asMilliseconds() > 1000) {
                 drawTransition(Width, Height);
                 duck1.dead = false;
                 duck2.dead = false;
@@ -2973,7 +2974,7 @@ int main() {
                 if (mapnum == 4) Map5();
                 GameEnd = 0;
             }
-            if (trans.getElapsedTime().asMilliseconds() > 4000) {
+            if (trans.getElapsedTime().asMilliseconds() > 3000) {
                 menuState = 0;
                 mapnum++;
                 if (mapnum == 1) mapnum++;
