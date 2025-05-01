@@ -40,7 +40,7 @@ Sprite gameBackground;
 Texture duck1AvatarTexture, duck2AvatarTexture, duck1AvatarReadyTexture, duck2AvatarReadyTexture;
 Sprite duck1Avatar, duck2Avatar, duck1AvatarReady, duck2AvatarReady;
 bool drawPaused = false;
-float weapsVelocity = -7.f;
+float weapsVelocity = 7.f;
 
 int menuState = 0; // 1000 = main menu, 0 = game/levels, 1 = settings, 2 = game menu (& level selector), 3 = transition between games, 4 = end game
 bullets bull[3];
@@ -54,7 +54,7 @@ float jumpSpeed = -14.f;
 float velocityX = 5.f;
 float MaxiVelocityY = 9.f;
 bool GameEnd = 0;
-ll mapnum = 5, duck1Score=0, duck2Score=0;
+ll mapnum = 1, duck1Score=0, duck2Score=0;
 float DUCK_SCALE;
 float GUN_SCALE;
 float scalex, scaley;
@@ -461,7 +461,7 @@ void drop_weapon(ducks& duck) {
     if (!duck.facingRight) {
         duck.myweap.velocityX *= -1.f;
     }
-    duck.myweap.velocityY = -weapsVelocity;
+    duck.myweap.velocityY = weapsVelocity*-1;
     if (duck.myweap.type == "sword") {
         duck.myweap.weapon.setOrigin(duck.myweap.weapon.getLocalBounds().width, duck.myweap.weapon.getLocalBounds().height);
         if (duck.facingRight) duck.myweap.weapon.setRotation(90);
@@ -1572,56 +1572,417 @@ void Map1() {
 
 
 //Fawzy's MAP
-RectangleShape player1(Vector2f(30, 35)), player2(Vector2f(30, 35));
-int spawnX = 25;
-int spawnY = 27;
-set<GameTile::TileType> solidTiles = {
-        GameTile::Stone, GameTile::Cement, GameTile::Ground, GameTile::Branch, GameTile::Weapon
-};
-GameTile::GameTile() {
-    loadTexture(Ground, "img/ground2.png");
-    loadTexture(Tree, "img/tree2.png");
-    loadTexture(Cement, "img/cement.png");
-    loadTexture(Weapon, "img/weapon.png");
-    loadTexture(Branch, "img/branch.png");
-    loadTexture(Stone, "img/stone2.png");
-    loadTexture(Root, "img/root.png");
+RectangleShape player1coll(Vector2f(25, 35));
+RectangleShape player2coll(Vector2f(25, 35));
+RectangleShape pistolcoll(Vector2f(35, 25)), snipercoll(Vector2f(70, 20)), pewpewcoll(Vector2f(55, 25)), swordcoll(Vector2f(50, 20));
+Texture GroundT, BackGroundT, TreeT, StoneT, CementT, RanT, BranchT, SideT;
+Sprite CementF[250], GroundF[250], TreeF[250], StoneF[250], RanF[250], BranchF[250], SideF[250], BackGroundF;
+
+void PosGround() {
+    // 1
+    GroundF[0].setPosition(300, 300);
+    GroundF[1].setPosition(315, 300);
+    GroundF[2].setPosition(330, 300);
+    GroundF[3].setPosition(345, 300);
+    GroundF[4].setPosition(360, 300);
+    GroundF[5].setPosition(375, 300);
+    GroundF[6].setPosition(390, 300);
+    GroundF[7].setPosition(405, 300);
+    GroundF[8].setPosition(420, 300);
+    GroundF[9].setPosition(435, 300);
+    // 2
+    GroundF[10].setPosition(800, 300);
+    GroundF[11].setPosition(815, 300);
+    GroundF[12].setPosition(830, 300);
+    GroundF[13].setPosition(845, 300);
+    GroundF[14].setPosition(860, 300);
+    GroundF[15].setPosition(875, 300);
+    GroundF[16].setPosition(890, 300);
+    GroundF[17].setPosition(905, 300);
+    GroundF[18].setPosition(920, 300);
+    GroundF[19].setPosition(935, 300);
+    // 3
+    GroundF[20].setPosition(580, 400);
+    GroundF[21].setPosition(595, 400);
+    GroundF[22].setPosition(610, 400);
+    GroundF[23].setPosition(625, 400);
+    GroundF[24].setPosition(640, 400);
+    // 4
+    GroundF[25].setPosition(595, 225);
+    GroundF[26].setPosition(610, 225);
+    GroundF[27].setPosition(625, 225);
+    // 5
+    GroundF[28].setPosition(530, 550);
+    GroundF[29].setPosition(545, 550);
+    GroundF[30].setPosition(560, 550);
+    GroundF[31].setPosition(575, 550);
+    GroundF[32].setPosition(590, 550);
+    GroundF[33].setPosition(515, 550);
+    GroundF[34].setPosition(520, 550);
+    GroundF[35].setPosition(535, 550);
+    GroundF[36].setPosition(590, 550);
+    GroundF[37].setPosition(605, 550);
+    GroundF[38].setPosition(620, 550);
+    GroundF[39].setPosition(635, 550);
+    GroundF[40].setPosition(650, 550);
+    GroundF[41].setPosition(665, 550);
+    GroundF[42].setPosition(680, 550);
+    GroundF[43].setPosition(695, 550);
+    GroundF[44].setPosition(710, 550);
+    // 6
+    GroundF[45].setPosition(725, 485);
+    GroundF[46].setPosition(740, 485);
+    GroundF[47].setPosition(755, 485);
+    GroundF[48].setPosition(770, 485);
+    GroundF[49].setPosition(785, 485);
+    GroundF[50].setPosition(800, 485);
+    GroundF[51].setPosition(815, 485);
+    GroundF[52].setPosition(830, 485);
+    GroundF[53].setPosition(845, 485);
+    GroundF[54].setPosition(860, 485);
+    GroundF[55].setPosition(875, 485);
+    GroundF[56].setPosition(890, 485);
+    GroundF[57].setPosition(905, 485);
+    GroundF[58].setPosition(920, 485);
+    GroundF[59].setPosition(935, 485);
+    GroundF[60].setPosition(950, 485);
+    GroundF[61].setPosition(965, 485);
+    GroundF[62].setPosition(980, 485);
+    GroundF[63].setPosition(995, 485);
+    // 7
+    GroundF[64].setPosition(1010, 400);
+    GroundF[65].setPosition(1025, 400);
+    GroundF[66].setPosition(1040, 400);
+    GroundF[67].setPosition(1055, 400);
+    GroundF[68].setPosition(1070, 400);
+    GroundF[69].setPosition(1085, 400);
+    GroundF[70].setPosition(1100, 400);
+    // 8
+    GroundF[71].setPosition(500, 485);
+    GroundF[72].setPosition(500, 485);
+    GroundF[73].setPosition(485, 485);
+    GroundF[74].setPosition(470, 485);
+    GroundF[75].setPosition(455, 485);
+    GroundF[76].setPosition(440, 485);
+    GroundF[77].setPosition(435, 485);
+    GroundF[78].setPosition(420, 485);
+    GroundF[79].setPosition(405, 485);
+    GroundF[80].setPosition(390, 485);
+    GroundF[81].setPosition(375, 485);
+    GroundF[82].setPosition(360, 485);
+    GroundF[83].setPosition(345, 485);
+    GroundF[84].setPosition(330, 485);
+    GroundF[85].setPosition(315, 485);
+    GroundF[86].setPosition(300, 485);
+    GroundF[87].setPosition(295, 485);
+    GroundF[88].setPosition(280, 485);
+    GroundF[89].setPosition(265, 485);
+    // 9
+    GroundF[90].setPosition(250, 400);
+    GroundF[91].setPosition(235, 400);
+    GroundF[92].setPosition(220, 400);
+    GroundF[93].setPosition(205, 400);
+    GroundF[94].setPosition(195, 400);
+    GroundF[95].setPosition(180, 400);
+    GroundF[96].setPosition(165, 400);
+
+    GroundF[97].setPosition(935, 225);
+    GroundF[98].setPosition(950, 225);
+    GroundF[99].setPosition(965, 195);
+    GroundF[100].setPosition(980, 195);
+    GroundF[101].setPosition(995, 195);
+    GroundF[102].setPosition(1010, 195);
+
+    GroundF[103].setPosition(315, 225);
+    GroundF[104].setPosition(300, 225);
+    GroundF[105].setPosition(285, 195);
+    GroundF[106].setPosition(270, 195);
+    GroundF[107].setPosition(255, 195);
+    GroundF[108].setPosition(240, 195);
 }
-void GameTile::loadTexture(TileType type, const std::string& path) {
-    sf::Texture texture;
-    if (texture.loadFromFile(path)) {
-        textures[type] = texture;
-        sprites[type].setTexture(textures[type]);
-    }
+void PosBranch() {
+    BranchF[0].setPosition(166, 195);
+    BranchF[0].setScale(-1, 1);
+    BranchF[1].setPosition(166, 300);
+    BranchF[1].setScale(-1, 1);
+    BranchF[2].setPosition(1114, 195);
+    BranchF[3].setPosition(1114, 300);
 }
-const sf::Sprite& GameTile::getTileSprite(TileType type) {
-    return sprites[type];
+void PosSide() {
+    SideF[0].setPosition(300, 300);
+    SideF[0].setScale(-1, 1);
+    SideF[1].setPosition(450, 300);
+    SideF[1].setScale(1, 1);
+    SideF[2].setPosition(800, 300);
+    SideF[2].setScale(-1, 1);
+    SideF[3].setPosition(950, 300);
+    SideF[3].setScale(1, 1);
+    SideF[4].setPosition(580, 400);
+    SideF[4].setScale(-1, 1);
+    SideF[5].setPosition(655, 400);
+    SideF[5].setScale(1, 1);
+    SideF[6].setPosition(595, 225);
+    SideF[6].setScale(-1, 1);
+    SideF[7].setPosition(640, 225);
+    SideF[7].setScale(1, 1);
+    SideF[8].setPosition(1115, 400);
+    SideF[8].setScale(1, 1);
+    SideF[9].setPosition(165, 400);
+    SideF[9].setScale(-1, 1);
 }
-const int TILE_SIZE = 9;
-GameTile::TileType charToTileType(char c) {
-    switch (c) {
-    case 'g': return GameTile::Ground;
-    case 'r': return GameTile::Root;
-    case 'c': return GameTile::Cement;
-    case 's': return GameTile::Stone;
-    case 'b': return GameTile::Branch;
-    case 'w': return GameTile::Weapon;
-    case 't': return GameTile::Tree;
-    default:  return GameTile::None;
-    }
+void PosCement() {
+    CementF[0].setPosition(530, 565);
+    CementF[1].setPosition(545, 565);
+    CementF[2].setPosition(560, 565);
+    CementF[3].setPosition(575, 565);
+    CementF[4].setPosition(590, 565);
+    CementF[5].setPosition(515, 565);
+    CementF[6].setPosition(520, 565);
+    CementF[7].setPosition(535, 565);
+    CementF[8].setPosition(590, 565);
+    CementF[9].setPosition(605, 565);
+    CementF[10].setPosition(620, 565);
+    CementF[11].setPosition(635, 565);
+    CementF[12].setPosition(650, 565);
+    CementF[13].setPosition(665, 565);
+    CementF[14].setPosition(680, 565);
+    CementF[15].setPosition(695, 565);
+    CementF[16].setPosition(710, 565);
+    CementF[17].setPosition(530, 580);
+    CementF[18].setPosition(545, 580);
+    CementF[19].setPosition(560, 580);
+    CementF[20].setPosition(575, 580);
+    CementF[21].setPosition(590, 580);
+    CementF[22].setPosition(515, 580);
+    CementF[23].setPosition(520, 580);
+    CementF[24].setPosition(535, 580);
+    CementF[25].setPosition(590, 580);
+    CementF[26].setPosition(605, 580);
+    CementF[27].setPosition(620, 580);
+    CementF[28].setPosition(635, 580);
+    CementF[29].setPosition(650, 580);
+    CementF[30].setPosition(665, 580);
+    CementF[31].setPosition(680, 580);
+    CementF[32].setPosition(695, 580);
+    CementF[33].setPosition(710, 580);
+
+    CementF[34].setPosition(725, 500);
+    CementF[35].setPosition(740, 500);
+    CementF[36].setPosition(755, 500);
+    CementF[37].setPosition(770, 500);
+    CementF[38].setPosition(785, 500);
+    CementF[39].setPosition(800, 500);
+    CementF[40].setPosition(725, 515);
+    CementF[41].setPosition(740, 515);
+    CementF[42].setPosition(755, 515);
+    CementF[43].setPosition(770, 515);
+    CementF[44].setPosition(785, 515);
+    CementF[45].setPosition(800, 515);
+    CementF[46].setPosition(725, 530);
+    CementF[47].setPosition(740, 530);
+    CementF[48].setPosition(755, 530);
+    CementF[49].setPosition(770, 530);
+    CementF[50].setPosition(785, 530);
+    CementF[51].setPosition(800, 530);
+    CementF[52].setPosition(725, 545);
+    CementF[53].setPosition(740, 545);
+    CementF[54].setPosition(755, 545);
+    CementF[55].setPosition(770, 545);
+    CementF[56].setPosition(725, 560);
+    CementF[57].setPosition(740, 560);
+    CementF[58].setPosition(755, 560);
+    CementF[59].setPosition(770, 560);
+    CementF[60].setPosition(725, 575);
+    CementF[61].setPosition(740, 575);
+    CementF[62].setPosition(755, 575);
+    CementF[63].setPosition(770, 575);
+
+    CementF[64].setPosition(500, 500);
+    CementF[65].setPosition(485, 500);
+    CementF[66].setPosition(470, 500);
+    CementF[67].setPosition(455, 500);
+    CementF[68].setPosition(440, 500);
+    CementF[69].setPosition(425, 500);
+    CementF[70].setPosition(500, 515);
+    CementF[71].setPosition(485, 515);
+    CementF[72].setPosition(470, 515);
+    CementF[73].setPosition(455, 515);
+    CementF[74].setPosition(440, 515);
+    CementF[75].setPosition(425, 515);
+    CementF[76].setPosition(500, 530);
+    CementF[77].setPosition(485, 530);
+    CementF[78].setPosition(470, 530);
+    CementF[79].setPosition(455, 530);
+    CementF[80].setPosition(440, 530);
+    CementF[81].setPosition(425, 530);
+    CementF[82].setPosition(500, 545);
+    CementF[83].setPosition(485, 545);
+    CementF[84].setPosition(470, 545);
+    CementF[85].setPosition(455, 545);
+    CementF[86].setPosition(500, 560);
+    CementF[87].setPosition(485, 560);
+    CementF[88].setPosition(470, 560);
+    CementF[89].setPosition(455, 560);
+    CementF[90].setPosition(500, 575);
+    CementF[91].setPosition(485, 575);
+    CementF[92].setPosition(470, 575);
+    CementF[93].setPosition(455, 575);
+
+    CementF[94].setPosition(1010, 415);
+    CementF[95].setPosition(1025, 415);
+    CementF[96].setPosition(1040, 415);
+    CementF[97].setPosition(1055, 415);
+    CementF[98].setPosition(1070, 415);
+    CementF[99].setPosition(1085, 415);
+    CementF[100].setPosition(1100, 415);
+    CementF[101].setPosition(1010, 430);
+    CementF[102].setPosition(1025, 430);
+    CementF[103].setPosition(1040, 430);
+    CementF[104].setPosition(1055, 430);
+    CementF[105].setPosition(1070, 430);
+    CementF[106].setPosition(1085, 430);
+    CementF[107].setPosition(1100, 430);
+    CementF[108].setPosition(1010, 445);
+    CementF[109].setPosition(1025, 445);
+    CementF[110].setPosition(1040, 445);
+    CementF[111].setPosition(1055, 445);
+    CementF[112].setPosition(1070, 445);
+    CementF[113].setPosition(1010, 460);
+    CementF[114].setPosition(1025, 460);
+    CementF[115].setPosition(1040, 460);
+    CementF[116].setPosition(1055, 460);
+    CementF[117].setPosition(1070, 460);
+    CementF[118].setPosition(1010, 475);
+    CementF[119].setPosition(1025, 475);
+    CementF[120].setPosition(1040, 475);
+    CementF[121].setPosition(1055, 475);
+    CementF[122].setPosition(1070, 475);
+
+    CementF[123].setPosition(250, 415);
+    CementF[124].setPosition(235, 415);
+    CementF[125].setPosition(220, 415);
+    CementF[126].setPosition(205, 415);
+    CementF[127].setPosition(190, 415);
+    CementF[128].setPosition(175, 415);
+    CementF[129].setPosition(160, 415);
+    CementF[130].setPosition(250, 430);
+    CementF[131].setPosition(235, 430);
+    CementF[132].setPosition(220, 430);
+    CementF[133].setPosition(205, 430);
+    CementF[134].setPosition(190, 430);
+    CementF[135].setPosition(175, 430);
+    CementF[136].setPosition(160, 430);
+    CementF[137].setPosition(250, 445);
+    CementF[138].setPosition(235, 445);
+    CementF[139].setPosition(220, 445);
+    CementF[140].setPosition(205, 445);
+    CementF[141].setPosition(190, 445);
+    CementF[142].setPosition(250, 460);
+    CementF[143].setPosition(235, 460);
+    CementF[144].setPosition(220, 460);
+    CementF[145].setPosition(205, 460);
+    CementF[146].setPosition(190, 460);
+    CementF[147].setPosition(250, 475);
+    CementF[148].setPosition(235, 475);
+    CementF[149].setPosition(220, 475);
+    CementF[150].setPosition(205, 475);
+    CementF[151].setPosition(190, 475);
+
+    CementF[152].setPosition(965, 210);
+    CementF[153].setPosition(980, 210);
+    CementF[154].setPosition(995, 210);
+    CementF[155].setPosition(1010, 210);
+    CementF[156].setPosition(965, 225);
+    CementF[157].setPosition(980, 225);
+    CementF[158].setPosition(995, 225);
+    CementF[159].setPosition(1010, 225);
+
+    CementF[160].setPosition(285, 210);
+    CementF[161].setPosition(270, 210);
+    CementF[162].setPosition(255, 210);
+    CementF[163].setPosition(240, 210);
+    CementF[164].setPosition(285, 225);
+    CementF[165].setPosition(270, 225);
+    CementF[166].setPosition(255, 225);
+    CementF[167].setPosition(240, 225);
 }
-GameTile gameTiles;
-vector<string> level;
+void PosTree() {
+    TreeF[0].setPosition(165, 380);
+    TreeF[0].setScale(1.5, 1);
+    TreeF[1].setPosition(165, 360);
+    TreeF[1].setScale(1.5, 1);
+    TreeF[2].setPosition(165, 340);
+    TreeF[2].setScale(1.5, 1);
+    TreeF[3].setPosition(165, 320);
+    TreeF[3].setScale(1.5, 1);
+    TreeF[4].setPosition(165, 300);
+    TreeF[4].setScale(1.5, 1);
+    TreeF[5].setPosition(165, 280);
+    TreeF[5].setScale(1.5, 1);
+    TreeF[6].setPosition(165, 260);
+    TreeF[6].setScale(1.5, 1);
+    TreeF[7].setPosition(165, 240);
+    TreeF[7].setScale(1.5, 1);
+    TreeF[8].setPosition(165, 220);
+    TreeF[8].setScale(1.5, 1);
+    TreeF[9].setPosition(165, 200);
+    TreeF[9].setScale(1.5, 1);
+    TreeF[10].setPosition(165, 180);
+    TreeF[10].setScale(1.5, 1);
+    TreeF[11].setPosition(165, 160);
+    TreeF[11].setScale(1.5, 1);
+    TreeF[12].setPosition(165, 140);
+    TreeF[12].setScale(1.5, 1);
+
+    TreeF[13].setPosition(1115, 380);
+    TreeF[13].setScale(-1.5, 1);
+    TreeF[14].setPosition(1115, 360);
+    TreeF[14].setScale(-1.5, 1);
+    TreeF[15].setPosition(1115, 340);
+    TreeF[15].setScale(-1.5, 1);
+    TreeF[16].setPosition(1115, 320);
+    TreeF[16].setScale(-1.5, 1);
+    TreeF[17].setPosition(1115, 300);
+    TreeF[17].setScale(-1.5, 1);
+    TreeF[18].setPosition(1115, 280);
+    TreeF[18].setScale(-1.5, 1);
+    TreeF[19].setPosition(1115, 260);
+    TreeF[19].setScale(-1.5, 1);
+    TreeF[20].setPosition(1115, 240);
+    TreeF[20].setScale(-1.5, 1);
+    TreeF[21].setPosition(1115, 220);
+    TreeF[21].setScale(-1.5, 1);
+    TreeF[22].setPosition(1115, 200);
+    TreeF[22].setScale(-1.5, 1);
+    TreeF[23].setPosition(1115, 180);
+    TreeF[23].setScale(-1.5, 1);
+    TreeF[24].setPosition(1115, 160);
+    TreeF[24].setScale(-1.5, 1);
+    TreeF[25].setPosition(1115, 140);
+    TreeF[25].setScale(-1.5, 1);
+}
+void PosStone() {
+    StoneF[0].setPosition(405, 288);
+    StoneF[0].setScale(1, 1);
+    StoneF[1].setPosition(845, 288);
+    StoneF[1].setScale(-1, 1);
+    StoneF[2].setPosition(785, 473);
+    StoneF[2].setScale(-1, 1);
+    StoneF[3].setPosition(455, 473);
+    StoneF[3].setScale(1, 1);
+}
+void PosRan() {
+    RanF[0].setPosition(610, 300);
+    RanF[0].setScale(1, 1);
+}
+
 void init_Map2() {
-    DUCK_SCALE = 1.5;
-    GUN_SCALE = 1.2f;
+    DUCK_SCALE = 1.2f;
+    GUN_SCALE = 0.96f;
     fact = 3.f;
-    gravity = 0.5f;
-    jumpSpeed = -10.0f;  //give it negative value
-    velocityX = 2.5f;   // the duck speed
-    duck1posx = 25 * TILE_SIZE;
-    duck1posy = 27 * TILE_SIZE - 16;
-    MaxiVelocityY = 7;
+    gravity = 0.24f;
+    jumpSpeed = -7.0f;  //give it negative value
+    velocityX = 3.f;   // the duck speed
     init();
     // pistol
     pistol.fix_X = -2.f;
@@ -1654,178 +2015,570 @@ void init_Map2() {
     //grave
     Grave.setScale(0.16f, 0.1f);
 
-    //spawn weaps
+    BackGroundT.loadFromFile("BackGroundT.png");
+    GroundT.loadFromFile("GroundT.png");
+    StoneT.loadFromFile("StoneT.png");
+    CementT.loadFromFile("CementT.png");
+    RanT.loadFromFile("RanT.png");
+    TreeT.loadFromFile("TreeT.png");
+    BranchT.loadFromFile("BranchT.png");
+    SideT.loadFromFile("SideT.png");
+
+    BackGroundF.setPosition(0, 0);
+    BackGroundF.setScale(12, 10);
+    PosBranch();
+    PosCement();
+    PosGround();
+    PosRan();
+    PosSide();
+    PosStone();
+    PosTree();
+    pistol.collider = pistolcoll;
+    sniper.collider = snipercoll;
+    pewpew.collider = pewpewcoll;
+    sword.collider = swordcoll;
+    duck1.myduck.setPosition(330, 266);
+    duck2.myduck.setPosition(880, 266);
+    sniper.weapon.setPosition(250, 100);
+    pistol.weapon.setPosition(980, 100);
+    pewpew.weapon.setPosition(600, 100);
+    sword.weapon.setPosition(600, 500);
     weaps.push_back(pistol);
     weaps.push_back(sniper);
     weaps.push_back(pewpew);
     weaps.push_back(sword);
-
-
-    level = {
-    "                                                                                                                                    ",
-    "                                                                                                                                    ",
-    "                                                                                                                                    ",
-    "                                                                                                                                    ",
-    "                                                                                                                                    ",
-    "                                                                                                                                    ",
-    "                                                                                                                                    ",
-    "                                                                                                                                    ",
-    "                                                                                                                                    ",
-    "                                                                                                       w                            ",
-    "                                                                                                                                    ",
-    "                                                                                                                                    ",
-    "                                                                                                                                    ",
-    "                                                                                                                                    ",
-    "                                                                                                                                    ",
-    "                                                                                                                                    ",
-    "                                           w                                                                                        ",
-    "                                                                                                                                    ",
-    "                                                                                                      ggggg                         ",
-    "                                                                                                      ccccc                         ",
-    "                                                                                                   gggccccc                         ",
-    "                                                                                                   ccccccc                          ",
-    "                                                                                              gggggccccc                            ",
-    "                                                                                              ccccccccc                             ",
-    "                                                                                              ccccccccc   tt                        ",
-    "                        t             gggggggggg                                              ccccccccc   tt                        ",
-    "                        t             cccccccccc                                                          tt                   w    ",
-    "                        t             cccccccccc                                                          tt                        ",
-    "                        t                ccccccc                                                          tttbbbbbt                 ",
-    "                        t                ccccccc                           s                                t     t                 ",
-    "                        t                ccccccc                                                            t     t                 ",
-    "                        t                                               gggggggggg                          t     t                 ",
-    "                        t                                   s           cccccccccc                          t     t                 ",
-    "                        t                                               ccccccccc                           t     t                 ",
-    "                        tbbbbbbb                     gggggggggggggggggggccc                                 t     t                 ",
-    "                        t                            cccccccccccccccccccccc                                 t     t        ggggggggg",
-    "                        t                                  ccccccccccccc                                    t     r        ccccccccc",
-    "                        t                                  ccccccccccccc                                    t              ccccccccc",
-    "                        t                                  ccccccccccccc                                    t  ggggggggggggcccccc   ",
-    "                        t                                                                                   t  cccccccccccccccccc   ",
-    "                        t                                                                                   t     ccccccccccccccc   ",
-    "                        t                                                                                bbbt     ccccccccccccccc   ",
-    "                        t                                                                                   t     ccccccccccccccc   ",
-    "                        t                                                           s                       t                       ",
-    "                        t                                                                                   t                       ",
-    "                        t                    gggggg                              gggggg                     t                       ",
-    "                        t                    cccccc                              cccccc                     t                       ",
-    "                        t                    cccccc                              cccccc                     t                       ",
-    "                        t                    cccccc      s                    gggccccccggg                  t                       ",
-    "                        t                    cccccc                           cccccccccccc                  t                       ",
-    "                        t                    ccccccggggggggggggggg bbt  ggggggccccccccc               bbbbbbt                       ",
-    "                        t                    ccccccccccccccccccccc   t  ccccccccccccccc                     t                       ",
-    "                        t                    ccccccccccccccccccccc   t  ccccccccccccccc                     t                       ",
-    "                        t                    ccccccccccccccccccccc   t  ccccccccccccccc                     t            w          ",
-    "                        tbbb                 ccccccccccc             t  ccccccccc                           t                       ",
-    "                   w    t                ggggccccccccccc             t  ccccccccc                           t                       ",
-    "                        t                ccccccccccccccc             r  ccccccccc                           t                       ",
-    "                        t                                               ccc                                 t                       ",
-    "                        t                                            gggccc                                 t                       ",
-    "                        t                                            cccccc                                 t                 ggg   ",
-    "            ggg         t                                                                             s     t                 ccc   ",
-    "            ccc         r                                                                                   t                 ccc   ",
-    "            ccc                                                                                     ggggggggt         ggggggggccc   ",
-    "            cccggggggggggggggggggg                                                                  ccccccccr         ccccccccccc   ",
-    "            cccccccccccccccccccccc                                                                    cccccc          cccccccc      ",
-    "            cccccccccccccccccccccc                                            s                       ccccccggggggggggcccccccc      ",
-    "            cccccccccccccccccccccc                                                                    cccccccccccccccccccccccc      ",
-    "                  ccccccccccccccccggg              ggggggggggggggggggggggggggggggggg                                                ",
-    "                  ccccccccccccccccccc     s        ccccccccccccccccccccccccccccccccc                                                ",
-    "                  ccccccccccccccccccc              ccccccccccccccccccccccccccccccccc                                                ",
-    "                        cccccccccccccggggggggggggggcccccccccccccccccccccccccccccccccgggggg                                          ",
-    "                        cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc                                          ",
-    "                        cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc                                          ",
-    "                              cccccccccc        ccccccccc                     ccccccccccccggg                                       ",
-    "                              cccccccccc        ccccccccc                     ccccccccccccccc                                       ",
-    "                              cccccccccc        ccccccccc                                                                           ",
-    "                                                   cccccc                                                                           ",
-    "                                                   cccccc                                                                           ",
-    "                                                   cccccc                                                                           ",
-    "                                                                                                                            "
-    };
-
-    duck1.myduck.setPosition(250, 300);
-    duck2.myduck.setPosition(950, 225);
 }
-void collision_Map2(RectangleShape& player, ducks& duck)
+void Bullet_Collision2() {
+    for (int i = bulls.size() - 1;i >= 0; i--)
+    {
+        for (int j = 0; j < 109; j++)
+        {
+            if (bulls[i].bullet.getGlobalBounds().intersects(GroundF[j].getGlobalBounds()))
+            {
+                bulls.erase(i);
+                break;
+            }
+        }
+        for (int j = 0; j < 168; j++)
+        {
+            if (bulls[i].bullet.getGlobalBounds().intersects(CementF[j].getGlobalBounds()))
+            {
+                bulls.erase(i);
+                break;
+            }
+        }
+        for (int j = 0; j < 10; j++)
+        {
+            if (bulls[i].bullet.getGlobalBounds().intersects(SideF[j].getGlobalBounds()))
+            {
+                bulls.erase(i);
+                break;
+            }
+        }
+        for (int j = 0; j < 4; j++)
+        {
+            if (bulls[i].bullet.getGlobalBounds().intersects(StoneF[j].getGlobalBounds()))
+            {
+                bulls.erase(i);
+                break;
+            }
+        }
+        for (int j = 0; j < 1; j++)
+        {
+            if (bulls[i].bullet.getGlobalBounds().intersects(RanF[j].getGlobalBounds()))
+            {
+                bulls.erase(i);
+                break;
+            }
+        }
+    }
+}
+void collision_weaps_Map2(RectangleShape& collider, weapons& weap)
 {
     FloatRect box, wall, intersection;
-    box = player.getGlobalBounds();
-    for (size_t y = 0; y < level.size(); ++y) {
-        for (size_t x = 0; x < level[y].size(); ++x) {
-            GameTile::TileType tileType = charToTileType(level[y][x]);
-            if (!solidTiles.count(tileType)) continue;
-
-            Sprite tile = gameTiles.getTileSprite(tileType);
-           
-            tile.setPosition(x * TILE_SIZE, y * TILE_SIZE);
-            wall = tile.getGlobalBounds();
-
-            if (box.intersects(wall))
+    box = weap.weapon.getGlobalBounds();
+    for (int i = 0; i < 109;i++)
+    {
+        wall = GroundF[i].getGlobalBounds();
+        if (box.intersects(wall))
+        {
+            box.intersects(wall, intersection);
+            if (intersection.width > intersection.height)
             {
-                box.intersects(wall, intersection);
-                if (intersection.width > intersection.height)
+                if (box.top < wall.top)
                 {
-                    if (box.top < wall.top)
-                    {
-                        duck.onGround = true;
-                        duck.isJumping = false;
-                        duck.velocityY = 0.f;
-                        duck.myduck.setPosition(duck.myduck.getPosition().x, tile.getPosition().y+1);
-                    }
-                    else
-                    {
-                        duck.velocityY = 0;
-                        duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
-                    }
+                    weap.onGround = true;
+                    weap.velocityY = 0.f;
+                    weap.velocityX = 0.f;
+                    weap.weapon.setPosition(weap.weapon.getPosition().x, GroundF[i].getPosition().y + 1.f);
                 }
                 else
                 {
-                    if (box.left <= wall.left)
-                    {
-                        duck.myduck.setPosition(duck.myduck.getPosition().x - intersection.width, duck.myduck.getPosition().y);
-                    }
-                    else
-                    {
-                        //cout << "a7a" << endl;
-                       duck.myduck.setPosition(duck.myduck.getPosition().x + intersection.width, duck.myduck.getPosition().y);
-                    }
+                    weap.weapon.setPosition(weap.weapon.getPosition().x, weap.weapon.getPosition().y + intersection.height);
+                    weap.velocityY = 0.f;
+                }
+            }
+            else
+            {
+                weap.velocityX = 0.f;
+                if (box.left < wall.left)
+                {
+                    weap.weapon.setPosition(weap.weapon.getPosition().x - intersection.width, weap.weapon.getPosition().y);
+                }
+                else
+                {
+                    weap.weapon.setPosition(weap.weapon.getPosition().x + intersection.width, weap.weapon.getPosition().y);
+                }
+            }
+        }
+    }
+    box = weap.weapon.getGlobalBounds();
+    for (int i = 0; i < 10;i++)
+    {
+        wall = SideF[i].getGlobalBounds();
+        if (box.intersects(wall))
+        {
+            box.intersects(wall, intersection);
+            if (intersection.width > intersection.height)
+            {
+                if (box.top < wall.top)
+                {
+                    weap.onGround = true;
+                    weap.velocityY = 0.f;
+                    weap.velocityX = 0.f;
+                    weap.weapon.setPosition(weap.weapon.getPosition().x, SideF[i].getPosition().y + 1.f);
+                }
+                else
+                {
+                    weap.weapon.setPosition(weap.weapon.getPosition().x, weap.weapon.getPosition().y + intersection.height);
+                    weap.velocityY = 0.f;
+                }
+            }
+            else
+            {
+                weap.velocityX = 0.f;
+                if (box.left < wall.left)
+                {
+                    weap.weapon.setPosition(weap.weapon.getPosition().x - intersection.width, weap.weapon.getPosition().y);
+                }
+                else
+                {
+                    weap.weapon.setPosition(weap.weapon.getPosition().x + intersection.width, weap.weapon.getPosition().y);
+                }
+            }
+        }
+    }
+    box = weap.weapon.getGlobalBounds();
+    for (int i = 0; i < 168;i++)
+    {
+        wall = CementF[i].getGlobalBounds();
+        if (box.intersects(wall))
+        {
+            box.intersects(wall, intersection);
+            if (intersection.width > intersection.height)
+            {
+                if (box.top < wall.top)
+                {
+                    weap.onGround = true;
+                    weap.velocityY = 0.f;
+                    weap.velocityX = 0.f;
+                    weap.weapon.setPosition(weap.weapon.getPosition().x, CementF[i].getPosition().y + 1.f);
+                }
+                else
+                {
+                    weap.weapon.setPosition(weap.weapon.getPosition().x, weap.weapon.getPosition().y + intersection.height);
+                    weap.velocityY = 0.f;
+                }
+            }
+            else
+            {
+                weap.velocityX = 0.f;
+                if (box.left < wall.left)
+                {
+                    weap.weapon.setPosition(weap.weapon.getPosition().x - intersection.width, weap.weapon.getPosition().y);
+                }
+                else
+                {
+                    weap.weapon.setPosition(weap.weapon.getPosition().x + intersection.width, weap.weapon.getPosition().y);
+                }
+            }
+        }
+    }
+    box = weap.weapon.getGlobalBounds();
+    for (int i = 0; i < 4;i++)
+    {
+        wall = StoneF[i].getGlobalBounds();
+        if (box.intersects(wall))
+        {
+            box.intersects(wall, intersection);
+            if (intersection.width > intersection.height)
+            {
+                if (box.top < wall.top)
+                {
+                    weap.onGround = true;
+                    weap.velocityY = 0.f;
+                    weap.velocityX = 0.f;
+                    weap.weapon.setPosition(weap.weapon.getPosition().x, StoneF[i].getPosition().y + 1.f);
+                }
+                else
+                {
+                    weap.weapon.setPosition(weap.weapon.getPosition().x, weap.weapon.getPosition().y + intersection.height);
+                    weap.velocityY = 0.f;
+                }
+            }
+            else
+            {
+                weap.velocityX = 0.f;
+                if (box.left < wall.left)
+                {
+                    weap.weapon.setPosition(weap.weapon.getPosition().x - intersection.width, weap.weapon.getPosition().y);
+                }
+                else
+                {
+                    weap.weapon.setPosition(weap.weapon.getPosition().x + intersection.width, weap.weapon.getPosition().y);
+                }
+            }
+        }
+    }
+    box = weap.weapon.getGlobalBounds();
+    for (int i = 0; i < 4;i++)
+    {
+        wall = BranchF[i].getGlobalBounds();
+        if (box.intersects(wall))
+        {
+            box.intersects(wall, intersection);
+            if (intersection.width > intersection.height)
+            {
+                if (box.top < wall.top)
+                {
+                    weap.onGround = true;
+                    weap.velocityY = 0.f;
+                    weap.velocityX = 0.f;
+                    weap.weapon.setPosition(weap.weapon.getPosition().x, BranchF[i].getPosition().y + 1.f);
+                }
+                else
+                {
+                    weap.weapon.setPosition(weap.weapon.getPosition().x, weap.weapon.getPosition().y + intersection.height);
+                    weap.velocityY = 0.f;
+                }
+            }
+            else
+            {
+                weap.velocityX = 0.f;
+                if (box.left < wall.left)
+                {
+                    weap.weapon.setPosition(weap.weapon.getPosition().x - intersection.width, weap.weapon.getPosition().y);
+                }
+                else
+                {
+                    weap.weapon.setPosition(weap.weapon.getPosition().x + intersection.width, weap.weapon.getPosition().y);
+                }
+            }
+        }
+    }
+    box = weap.weapon.getGlobalBounds();
+    for (int i = 0; i < 1;i++)
+    {
+        wall = RanF[i].getGlobalBounds();
+        if (box.intersects(wall))
+        {
+            box.intersects(wall, intersection);
+            if (intersection.width > intersection.height)
+            {
+                if (box.top < wall.top)
+                {
+                    weap.onGround = true;
+                    weap.velocityY = 0.f;
+                    weap.velocityX = 0.f;
+                    weap.weapon.setPosition(weap.weapon.getPosition().x, RanF[i].getPosition().y + 1.f);
+                }
+                else
+                {
+                    weap.weapon.setPosition(weap.weapon.getPosition().x, weap.weapon.getPosition().y + intersection.height);
+                    weap.velocityY = 0.f;
+                }
+            }
+            else
+            {
+                weap.velocityX = 0.f;
+                if (box.left < wall.left)
+                {
+                    weap.weapon.setPosition(weap.weapon.getPosition().x - intersection.width, weap.weapon.getPosition().y);
+                }
+                else
+                {
+                    weap.weapon.setPosition(weap.weapon.getPosition().x + intersection.width, weap.weapon.getPosition().y);
+                }
+            }
+        }
+    }
+}
+void collision_Map2(RectangleShape& player_collider, ducks& duck)
+{
+    FloatRect box, wall, intersection;
+    box = player_collider.getGlobalBounds();
+    for (int i = 0; i < 109;i++)
+    {
+        wall = GroundF[i].getGlobalBounds();
+        if (box.intersects(wall))
+        {
+            box.intersects(wall, intersection);
+            if (intersection.width > intersection.height)
+            {
+                if (box.top < wall.top)
+                {
+                    duck.onGround = true;
+                    duck.isJumping = false;
+                    duck.velocityY = 0.f;
+                    cout << "sss";
+                    duck.myduck.setPosition(duck.myduck.getPosition().x, GroundF[i].getPosition().y);
+                }
+                else
+                {
+                    duck.velocityY = 0.f;
+                    duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
+                }
+            }
+            else
+            {
+                if (box.left <= wall.left)
+                {
+                    duck.myduck.setPosition(duck.myduck.getPosition().x - intersection.width, duck.myduck.getPosition().y);
+                }
+                else
+                {
+                    duck.myduck.setPosition(duck.myduck.getPosition().x + intersection.width, duck.myduck.getPosition().y);
+                }
+            }
+        }
+    }
+    box = player_collider.getGlobalBounds();
+    for (int i = 0; i < 168;i++)
+    {
+        wall = CementF[i].getGlobalBounds();
+        if (box.intersects(wall))
+        {
+            box.intersects(wall, intersection);
+            if(intersection.width < intersection.height)
+            {
+                if (box.left <= wall.left)
+                {
+                    duck.myduck.setPosition(duck.myduck.getPosition().x - intersection.width, duck.myduck.getPosition().y);
+                }
+                else
+                {
+                    duck.myduck.setPosition(duck.myduck.getPosition().x + intersection.width, duck.myduck.getPosition().y);
+                }
+            }
+            else
+            {
+                if (box.top < wall.top)
+                {
+                    duck.onGround = true;
+                    duck.isJumping = false;
+                    duck.velocityY = 0.f;
+                    duck.myduck.setPosition(duck.myduck.getPosition().x, CementF[i].getPosition().y + 1.f);
+                }
+                else
+                {
+                    duck.velocityY = 0.f;
+                    duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
+                }
+            }
+        }
+    }
+    box = player_collider.getGlobalBounds();
+    for (int i = 0; i < 10;i++)
+    {
+        wall = SideF[i].getGlobalBounds();
+        if (box.intersects(wall))
+        {
+            box.intersects(wall, intersection);
+            if (intersection.width > intersection.height)
+            {
+                if (box.top < wall.top)
+                {
+                    duck.onGround = true;
+                    duck.isJumping = false;
+                    duck.velocityY = 0.f;
+                    duck.myduck.setPosition(duck.myduck.getPosition().x, SideF[i].getPosition().y + 1.f);
+                }
+                else
+                {
+                    duck.velocityY = 0.f;
+                    duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
+                }
+            }
+            else
+            {
+                if (box.left <= wall.left)
+                {
+                    duck.myduck.setPosition(duck.myduck.getPosition().x - intersection.width, duck.myduck.getPosition().y);
+                }
+                else
+                {
+                    duck.myduck.setPosition(duck.myduck.getPosition().x + intersection.width, duck.myduck.getPosition().y);
+                }
+            }
+        }
+    }
+    box = player_collider.getGlobalBounds();
+    for (int i = 0; i < 4;i++)
+    {
+        wall = StoneF[i].getGlobalBounds();
+        if (box.intersects(wall))
+        {
+            box.intersects(wall, intersection);
+            if (intersection.width > intersection.height)
+            {
+                if (box.top < wall.top)
+                {
+                    duck.onGround = true;
+                    duck.isJumping = false;
+                    duck.velocityY = 0.f;
+                    duck.myduck.setPosition(duck.myduck.getPosition().x, StoneF[i].getPosition().y + 1.f);
+                }
+                else
+                {
+                    duck.velocityY = 0.f;
+                    duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
+                }
+            }
+            else
+            {
+                if (box.left <= wall.left)
+                {
+                    duck.myduck.setPosition(duck.myduck.getPosition().x - intersection.width, duck.myduck.getPosition().y);
+                }
+                else
+                {
+                    duck.myduck.setPosition(duck.myduck.getPosition().x + intersection.width, duck.myduck.getPosition().y);
+                }
+            }
+        }
+    }
+    box = player_collider.getGlobalBounds();
+    for (int i = 0; i < 4;i++)
+    {
+        wall = BranchF[i].getGlobalBounds();
+        if (box.intersects(wall))
+        {
+            box.intersects(wall, intersection);
+            if (intersection.width > intersection.height)
+            {
+                if (box.top < wall.top)
+                {
+                    duck.onGround = true;
+                    duck.isJumping = false;
+                    duck.velocityY = 0.f;
+                    duck.myduck.setPosition(duck.myduck.getPosition().x, BranchF[i].getPosition().y + 1.f);
+                }
+                else
+                {
+                    duck.velocityY = 0.f;
+                    duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
+                }
+            }
+            else
+            {
+                if (box.left <= wall.left)
+                {
+                    duck.myduck.setPosition(duck.myduck.getPosition().x - intersection.width, duck.myduck.getPosition().y);
+                }
+                else
+                {
+                    duck.myduck.setPosition(duck.myduck.getPosition().x + intersection.width, duck.myduck.getPosition().y);
+                }
+            }
+        }
+    }
+    box = player_collider.getGlobalBounds();
+    for (int i = 0; i < 1;i++)
+    {
+        wall = RanF[i].getGlobalBounds();
+        if (box.intersects(wall))
+        {
+            box.intersects(wall, intersection);
+            if (intersection.width > intersection.height)
+            {
+                if (box.top < wall.top)
+                {
+                    duck.onGround = true;
+                    duck.isJumping = false;
+                    duck.velocityY = 0.f;
+                    duck.myduck.setPosition(duck.myduck.getPosition().x, RanF[i].getPosition().y + 1.f);
+                }
+                else
+                {
+                    duck.velocityY = 0.f;
+                    duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
+                }
+            }
+            else
+            {
+                if (box.left <= wall.left)
+                {
+                    duck.myduck.setPosition(duck.myduck.getPosition().x - intersection.width, duck.myduck.getPosition().y);
+                }
+                else
+                {
+                    duck.myduck.setPosition(duck.myduck.getPosition().x + intersection.width, duck.myduck.getPosition().y);
                 }
             }
         }
     }
 }
 void update_Map2() {
-    update_Logic();
-    duck1.onGround = false;
-    duck2.onGround = false;
-    player1.setPosition(duck1.myduck.getPosition().x + 10, duck1.myduck.getPosition().y - 35);
-    player2.setPosition(duck2.myduck.getPosition().x + 10, duck2.myduck.getPosition().y - 35);
-    collision_Map2(player1, duck1);
-    collision_Map2(player2, duck2);
-    if (duck1.myduck.getPosition().y >= 620)
+    BackGroundF.setTexture(BackGroundT);
+    for (int i = 0; i < 250; i++) GroundF[i].setTexture(GroundT);
+    for (int i = 0; i < 250; i++) CementF[i].setTexture(CementT);
+    for (int i = 0; i < 250; i++) TreeF[i].setTexture(TreeT);
+    for (int i = 0; i < 250; i++) BranchF[i].setTexture(BranchT);
+    for (int i = 0; i < 250; i++) SideF[i].setTexture(SideT);
+    for (int i = 0; i < 250; i++) RanF[i].setTexture(RanT);
+    for (int i = 0; i < 250; i++) StoneF[i].setTexture(StoneT);
+    player1coll.setPosition(duck1.myduck.getPosition().x + 10, duck1.myduck.getPosition().y - 35);
+    player2coll.setPosition(duck2.myduck.getPosition().x + 10, duck2.myduck.getPosition().y - 35);
+    for (int i = 0;i < weaps.size();i++)
     {
-        duck1.dead = false; //edit later
-    }
-    if (duck2.myduck.getPosition().y >= 620)
-    {
-        duck2.dead = false; //edit later
-    }
-}
-void draw_Map2() {
-    for (size_t y = 0; y < level.size(); ++y) {
-        for (size_t x = 0; x < level[y].size(); ++x) {
-            char tileChar = level[y][x];
-            GameTile::TileType tileType = charToTileType(tileChar);
-            if (tileType != GameTile::None) {
-                sf::Sprite tile = gameTiles.getTileSprite(tileType);
-                tile.setPosition(static_cast<float>(x * TILE_SIZE), static_cast<float>(y * TILE_SIZE));
-                window.draw(tile);
-            }
+        if (weaps[i].type == "pistol")
+        {
+            weaps[i].collider.setPosition(weaps[i].weapon.getPosition().x + 17, weaps[i].weapon.getPosition().y - 10);
+        }
+        else if (weaps[i].type == "sniper")
+        {
+            weaps[i].collider.setPosition(weaps[i].weapon.getPosition().x + 33, weaps[i].weapon.getPosition().y - 10);
+        }
+        else if (weaps[i].type == "pewpew")
+        {
+            weaps[i].collider.setPosition(weaps[i].weapon.getPosition().x + 25, weaps[i].weapon.getPosition().y - 10);
+        }
+        else
+        {
+            weaps[i].collider.setPosition(weaps[i].weapon.getPosition().x + 23, weaps[i].weapon.getPosition().y - 8);
         }
     }
-    cout << duck1.myduck.getPosition().x << " " << duck1.myduck.getPosition().y << endl;
-    window.draw(player1);
+    Bullet_Collision2();
+    for (int i = 0; i < weaps.size(); i++) {
+        collision_weaps_Map2(weaps[i].collider, weaps[i]);
+    }
+    duck1.onGround = false;
+    duck2.onGround = false;
+    collision_Map2(player1coll, duck1);
+    collision_Map2(player2coll, duck2);
+    update_Logic();
+}
+
+
+void draw_Map2() {
+    window.draw(BackGroundF);
+    for (int i = 0; i < 109; i++) window.draw(GroundF[i]);
+    for (int i = 0; i < 168; i++) window.draw(CementF[i]);
+    for (int i = 0; i < 26; i++) window.draw(TreeF[i]);
+    for (int i = 0; i < 4; i++) window.draw(BranchF[i]);
+    for (int i = 0; i < 10; i++) window.draw(SideF[i]);
+    for (int i = 0; i < 1; i++) window.draw(RanF[i]);
+    for (int i = 0; i < 4; i++) window.draw(StoneF[i]);
     draw_Logic();
 }
 void Map2() {
