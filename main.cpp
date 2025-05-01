@@ -23,13 +23,14 @@ typedef long long ll;
 using namespace sf;
 using namespace std;
 
-Menu mainMenu, settingsMenu, gameMenu, transition;
+Menu mainMenu, settingsMenu, gameMenu, pausedMenu, transition, endScreen;
 RenderWindow window(VideoMode(1280, 720), "Duck Game");
 Texture grave;
 Sprite Grave;
 splashScreen intro;
 
-Clock trans, SPAWN, fadeTimer;
+Clock trans, SPAWN, fadeTimer, endGameTimer;
+bool started = false;
 int fadeDirection = 0, fadeTargetState = 1000, fadeCurrentAlpha, fadeDuration = 500;
 RectangleShape fadeScreen;
 
@@ -37,9 +38,9 @@ Texture gameBackgroundTexture;
 Sprite gameBackground;
 Texture duck1AvatarTexture, duck2AvatarTexture, duck1AvatarReadyTexture, duck2AvatarReadyTexture;
 Sprite duck1Avatar, duck2Avatar, duck1AvatarReady, duck2AvatarReady;
-bool fullscreen = false;
+bool drawPaused = false;
 
-int menuState = 1000; // 1000 = main menu, 0 = game/levels, 1 = settings, 2 = game menu (& level selector), 3 = transition between games 
+int menuState = 1000; // 1000 = main menu, 0 = game/levels, 1 = settings, 2 = game menu (& level selector), 3 = transition between games, 4 = end game
 bullets bull[3];
 ducks duck1, duck2;
 float fact;
@@ -51,7 +52,7 @@ float jumpSpeed = -14.f;
 float velocityX = 5.f;
 float MaxiVelocityY = 9.f;
 bool GameEnd = 0;
-ll mapnum = 3, duck1Score=0, duck2Score=0;
+ll mapnum = 0, duck1Score=0, duck2Score=0;
 float DUCK_SCALE;
 float GUN_SCALE;
 float scalex, scaley;
@@ -574,6 +575,7 @@ void draw_Logic() {
 
 
 // Walid
+
 void initFade(int width, int height) {
     fadeScreen.setPosition(0.f, 0.f);
     fadeScreen.setSize(Vector2f(width, height));
@@ -653,11 +655,50 @@ void updateReadiness(Menu& menu) {
         menu.menuText[3].setString("PLAYER 2");
     }
 }
+
 void startGame(Menu& menu, ducks& duck1, ducks& duck2) {
     if ((duck1.ready && duck2.ready) && menu.selected == 0) {
         fadeIn(0);
     }
 }
+
+void endGame() {
+    fadeIn(4);
+}
+
+void initEndGameScreen(int width, int height) {
+    endScreen.font.loadFromFile("img/arcade.ttf");
+
+    float scaleX, scaleY;
+    endScreen.backgroundTexture.loadFromFile("img/bigTV.png");
+    endScreen.background.setTexture(endScreen.backgroundTexture);
+
+    scaleX = window.getSize().x * 1.0 / endScreen.backgroundTexture.getSize().x;
+    scaleY = window.getSize().y * 1.0 / endScreen.backgroundTexture.getSize().y;
+
+    endScreen.background.setScale(scaleX, scaleY);
+    endScreen.background.setPosition(0.f, 0.f);
+
+    for (int i = 0; i < 3; i++) {
+        endScreen.menuText[i].setFont(endScreen.font);
+    }
+
+    endScreen.menuText[0].setString("WINNER!!!");
+    endScreen.menuText[0].setCharacterSize(60.f);
+    endScreen.menuText[0].setFillColor(Color(255, 255, 255));
+    endScreen.menuText[0].setPosition(Vector2f(width / 4.5f, height / 4.f));
+
+    endScreen.menuText[1].setString("PLAYER 1");
+    endScreen.menuText[1].setCharacterSize(60.f);
+    endScreen.menuText[1].setFillColor(Color(255, 255, 255));
+    endScreen.menuText[1].setPosition(Vector2f(width / 4.5f, height / 4.f + 150.f));
+
+    endScreen.menuText[2].setString("PLAYER 2");
+    endScreen.menuText[2].setCharacterSize(60.f);
+    endScreen.menuText[2].setFillColor(Color(255, 255, 255));
+    endScreen.menuText[2].setPosition(Vector2f(width / 4.5f, height / 4.f + 150.f));
+}
+
 void initTransition(ducks& duck1, ducks& duck2, int width, int height) {
     transition.font.loadFromFile("img/arcade.ttf");
 
@@ -694,6 +735,33 @@ void initTransition(ducks& duck1, ducks& duck2, int width, int height) {
     transition.menuText[2].setString(score2);
 
 }
+
+void drawEndScreen() {
+    endScreen.menuText[0].setString("WINNER!!");
+
+    window.draw(endScreen.background);
+    window.draw(endScreen.menuText[0]);
+
+    if (duck1Score == 10) {
+        window.draw(endScreen.menuText[1]);
+    }
+    else if (duck2Score == 10) {
+        window.draw(endScreen.menuText[2]);
+    }
+
+    if (!started) {
+        endGameTimer.restart();
+        started = true;
+    }
+
+    if (endGameTimer.getElapsedTime().asMilliseconds() >= 5000) {
+        fadeOut(1000);
+        started = false;
+        duck1Score = 0;
+        duck2Score = 0;
+    }
+}
+
 void drawTransition(int width, int height) {
     string score1 = "PLAYER 1     " + to_string(duck1Score);
     string score2 = "PLAYER 2     " + to_string(duck2Score);
@@ -707,6 +775,37 @@ void drawTransition(int width, int height) {
         window.draw(transition.menuText[i]);
     }
 }
+
+void initPaused(int width, int height, RenderWindow& window) {
+
+    float charSize = 60.f;
+
+    // Loading and setting font  
+    pausedMenu.font.loadFromFile("img/arcade.ttf");
+
+    for (int i = 0; i < 3; i++) {
+        pausedMenu.menuText[i].setFont(pausedMenu.font);
+    }
+
+    /* First Button (CONTINUE) */
+    pausedMenu.menuText[0].setString("CONTINUE");
+    pausedMenu.menuText[0].setCharacterSize(charSize);
+    pausedMenu.menuText[0].setFillColor(Color(255, 255, 255));
+    pausedMenu.menuText[0].setPosition(Vector2f(width / 1.5f, height / 4.f + 100.f));
+
+    /* Second Button (SETTINGS) */
+    pausedMenu.menuText[1].setString("SETTINGS");
+    pausedMenu.menuText[1].setCharacterSize(charSize);
+    pausedMenu.menuText[1].setFillColor(Color(255, 255, 255));
+    pausedMenu.menuText[1].setPosition(Vector2f(width / 1.5f, height / 4.f + 250.f));
+
+    /* Third Button (QUIT) */
+    pausedMenu.menuText[2].setString("QUIT");
+    pausedMenu.menuText[2].setCharacterSize(charSize);
+    pausedMenu.menuText[2].setFillColor(Color(255, 255, 255));
+    pausedMenu.menuText[2].setPosition(Vector2f(width / 1.5f, height / 4.f + 400.f));
+}
+
 void initMainMenu(int width, int height, RenderWindow& window) {
 
     float charSize = 60.f;
@@ -861,12 +960,11 @@ void initSettingsMenu(int width, int height, RenderWindow& window) {
     settingsMenu.menuText[0].setCharacterSize(60);
     settingsMenu.menuText[0].setFillColor(Color::White);
     settingsMenu.menuText[0].setPosition(Vector2f(width / 2.f, height / 4.f + 100.f));
-    string fullscreenText = "FULLSCREEN               " + string(fullscreen ? "ON" : "OFF");
-    settingsMenu.menuText[1].setString(fullscreenText);
+
+    settingsMenu.menuText[1].setString("CONTROLS");
     settingsMenu.menuText[1].setCharacterSize(60);
     settingsMenu.menuText[1].setFillColor(Color::White);
     settingsMenu.menuText[1].setPosition(Vector2f(width / 2.f, height / 4.f + 250.f));
-
 
     settingsMenu.menuText[2].setString("BACK");
     settingsMenu.menuText[2].setCharacterSize(60);
@@ -888,6 +986,7 @@ void drawDucksGameMenu() {
         window.draw(duck2Avatar);
     }
 }
+
 void drawMenu(RenderWindow& window, Menu& menu, int itemCount) {
     if (menuState == 2)
         window.draw(gameBackground);
@@ -901,10 +1000,19 @@ void drawMenu(RenderWindow& window, Menu& menu, int itemCount) {
     if (menuState == 2)
         drawDucksGameMenu();
 
-    for (int i = 0; i < itemCount; i++) {
-        window.draw(menu.menuText[i]);
+    if (menuState == 0 && drawPaused) {
+        for (int i = 0; i < itemCount; i++) {
+            window.draw(menu.menuText[i]);
+        }
+        cout << drawPaused << endl;
+    }
+    else if (menuState != 0) {
+        for (int i = 0; i < itemCount; i++) {
+            window.draw(menu.menuText[i]);
+        }
     }
 }
+
 void moveUp(Menu& menu, int itemCount) {
     if (menu.selected - 1 >= -1) {
         menu.menuText[menu.selected].setOutlineThickness(0);
@@ -938,17 +1046,6 @@ void moveDown(Menu& menu, ll itemCount) {
         menu.menuText[menu.selected].setOutlineColor(Color(255, 150, 0));
         menu.menuText[menu.selected].setFillColor(Color(255, 255, 255));
     }
-}
-void fullscreenMode(RenderWindow& window) {
-    fullscreen = !fullscreen;
-
-    if (fullscreen) {
-        window.create(VideoMode::getFullscreenModes()[0], "Duck Game", Style::Fullscreen);
-    }
-    else {
-        window.create(VideoMode(Width, Height), "Duck Game", Style::Default);
-    }
-
 }
 
 
@@ -2789,16 +2886,17 @@ int main() {
 
     window.setFramerateLimit(90);
     initMainMenu(Width, Height, window);
-    initTransition(duck1, duck2, Width, Height);
     initGameMenu(Width, Height, window);
     initSettingsMenu(Width, Height, window);
+    initPaused(Width, Height, window);
+    initTransition(duck1, duck2, Width, Height);
+    initEndGameScreen(Width, Height);
     initFade(Width, Height);
     initMusic();
 
+    Event event;
     while (window.isOpen()) {
-        Event event;
-
-        while (window.pollEvent(event)) {
+        while (window.pollEvent(event) && !drawPaused) {
             if (event.type == Event::Closed) {
                 window.close();
             }
@@ -2828,10 +2926,9 @@ int main() {
                 }
 
                 // Return to main menu 
-                else if (menuState != 1000 && event.key.code == Keyboard::Escape) {
+                else if ((menuState != 1000 && menuState != 0) && event.key.code == Keyboard::Escape) {
                     fadeOut(1000);
                 }
-
                 else if (menuState == 1) {
                     if (event.key.code == Keyboard::Down) {
                         moveDown(settingsMenu, 3);
@@ -2840,16 +2937,6 @@ int main() {
                         moveUp(settingsMenu, 3);
                     }
                     else if (event.key.code == Keyboard::Return) {
-
-                        if (settingsMenu.selected == 1) {
-                            fullscreenMode(window);
-
-                            initMainMenu(Width, Height, window);
-                            initGameMenu(Width, Height, window);
-                            initSettingsMenu(Width, Height, window);
-                            initFade(Width, Height);
-                        }
-
                         if (settingsMenu.selected == 2)
                             fadeOut(1000);
                     }
@@ -2869,7 +2956,6 @@ int main() {
                     }
                 }
                 else if (menuState == 2) {
-                    getMousePos();
                     if (event.key.code == Keyboard::Down || event.key.code == Keyboard::S) {
                         moveDown(gameMenu, 2);
                     }
@@ -2941,6 +3027,13 @@ int main() {
             if (mapnum == 2) Map3();
             if (mapnum == 3) Map4();
             if (mapnum == 4) Map5();
+
+            /*
+            if (event.key.code == Keyboard::Escape) {
+                drawPaused = !drawPaused;
+                drawMenu(window, pausedMenu, 3);
+            }
+            */
         }
         else if (menuState == 1) {
             drawMenu(window, settingsMenu, 3);
@@ -2964,22 +3057,30 @@ int main() {
                 GameEnd = 0;
             }
             if (trans.getElapsedTime().asMilliseconds() > 3000) {
-                menuState = 0;
-                mapnum++;
-                if (mapnum == 1) mapnum++;
-                mapnum %= 5;
-                GameEnd = 0;
-                if (mapnum == 0) init_Map1();
-                if (mapnum == 1) init_Map2();
-                if (mapnum == 2) init_Map3();
-                if (mapnum == 3) init_Map4();
-                if (mapnum == 4) init_Map5();
-                if (mapnum == 0) Map1();
-                if (mapnum == 1) Map2();
-                if (mapnum == 2) Map3();
-                if (mapnum == 3) Map4();
-                if (mapnum == 4) Map5();
+                if (duck1Score == 10 || duck2Score == 10) {
+                    menuState = 4;
+                }
+                else {
+                    menuState = 0;
+                    mapnum++;
+                    if (mapnum == 1) mapnum++;
+                    mapnum %= 5;
+                    GameEnd = 0;
+                    if (mapnum == 0) init_Map1();
+                    if (mapnum == 1) init_Map2();
+                    if (mapnum == 2) init_Map3();
+                    if (mapnum == 3) init_Map4();
+                    if (mapnum == 4) init_Map5();
+                    if (mapnum == 0) Map1();
+                    if (mapnum == 1) Map2();
+                    if (mapnum == 2) Map3();
+                    if (mapnum == 3) Map4();
+                    if (mapnum == 4) Map5();
+                }
             }
+        }
+        else if (menuState == 4) {
+            drawEndScreen();
         }
 
         window.display();
