@@ -39,7 +39,7 @@ Texture duck1AvatarTexture, duck2AvatarTexture, duck1AvatarReadyTexture, duck2Av
 Sprite duck1Avatar, duck2Avatar, duck1AvatarReady, duck2AvatarReady;
 bool fullscreen = false;
 
-int menuState = 1000; // 1000 = main menu, 0 = game/levels, 1 = settings, 2 = game menu (& level selector), 3 = transition between games 
+int menuState = 0; // 1000 = main menu, 0 = game/levels, 1 = settings, 2 = game menu (& level selector), 3 = transition between games 
 bullets bull[3];
 ducks duck1, duck2;
 float fact;
@@ -51,7 +51,7 @@ float jumpSpeed = -14.f;
 float velocityX = 5.f;
 float MaxiVelocityY = 10.f;
 bool GameEnd = 0;
-ll mapnum = 0, duck1Score=0, duck2Score=0;
+ll mapnum = 3, duck1Score=0, duck2Score=0;
 float DUCK_SCALE;
 float GUN_SCALE;
 float scalex, scaley;
@@ -2311,10 +2311,11 @@ void init_Map4()
                     mapTiles[tileCount].bounds.width = 32;
                     mapTiles[tileCount].bounds.height = 32;
                 }
+                if(mapTiles[tileCount].isCollidable) tileCount++;
             }
-            tileCount++;
         }
     }
+    cout << tileCount << endl;
 }
 void collision_Map4(ducks& duck)
 {
@@ -2457,9 +2458,7 @@ void bullet_collision4() {
         for (int j = 0; j < tileCount; j++) {
             if (!mapTiles[j].isCollidable) continue;
             else {
-                cout << bulls.size() << endl;
                 if (bulls[i].bullet.getGlobalBounds().intersects(mapTiles[j].bounds)) {
-                    cout << "FOUND !!" << endl;
                     bulls.erase(i);
                     break;
                 }
@@ -2945,7 +2944,6 @@ int main() {
 
                 GameEnd = 0;
                 menuState = 3;
-                cout << "DONE" << endl;
                 trans.restart();
             }
             if (mapnum == 0) Map1();
@@ -2980,7 +2978,6 @@ int main() {
                 mapnum++;
                 if (mapnum == 1) mapnum++;
                 mapnum %= 5;
-                cout << "yalla" << endl;
                 GameEnd = 0;
                 if (mapnum == 0) init_Map1();
                 if (mapnum == 1) init_Map2();
