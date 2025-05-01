@@ -1371,16 +1371,6 @@ void update_Map1()
     {
         collision_weaps_Map1(weaps[i].collider, weaps[i]);
     }
-    if (duck1.myduck.getPosition().y >= 620)
-    {
-        duck1.dead = true;
-        GameEnd = 1;
-    }
-    if (duck2.myduck.getPosition().y >= 620)
-    {
-        duck2.dead = true;
-        GameEnd = 1;
-    }
     update_Logic();
     if (SPAWN.getElapsedTime().asSeconds() >= 60) {
         SPAWN1();
