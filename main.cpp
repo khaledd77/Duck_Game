@@ -54,7 +54,7 @@ float jumpSpeed = -14.f;
 float velocityX = 5.f;
 float MaxiVelocityY = 9.f;
 bool GameEnd = 0;
-ll mapnum = 1, duck1Score=0, duck2Score=0;
+ll mapnum = 5, duck1Score=0, duck2Score=0;
 float DUCK_SCALE;
 float GUN_SCALE;
 float scalex, scaley;
@@ -3727,19 +3727,19 @@ void Map5() {
 }
 
 //khaled`s MAP 2
-Sprite nblocks[16], pillars[15], right_edges[8], left_edges[8], bases[15], middle_blocks[10], boxes[8], green_barrel, red_barrel, fence1, fence2[3], fence3, doorlocked[2], switch6[2];
-Texture blocks_texture6, pillar_texture6, right_edges_texture6, left_edges_texture6, bases_texture6, middle_blocks_texture6, base_redge6, base_ledge6, boxes_texture6, red_barrel_texture, green_barrel_texture, fence1_texture6, fence2_texture6, fence3_texture6, doorlocked_texture6, switch_texture6;
-RectangleShape player1_collider6, player2_collider6;
+Sprite nblocks[12], pillars[15], right_edges[8], left_edges[8], bases[15], middle_blocks[10], boxes[8], green_barrel, red_barrel, fence1, fence2[3], fence3, doorlocked[2], switch6[2], spikes[12], acid1[5], acid2[4], acid_skel;
+Texture blocks_texture6, pillar_texture6, right_edges_texture6, left_edges_texture6, bases_texture6, middle_blocks_texture6, base_redge6, base_ledge6, boxes_texture6, red_barrel_texture, green_barrel_texture, fence1_texture6, fence2_texture6, fence3_texture6, doorlocked_texture6, switch_texture6, spikes_texture6, acid1_texture6, acid2_texture6, acid_skel_texture6;
+RectangleShape player1_collider6(Vector2f(25, 40)), player2_collider62(Vector2f(25, 40));
 void SPAWN6() {
     sniper_collider.setOrigin(sniper_collider.getLocalBounds().width / 2, sniper_collider.getLocalBounds().height / 2);
     pistol_collider.setOrigin(pistol_collider.getLocalBounds().width / 2, pistol_collider.getLocalBounds().height / 2);
     pewpew_collider.setOrigin(pewpew_collider.getLocalBounds().width / 2, pewpew_collider.getLocalBounds().height / 2);
     swrd_collider.setOrigin(swrd_collider.getLocalBounds().width / 2, swrd_collider.getLocalBounds().height / 2);
-    sniper.weapon.setPosition(450.f, 510);
-    pistol.weapon.setPosition(720.f, 145);
-    grenade.weapon.setPosition(690.f, 145);
-    pewpew.weapon.setPosition(360.f, 510);
-    sword.weapon.setPosition(1035.f, 465);
+    sniper.weapon.setPosition(320.f, 110);
+    pistol.weapon.setPosition(625.f, 420);
+    grenade.weapon.setPosition(640.f, 80);
+    pewpew.weapon.setPosition(620.f, 160);
+    sword.weapon.setPosition(920.f, 110);
     pistol.collider = pistol_collider;
     sniper.collider = sniper_collider;
     pewpew.collider = pewpew_collider;
@@ -3969,6 +3969,44 @@ void set_decorations()
     switch6[0].setScale(0.15, 0.15);
     switch6[1].setPosition(700, 562);
     switch6[1].setScale(0.15, 0.15);
+}
+void set_spikes()
+{
+    spikes[0].setPosition(395, 505);
+    spikes[0].setScale(0.35, 0.2);
+    spikes[1].setPosition(480, 505);
+    spikes[1].setScale(0.35, 0.2);
+    spikes[2].setPosition(630, 505);
+    spikes[2].setScale(-0.35, 0.2);
+    spikes[3].setPosition(630, 505);
+    spikes[3].setScale(0.35, 0.2);
+    spikes[4].setPosition(780, 505);
+    spikes[4].setScale(-0.35, 0.2);
+    spikes[5].setPosition(785, 505);
+    spikes[5].setScale(0.4, 0.2);
+}
+void set_acid()
+{
+    acid1[0].setPosition(440, 240);
+    acid1[0].setScale(0.3, 0.2);
+    acid2[0].setPosition(440, 277);
+    acid2[0].setScale(0.3, 0.21);
+    acid1[1].setPosition(517, 240);
+    acid1[1].setScale(0.3, 0.2);
+    acid2[1].setPosition(517, 277);
+    acid2[1].setScale(0.3, 0.21);
+    acid1[2].setPosition(671, 240);
+    acid1[2].setScale(-0.3, 0.2);
+    acid2[2].setPosition(671, 277);
+    acid2[2].setScale(-0.3, 0.21);
+    acid1[3].setPosition(671, 240);
+    acid1[3].setScale(0.3, 0.2);
+    acid_skel.setPosition(671, 265);
+    acid_skel.setScale(0.3, 0.3);
+    acid1[4].setPosition(748, 240);
+    acid1[4].setScale(0.36, 0.2);
+    acid2[3].setPosition(748, 277);
+    acid2[3].setScale(0.36, 0.21);
 }
 void collision_Map6(RectangleShape& player_collider, ducks& duck)
 {
@@ -4206,6 +4244,22 @@ void collision_Map6(RectangleShape& player_collider, ducks& duck)
             }
         }
     }
+    for (int i = 0;i < 5;i++)
+    {
+        wall = acid1[i].getGlobalBounds();
+        if (box.intersects(wall))
+        {
+            duck.dead = true;
+        }
+    }
+    for (int i = 0;i < 6;i++)
+    {
+        wall = spikes[i].getGlobalBounds();
+        if (box.intersects(wall))
+        {
+            duck.dead = true;
+        }
+    }
 }
 void collision_weaps_Map6(RectangleShape& player_collider, weapons& weap)
 {
@@ -4224,7 +4278,7 @@ void collision_weaps_Map6(RectangleShape& player_collider, weapons& weap)
                     weap.onGround = true;
                     weap.velocityY = 0.f;
                     weap.velocityX = 0.f;
-                    weap.weapon.setPosition(weap.weapon.getPosition().x, nblocks[i].getPosition().y);
+                    weap.weapon.setPosition(weap.weapon.getPosition().x, nblocks[i].getPosition().y+1);
                 }
                 else
                 {
@@ -4258,7 +4312,7 @@ void collision_weaps_Map6(RectangleShape& player_collider, weapons& weap)
                     weap.onGround = true;
                     weap.velocityY = 0.f;
                     weap.velocityX = 0.f;
-                    weap.weapon.setPosition(weap.weapon.getPosition().x, left_edges[i].getPosition().y);
+                    weap.weapon.setPosition(weap.weapon.getPosition().x, left_edges[i].getPosition().y+1);
                 }
                 else
                 {
@@ -4291,7 +4345,7 @@ void collision_weaps_Map6(RectangleShape& player_collider, weapons& weap)
                     weap.onGround = true;
                     weap.velocityY = 0.f;
                     weap.velocityX = 0.f;
-                    weap.weapon.setPosition(weap.weapon.getPosition().x, right_edges[i].getPosition().y);
+                    weap.weapon.setPosition(weap.weapon.getPosition().x, right_edges[i].getPosition().y+1);
                 }
                 else
                 {
@@ -4324,7 +4378,7 @@ void collision_weaps_Map6(RectangleShape& player_collider, weapons& weap)
                     weap.onGround = true;
                     weap.velocityY = 0.f;
                     weap.velocityX = 0.f;
-                    weap.weapon.setPosition(weap.weapon.getPosition().x, pillars[i].getPosition().y);
+                    weap.weapon.setPosition(weap.weapon.getPosition().x, pillars[i].getPosition().y+1);
                 }
                 else
                 {
@@ -4357,7 +4411,7 @@ void collision_weaps_Map6(RectangleShape& player_collider, weapons& weap)
                     weap.onGround = true;
                     weap.velocityY = 0.f;
                     weap.velocityX = 0.f;
-                    weap.weapon.setPosition(weap.weapon.getPosition().x, bases[i].getPosition().y);
+                    weap.weapon.setPosition(weap.weapon.getPosition().x, bases[i].getPosition().y+1);
                 }
                 else
                 {
@@ -4390,7 +4444,7 @@ void collision_weaps_Map6(RectangleShape& player_collider, weapons& weap)
                     weap.onGround = true;
                     weap.velocityY = 0.f;
                     weap.velocityX = 0.f;
-                    weap.weapon.setPosition(weap.weapon.getPosition().x, middle_blocks[i].getPosition().y);
+                    weap.weapon.setPosition(weap.weapon.getPosition().x, middle_blocks[i].getPosition().y+1);
                 }
                 else
                 {
@@ -4423,7 +4477,7 @@ void collision_weaps_Map6(RectangleShape& player_collider, weapons& weap)
                     weap.onGround = true;
                     weap.velocityY = 0.f;
                     weap.velocityX = 0.f;
-                    weap.weapon.setPosition(weap.weapon.getPosition().x, boxes[i].getPosition().y);
+                    weap.weapon.setPosition(weap.weapon.getPosition().x, boxes[i].getPosition().y+1);
                 }
                 else
                 {
@@ -4440,6 +4494,99 @@ void collision_weaps_Map6(RectangleShape& player_collider, weapons& weap)
                 {
                     weap.weapon.setPosition(weap.weapon.getPosition().x + intersection.width, weap.weapon.getPosition().y);
                 }
+            }
+        }
+    }
+}
+void Bullet_Collision6() {
+    for (int i = bulls.size() - 1;i >= 0; i--)
+    {
+
+        for (int j = 0; j < 12; j++)
+        {
+            if (bulls[i].bullet.getGlobalBounds().intersects(nblocks[j].getGlobalBounds()))
+            {
+
+                bulls.erase(i);
+                break;
+            }
+        }
+    }
+    for (int i = bulls.size() - 1;i >= 0; i--)
+    {
+
+        for (int j = 0; j < 7; j++)
+        {
+            if (bulls[i].bullet.getGlobalBounds().intersects(right_edges[j].getGlobalBounds()))
+            {
+
+                bulls.erase(i);
+                break;
+            }
+        }
+    }
+    for (int i = bulls.size() - 1;i >= 0; i--)
+    {
+
+        for (int j = 0; j < 7; j++)
+        {
+            if (bulls[i].bullet.getGlobalBounds().intersects(left_edges[j].getGlobalBounds()))
+            {
+
+                bulls.erase(i);
+                break;
+            }
+        }
+    }
+    for (int i = bulls.size() - 1;i >= 0; i--)
+    {
+
+        for (int j = 0; j < 13; j++)
+        {
+            if (bulls[i].bullet.getGlobalBounds().intersects(pillars[j].getGlobalBounds()))
+            {
+
+                bulls.erase(i);
+                break;
+            }
+        }
+    }
+    for (int i = bulls.size() - 1;i >= 0; i--)
+    {
+
+        for (int j = 0; j < 13; j++)
+        {
+            if (bulls[i].bullet.getGlobalBounds().intersects(bases[j].getGlobalBounds()))
+            {
+
+                bulls.erase(i);
+                break;
+            }
+        }
+    }
+    for (int i = bulls.size() - 1;i >= 0; i--)
+    {
+
+        for (int j = 0; j < 10; j++)
+        {
+            if (bulls[i].bullet.getGlobalBounds().intersects(middle_blocks[j].getGlobalBounds()))
+            {
+
+                bulls.erase(i);
+                break;
+            }
+        }
+    }
+    for (int i = bulls.size() - 1;i >= 0; i--)
+    {
+
+        for (int j = 0; j < 8; j++)
+        {
+            if (bulls[i].bullet.getGlobalBounds().intersects(boxes[j].getGlobalBounds()))
+            {
+
+                bulls.erase(i);
+                break;
             }
         }
     }
@@ -4504,6 +4651,10 @@ void init_Map6()
     fence3_texture6.loadFromFile("img/Fence (3).png");
     doorlocked_texture6.loadFromFile("img/DoorLocked.png");
     switch_texture6.loadFromFile("img/Switch (2).png");
+    spikes_texture6.loadFromFile("img/Spike.png");
+    acid1_texture6.loadFromFile("img/Acid (1).png");
+    acid2_texture6.loadFromFile("img/Acid (2).png");
+    acid_skel_texture6.loadFromFile("img/acid_skel.png");
     set_grounds();
     set_pillars();
     set_right_edges();
@@ -4512,14 +4663,18 @@ void init_Map6()
     set_middle_blocks();
     set_boxes();
     set_decorations();
+    set_spikes();
+    set_acid();
     player1_collider6.setOrigin(player1_collider.getLocalBounds().width / 2, player1_collider.getLocalBounds().height / 2);
-    player2_collider6.setOrigin(player2_collider.getLocalBounds().width / 2, player2_collider.getLocalBounds().height / 2);
-    duck1.myduck.setPosition(35, 300);
-    duck2.myduck.setPosition(950, 225);
+    player2_collider62.setOrigin(player2_collider.getLocalBounds().width / 2, player2_collider.getLocalBounds().height / 2);
+    duck1.myduck.setPosition(590, 600);
+    duck2.myduck.setPosition(660, 600);
     SPAWN6();
 }
 void update_Map6()
 {
+    duck1.onGround = false;
+    duck2.onGround = false;
     for (int i = 0;i < 15;i++) nblocks[i].setTexture(blocks_texture6);
     for (int i = 0;i < 15;i++) pillars[i].setTexture(pillar_texture6);
     for (int i = 0;i < 8;i++) left_edges[i].setTexture(left_edges_texture6);
@@ -4534,6 +4689,20 @@ void update_Map6()
     fence3.setTexture(fence3_texture6);
     for (int i = 0;i < 2;i++) doorlocked[i].setTexture(doorlocked_texture6);
     for (int i = 0;i < 2;i++) switch6[i].setTexture(switch_texture6);
+    for (int i = 0;i < 10;i++) spikes[i].setTexture(spikes_texture6);
+    for (int i = 0;i < 5;i++) acid1[i].setTexture(acid1_texture6);
+    for (int i = 0;i < 4;i++) acid2[i].setTexture(acid2_texture6);
+    acid_skel.setTexture(acid_skel_texture6);
+    duck1.isJumping = 0;
+    player1_collider6.setPosition(duck1.myduck.getPosition().x + 35, duck1.myduck.getPosition().y - 7);
+    player2_collider62.setPosition(duck2.myduck.getPosition().x + 35, duck2.myduck.getPosition().y - 7);
+    collision_Map6(player1_collider6, duck1);
+    collision_Map6(player2_collider62, duck2);
+    for (int i = 0;i < weaps.size();i++)
+    {
+        collision_weaps_Map6(weaps[i].collider, weaps[i]);
+    }
+    Bullet_Collision6();
     update_Logic();
     if (SPAWN.getElapsedTime().asSeconds() >= 60) {
         SPAWN6();
@@ -4542,6 +4711,9 @@ void update_Map6()
 void draw_Map6()
 {
     for (int i = 0;i < 12;i++) window.draw(nblocks[i]);
+    for (int i = 0;i < 5;i++) window.draw(acid1[i]);
+    for (int i = 0;i < 4;i++) window.draw(acid2[i]);
+    window.draw(acid_skel);
     for (int i = 0;i < 13;i++) window.draw(pillars[i]);
     for (int i = 0;i < 7;i++) window.draw(left_edges[i]);
     for (int i = 0;i < 7;i++) window.draw(right_edges[i]);
@@ -4555,6 +4727,7 @@ void draw_Map6()
     window.draw(fence3);
     for (int i = 0;i < 2;i++) window.draw(doorlocked[i]);
     for (int i = 0;i < 2;i++) window.draw(switch6[i]);
+    for (int i = 0;i < 6;i++) window.draw(spikes[i]);
     draw_Logic();
 }
 void Map6() {
