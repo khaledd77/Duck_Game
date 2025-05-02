@@ -54,7 +54,7 @@ float jumpSpeed = -14.f;
 float velocityX = 5.f;
 float MaxiVelocityY = 9.f;
 bool GameEnd = 0;
-ll mapnum = 5, duck1Score=0, duck2Score=0;
+ll mapnum = 0, duck1Score=0, duck2Score=0;
 float DUCK_SCALE;
 float GUN_SCALE;
 float scalex, scaley;
@@ -483,7 +483,6 @@ void drop_weapon(ducks& duck) {
 void get_weapon(ducks& duck) {
     if (duck.haveWeapon) {
         drop_weapon(duck);
-        cout << "sss";
         return;
     }
     if (weaps.size() == 0) return;
@@ -564,9 +563,17 @@ void update_Logic() {
     update_bullets();
     if (duck1.haveWeapon && duck1.myweap.type == "grenade" && duck1.myweap.ready) {
         update_grenade(duck1.myweap);
+        if (duck1.myweap.boom) {
+            duck1.haveWeapon = false;
+            weaps.push_back(duck1.myweap);
+        }
     }
     if (duck2.haveWeapon && duck2.myweap.type == "grenade" && duck2.myweap.ready) {
         update_grenade(duck2.myweap);
+        if (duck2.myweap.boom) {
+            duck2.haveWeapon = false;
+            weaps.push_back(duck2.myweap);
+        }
     }
 
     if (Keyboard::isKeyPressed(duck1.hold)) {
@@ -990,8 +997,6 @@ void initGameMenu(int width, int height, RenderWindow& window) {
 //For debugging purposes
 void getMousePos() {
     sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-    cout << "Mouse Position X - Y\n";
-    cout << mousePos.x << " - " << mousePos.y << '\n';
 }
 
 void initMusic() {
@@ -1071,7 +1076,6 @@ void drawMenu(RenderWindow& window, Menu& menu, int itemCount) {
         for (int i = 0; i < itemCount; i++) {
             window.draw(menu.menuText[i]);
         }
-        cout << drawPaused << endl;
     }
     else if (menuState != 0) {
         for (int i = 0; i < itemCount; i++) {
@@ -2330,7 +2334,6 @@ void collision_Map2(RectangleShape& player_collider, ducks& duck)
                     duck.onGround = true;
                     duck.isJumping = false;
                     duck.velocityY = 0.f;
-                    cout << "sss";
                     duck.myduck.setPosition(duck.myduck.getPosition().x, GroundF[i].getPosition().y);
                 }
                 else
@@ -3248,7 +3251,6 @@ void init_Map4()
             }
         }
     }
-    cout << tileCount << endl;
 }
 void collision_Map4(ducks& duck)
 {
@@ -3274,7 +3276,6 @@ void collision_Map4(ducks& duck)
             if (duckBound.intersects(mapTiles[i].bounds)) {
                 FloatRect intersection;
                 duckBound.intersects(mapTiles[i].bounds, intersection);
-                //cout << intersection.width << " " << intersection.height << endl;
                 if (intersection.width < intersection.height - 4) {
                     if (duckBound.left < mapTiles[i].bounds.left) {
                         // Right collision
@@ -3285,7 +3286,6 @@ void collision_Map4(ducks& duck)
                     }
                     else {
                         // Left collision
-                        //cout << "left" << endl;
                         duck.myduck.setPosition(
                             mapTiles[i].bounds.left + mapTiles[i].bounds.width - (duck.facingRight ? 16 : 22),
                             duck.myduck.getPosition().y
@@ -3293,11 +3293,8 @@ void collision_Map4(ducks& duck)
                     }
                 }
                 else if (intersection.width - 4 > intersection.height) { // Vertical collision
-                    //cout << "top : " << duckBound.top << "   MAP TILE BOTTOM : " << mapTiles[i].bounds.top + mapTiles[i].bounds.height << endl;
-                    //cout << mapTiles[i].bounds.top << endl;
                     if (duckBound.top < mapTiles[i].bounds.top) {
                         // Landing on ground (from above)
-                        //cout << "from above" << endl;
                         duck.myduck.setPosition(
                             duck.myduck.getPosition().x,
                             mapTiles[i].tileSprite.getPosition().y + 1
@@ -3308,7 +3305,6 @@ void collision_Map4(ducks& duck)
                     }
                     else {
                         // Hitting ceiling (from below)
-                        //cout << "from below" << endl;
                         duck.myduck.setPosition(
                             duck.myduck.getPosition().x,
                             mapTiles[i].bounds.top + mapTiles[i].bounds.height + 46
@@ -3337,11 +3333,9 @@ void weap_collision_Map4(weapons& Gun) {
             if (weaponBounds.intersects(mapTiles[i].bounds)) {
                 FloatRect intersection;
                 weaponBounds.intersects(mapTiles[i].bounds, intersection);
-                //cout << intersection.width << " " << intersection.height << endl;
                 if (intersection.width < intersection.height) {
                     if (weaponBounds.left < mapTiles[i].bounds.left) {
                         // Right collision
-                        cout << "RIGHT " << endl;
                         Gun.velocityX = 0;
                         Gun.weapon.setPosition(
                             Gun.weapon.getPosition().x - intersection.width - 1,
@@ -3350,8 +3344,6 @@ void weap_collision_Map4(weapons& Gun) {
                     }
                     else if (weaponBounds.left > mapTiles[i].bounds.left) {
                         // Left collision
-                        cout << "left" << endl;
-                        //cout << intersection.width << " " << intersection.height << endl;
                         Gun.velocityX = 0;
                         Gun.weapon.setPosition(
                             Gun.weapon.getPosition().x + intersection.width + 1, // +16
@@ -3362,7 +3354,6 @@ void weap_collision_Map4(weapons& Gun) {
                 else if (intersection.width > intersection.height) { // Vertical collision                    
                     if (weaponBounds.top < mapTiles[i].bounds.top) {
                         // Landing on ground (from above)
-                        //cout << "from above" << endl;
                         Gun.weapon.setPosition(
                             Gun.weapon.getPosition().x,
                             mapTiles[i].tileSprite.getPosition().y + 1 // adjust accurate positioning
@@ -3373,7 +3364,6 @@ void weap_collision_Map4(weapons& Gun) {
                     }
                     else {
                         // Hitting ceiling (from below)
-                        //cout << "from below" << endl;
                         Gun.weapon.setPosition(
                             Gun.weapon.getPosition().x,
                             mapTiles[i].bounds.top + mapTiles[i].bounds.height + 47
