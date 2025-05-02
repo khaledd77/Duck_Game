@@ -430,7 +430,6 @@ void update_duck(ducks& duck) {
         duck.velocityY += gravity;
         duck.velocityY = min(duck.velocityY, MaxiVelocityY);
         duck.myduck.move(0.f, duck.velocityY);
-        cout << duck.velocityY << endl;
         duck.myarm.arm.setPosition(
             duck.myduck.getPosition().x + duck.myduck.getGlobalBounds().width / 6,
             duck.myduck.getPosition().y - duck.myduck.getGlobalBounds().height / 2 - fact
@@ -5023,6 +5022,7 @@ int main() {
     initEndGameScreen(Width, Height);
     initFade(Width, Height);
     initMusic();
+    updateMapNum();
 
     Event event;
     while (window.isOpen()) {
@@ -5036,6 +5036,7 @@ int main() {
                     duck2Score = 0;
                     duck1.ready = 0;
                     duck2.ready = 0;
+                    mapnum = 0;
                     if (event.key.code == Keyboard::Up) {
                         moveUp(mainMenu, 3);
                     }
@@ -5056,7 +5057,7 @@ int main() {
                 }
 
                 // Return to main menu 
-                else if ((menuState != 1000 && menuState != 0) && event.key.code == Keyboard::Escape) {
+                else if ((menuState != 1000) && event.key.code == Keyboard::Escape) {
                     fadeOut(1000);
                 }
                 else if (menuState == 1) {
@@ -5108,7 +5109,6 @@ int main() {
                             mapnum++;
                             if (mapnum > 5)
                                 mapnum = 0;
-                            updateMapNum();
                         }
                     }
                     else if (event.key.code == Keyboard::Left) {
@@ -5116,7 +5116,6 @@ int main() {
                             mapnum--;
                             if (mapnum < 0)
                                 mapnum = 5;
-                            updateMapNum();
                         }
 
                     }
@@ -5177,6 +5176,7 @@ int main() {
             drawMenu(window, settingsMenu, 3);
         }
         else if (menuState == 2) {
+            updateMapNum();
             drawMenu(window, gameMenu, 4);
         }
         else if (menuState == 3) {
