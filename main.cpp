@@ -34,6 +34,10 @@ bool started = false;
 int fadeDirection = 0, fadeTargetState = 1000, fadeCurrentAlpha, fadeDuration = 500;
 RectangleShape fadeScreen;
 
+SoundBuffer buffer1, buffer2, buffer3, buffer4;
+Sound gunfire, lazerfire, launch, bombb;
+
+
 Texture gameBackgroundTexture;
 Texture smoke;
 Sprite gameBackground;
@@ -65,6 +69,16 @@ bool wait = 0;
 
 //Fady
 void init() {
+
+    buffer1.loadFromFile("img/gunshot.wav");
+    gunfire.setBuffer(buffer1);
+    buffer2.loadFromFile("img/lasershot.wav");
+    lazerfire.setBuffer(buffer2);
+    buffer3.loadFromFile("img/launch.wav");
+    launch.setBuffer(buffer3);
+    buffer4.loadFromFile("img/explode.wav");
+    bombb.setBuffer(buffer4);
+
     //init the first duck
     ducks duck;
     duck1 = duck;
@@ -210,6 +224,7 @@ void launch_grenade(weapons& weap) {
         weap.ready = 1;
         weap.myclock.restart();
         weap.weapon.setTextureRect(IntRect(16, 0, 10, 11));
+        launch.play();
     }
     return;
 }
@@ -222,8 +237,11 @@ void Fire(ducks& duck, ll shooter) {
     }
     if (duck.myweap.type == "grenade") {
         launch_grenade(duck.myweap);
+        return;
     }
     if (duck.myweap.bullets > 0) {
+        if (idx == 1) gunfire.play();
+        else lazerfire.play();
         duck.myweap.bullets--;
         bull[idx].right = duck.facingRight;
         if (duck.facingRight) {
@@ -244,7 +262,8 @@ void Fire(ducks& duck, ll shooter) {
     }
 }
 void update_grenade(weapons& weap) {
-    if (!weap.boom && weap.myclock.getElapsedTime().asMilliseconds() >= 4000) {
+    if (!weap.boom && weap.myclock.getElapsedTime().asMilliseconds() >= 3000) {
+        bombb.play();
         weap.boom = 1;
         weap.weapon.setTexture(smoke);
         weap.weapon.setTextureRect(IntRect(0, 0, 44, 42));
