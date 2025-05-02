@@ -46,7 +46,7 @@ Sprite duck1Avatar, duck2Avatar, duck1AvatarReady, duck2AvatarReady;
 bool drawPaused = false;
 float weapsVelocity = 7.f;
 
-int menuState = 1000; // 1000 = main menu, 0 = game/levels, 1 = settings, 2 = game menu (& level selector), 3 = transition between games, 4 = end game
+int menuState = 0; // 1000 = main menu, 0 = game/levels, 1 = settings, 2 = game menu (& level selector), 3 = transition between games, 4 = end game
 bullets bull[3];
 ducks duck1, duck2;
 float fact;
@@ -58,7 +58,7 @@ float jumpSpeed = -14.f;
 float velocityX = 5.f;
 float MaxiVelocityY = 9.f;
 bool GameEnd = 0;
-ll mapnum = 0, duck1Score=0, duck2Score=0;
+ll mapnum = 2, duck1Score=0, duck2Score=0;
 float DUCK_SCALE;
 float GUN_SCALE;
 float scalex, scaley;
@@ -430,6 +430,7 @@ void update_duck(ducks& duck) {
         duck.velocityY += gravity;
         duck.velocityY = min(duck.velocityY, MaxiVelocityY);
         duck.myduck.move(0.f, duck.velocityY);
+        cout << duck.velocityY << endl;
         duck.myarm.arm.setPosition(
             duck.myduck.getPosition().x + duck.myduck.getGlobalBounds().width / 6,
             duck.myduck.getPosition().y - duck.myduck.getGlobalBounds().height / 2 - fact
@@ -2638,21 +2639,17 @@ void Map2() {
 
 
 // Khaled Ghareeb
-struct block
-{
-    Sprite map_blocks;
-};
-block b; block obs;
+Sprite blocks3; Sprite obs;
 
-const int MAX_BLOCKS = 100;
-block finalground[MAX_BLOCKS];
-block finalblock[MAX_BLOCKS];
-block finalobs[MAX_BLOCKS];
+const int MAX_BLOCKS = 50;
+Sprite finalground[MAX_BLOCKS];
+Sprite finalblock[MAX_BLOCKS];
+Sprite finalobs[MAX_BLOCKS];
 int groundCount = 0;
 int blockCount = 0;
 int obsCount = 0;
 
-Sprite backgroundGhareeb;
+Sprite backgroundmap3;
 Texture backgroundtexture;
 
 Texture mapblock_Texture;
@@ -2661,35 +2658,15 @@ Texture obstacels_texture;
 RectangleShape playercollider1(Vector2f(28, 46));
 RectangleShape playercollider2(Vector2f(28, 46));
 
-RectangleShape pistolcollider3(Vector2f(28, 25));
-RectangleShape snipercollider3(Vector2f(40, 25));
-RectangleShape pewpewcollider3(Vector2f(40, 25));
-RectangleShape swordcollider3(Vector2f(36, 20));
-
 void SPAWN3() {
     playercollider1.setOrigin(duck1.myduck.getLocalBounds().width / 2 - 34, duck1.myduck.getLocalBounds().height / 2 + 30);
     playercollider2.setOrigin(duck2.myduck.getLocalBounds().width / 2 - 34, duck2.myduck.getLocalBounds().height / 2 + 30);
-
-    pistolcollider3.setOrigin(pistol.weapon.getLocalBounds().width / 2 - 8, pistol.weapon.getLocalBounds().height / 2 + 13);
-    snipercollider3.setOrigin(sniper.weapon.getLocalBounds().width / 2 - 18, sniper.weapon.getLocalBounds().height / 2 + 11);
-    pewpewcollider3.setOrigin(pewpew.weapon.getLocalBounds().width / 2 - 13, pewpew.weapon.getLocalBounds().height / 2 + 12);
-    swordcollider3.setOrigin(sword.weapon.getLocalBounds().width / 2 - 4, sword.weapon.getLocalBounds().height / 2);
-
-    pistolcollider3.setFillColor(Color::Green);
-    snipercollider3.setFillColor(Color::Green);
-    pewpewcollider3.setFillColor(Color::Green);
-    swordcollider3.setFillColor(Color::Green);
-
-    pistol.collider = pistolcollider3;
-    sniper.collider = snipercollider3;
-    pewpew.collider = pewpewcollider3;
-    sword.collider = swordcollider3;
 
     pistol.weapon.setPosition(60, 466);
     pewpew.weapon.setPosition(1240, 460);
     sniper.weapon.setPosition(750, 366);
     sword.weapon.setPosition(875, 535);
-    grenade.weapon.setPosition(350, 660);
+    grenade.weapon.setPosition(645, 135);
 
     //spawn weaps
     bool flag = 1;
@@ -2729,35 +2706,31 @@ void SPAWN3() {
     if (flag) weaps.push_back(grenade);
     SPAWN.restart();
 }
-void groundd()
+void map3_groundd()
 {
     for (int i = 0; i < 10; i++)
     {
-        block ground;
 
-
-        ground.map_blocks.setTexture(mapblock_Texture);
-        ground.map_blocks.setScale(0.45, 0.17);
-        ground.map_blocks.setPosition(0 + i * 150, 697);
-        finalground[groundCount++] = ground;
+        blocks3.setPosition(i * 150, 697);
+        finalground[groundCount++] = blocks3;
     }
 }
 void obstacels_position(int x, int y)
 {
-    obs.map_blocks.setPosition(x, y);
+    obs.setPosition(x, y);
     finalobs[obsCount++] = obs;
 
 }
 void block_position(int x, int y)
 {
 
-    b.map_blocks.setPosition(x, y);
-    finalblock[blockCount++] = b;
+    blocks3.setPosition(x, y);
+    finalblock[blockCount++] = blocks3;
 
 }
-void blocksGhareeb()
+void map3_positions()
 {
-    groundd();
+    map3_groundd();
 
     block_position(295, 545);
     block_position(0, 595);
@@ -2786,10 +2759,10 @@ void blocksGhareeb()
     obstacels_position(950, 331);
     obstacels_position(460, 161);
 }
-void handleCollision3(RectangleShape& player, block& obj, ducks& duck)
+void handleCollision3(RectangleShape& player, Sprite& obj, ducks& duck)
 {
     FloatRect duckBounds = player.getGlobalBounds();
-    FloatRect objBounds = obj.map_blocks.getGlobalBounds();
+    FloatRect objBounds = obj.getGlobalBounds();
 
     if (duckBounds.intersects(objBounds))
     {
@@ -2810,14 +2783,16 @@ void handleCollision3(RectangleShape& player, block& obj, ducks& duck)
                 if (duck.velocityY < 0) {
                     return;
                 }
-                duck.myduck.setPosition(duck.myduck.getPosition().x, obj.map_blocks.getPosition().y + 1.f);
+                duck.myduck.setPosition(duck.myduck.getPosition().x, obj.getPosition().y + 1.f);
                 duck.onGround = 1;
                 duck.isJumping = 0;
+                duck.velocityY = 0;
             }
             else {
                 if (duck.velocityY > 0) {
                     return;
                 }
+                duck.velocityY = 0;
                 duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
             }
         }
@@ -2834,14 +2809,14 @@ void collision3(RectangleShape& player, ducks& duck)
     for (int i = 0; i < obsCount; i++)
         handleCollision3(player, finalobs[i], duck);
 }
-void handle_BulletCollision3(block& obj)
+void handle_BulletCollision3(Sprite& obj)
 {
-    for (int i = bulls.size()-1;i>=0; i--)
+    for (int i = bulls.size() - 1;i >= 0; i--)
     {
 
         for (int j = 0; j < MAX_BLOCKS; j++)
         {
-            if (bulls[i].bullet.getGlobalBounds().intersects(obj.map_blocks.getGlobalBounds()))
+            if (bulls[i].bullet.getGlobalBounds().intersects(obj.getGlobalBounds()))
             {
 
                 bulls.erase(i);
@@ -2859,10 +2834,10 @@ void BulletCollision3()
     for (int i = 0; i < groundCount; i++)
         handle_BulletCollision3(finalground[i]);
 }
-void weapon_handleCollision3(RectangleShape& weapcoll, weapons& weapon, block& obj)
+void weapon_handleCollision3(weapons& weapon, Sprite& obj)
 {
     FloatRect weapBounds = weapon.weapon.getGlobalBounds();
-    FloatRect objBounds = obj.map_blocks.getGlobalBounds();
+    FloatRect objBounds = obj.getGlobalBounds();
 
     if (weapBounds.intersects(objBounds))
     {
@@ -2878,10 +2853,10 @@ void weapon_handleCollision3(RectangleShape& weapcoll, weapons& weapon, block& o
             weapon.velocityX = 0;
         }
 
-        else{
+        else {
             if (weapBounds.top < objBounds.top)
             {
-                weapon.weapon.setPosition(weapon.weapon.getPosition().x, obj.map_blocks.getPosition().y + 1.f);
+                weapon.weapon.setPosition(weapon.weapon.getPosition().x, obj.getPosition().y + 1.f);
                 weapon.velocityY = 0;
                 weapon.velocityX = 0;
                 weapon.onGround = true;
@@ -2896,24 +2871,24 @@ void weapon_handleCollision3(RectangleShape& weapcoll, weapons& weapon, block& o
         }
     }
 }
-void collision_Weapon3(RectangleShape& weap, weapons& weapon)
+void collision_Weapon3(weapons& weapon)
 {
-    if (weapon.type == "grenade" && weapon.boom) return;
     for (int i = 0; i < blockCount; i++)
-        weapon_handleCollision3(weap, weapon, finalblock[i]);
+        weapon_handleCollision3(weapon, finalblock[i]);
     for (int i = 0; i < groundCount; i++)
-        weapon_handleCollision3(weap, weapon, finalground[i]);
+        weapon_handleCollision3(weapon, finalground[i]);
     for (int i = 0; i < obsCount; i++)
-        weapon_handleCollision3(weap, weapon, finalobs[i]);
+        weapon_handleCollision3(weapon, finalobs[i]);
 }
 void init_Map3()
 {
     DUCK_SCALE = 2.f;
     GUN_SCALE = 1.6f;
     fact = 3.f;
-    gravity = 0.35f;
-    jumpSpeed = -9.5f;  //give it negative value
-    velocityX = 3;   // the duck speed
+    gravity = 0.05f;
+    jumpSpeed = -4.f;  //give it negative value
+    velocityX = 1;   // the duck speed
+    weapsVelocity = 2;
     init();
     // pistol
     pistol.fix_X = -4.f;
@@ -2950,29 +2925,25 @@ void init_Map3()
     //grave
     Grave.setScale(0.107f, 0.067f);
 
-
-
-
     backgroundtexture.loadFromFile("img/background.jpg");
-    backgroundGhareeb.setTexture(backgroundtexture);
-    backgroundGhareeb.setScale(0.5, 0.5);
-
     mapblock_Texture.loadFromFile("img/cccc.png");
-
     obstacels_texture.loadFromFile("img/Block 2.png");
 
 
-    b.map_blocks.setTexture(mapblock_Texture);
-    b.map_blocks.setScale(0.45, 0.17);
+    backgroundmap3.setTexture(backgroundtexture);
+    backgroundmap3.setScale(0.5, 0.5);
 
-    obs.map_blocks.setTexture(obstacels_texture);
-    obs.map_blocks.setScale(0.035, 0.035);
+    blocks3.setTexture(mapblock_Texture);
+    blocks3.setScale(0.45, 0.17);
+
+    obs.setTexture(obstacels_texture);
+    obs.setScale(0.035, 0.035);
 
     duck1.myduck.setPosition(180, 250);
     duck2.myduck.setPosition(530, 660);
-    
+
     SPAWN3();
-    blocksGhareeb();
+    map3_positions();
 
 }
 void update3()
@@ -2980,19 +2951,18 @@ void update3()
     duck1.onGround = false;
     duck2.onGround = false;
 
-
     playercollider1.setPosition(duck1.myduck.getPosition());
     playercollider2.setPosition(duck2.myduck.getPosition());
 
-    for(ll i=0;i<weaps.size();++i)
+    for (ll i = 0;i < weaps.size();++i)
         weaps[i].collider.setPosition(weaps[i].weapon.getPosition());
 
     collision3(playercollider1, duck1);
     collision3(playercollider2, duck2);
 
     BulletCollision3();
-    for (ll i = 0;i < weaps.size();++i) 
-        collision_Weapon3(weaps[i].collider, weaps[i]);
+    for (ll i = 0;i < weaps.size();++i)
+        collision_Weapon3(weaps[i]);
 
     duck1.myarm.arm.setPosition(
         duck1.myduck.getPosition().x + duck1.myduck.getGlobalBounds().width / 6,
@@ -3012,29 +2982,19 @@ void update3()
 }
 void draw3()
 {
-    window.draw(backgroundGhareeb);
+    window.draw(backgroundmap3);
 
     for (int i = 0; i < groundCount; i++)
-        window.draw(finalground[i].map_blocks);
+        window.draw(finalground[i]);
 
     for (int i = 0; i < blockCount; i++)
-        window.draw(finalblock[i].map_blocks);
+        window.draw(finalblock[i]);
 
     for (int i = 0; i < obsCount; i++)
-        window.draw(finalobs[i].map_blocks);
+        window.draw(finalobs[i]);
 
-    /*window.draw(pistol.weapon);
-    window.draw(pistolcollider3);
-    window.draw(snipercollider3);
-    window.draw(pewpewcollider3);
-    window.draw(swordcollider3);
-
-    window.draw(sniper.weapon);
-    window.draw(pewpew.weapon);
-    window.draw(sword.weapon);*/
 
     draw_Logic();
-
 
 }
 void Map3() {
