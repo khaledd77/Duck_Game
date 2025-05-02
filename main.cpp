@@ -42,7 +42,7 @@ Sprite duck1Avatar, duck2Avatar, duck1AvatarReady, duck2AvatarReady;
 bool drawPaused = false;
 float weapsVelocity = 7.f;
 
-int menuState = 1000; // 1000 = main menu, 0 = game/levels, 1 = settings, 2 = game menu (& level selector), 3 = transition between games, 4 = end game
+int menuState = 0; // 1000 = main menu, 0 = game/levels, 1 = settings, 2 = game menu (& level selector), 3 = transition between games, 4 = end game
 bullets bull[3];
 ducks duck1, duck2;
 float fact;
@@ -54,7 +54,7 @@ float jumpSpeed = -14.f;
 float velocityX = 5.f;
 float MaxiVelocityY = 9.f;
 bool GameEnd = 0;
-ll mapnum = 0, duck1Score=0, duck2Score=0;
+ll mapnum = 1, duck1Score=0, duck2Score=0;
 float DUCK_SCALE;
 float GUN_SCALE;
 float scalex, scaley;
@@ -1256,6 +1256,9 @@ void collision_Map1(RectangleShape& player_collider, ducks& duck)
             {
                 if (box.top < wall.top)
                 {
+                    if (duck.velocityY < 0) {
+                        continue;
+                    }
                     duck.onGround = true;
                     duck.isJumping = false;
                     duck.velocityY = 0.f;
@@ -1263,6 +1266,9 @@ void collision_Map1(RectangleShape& player_collider, ducks& duck)
                 }
                 else
                 {
+                    if (duck.velocityY > 0) {
+                        continue;
+                    }
                     duck.velocityY = 0.f;
                     duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
                 }
@@ -1290,6 +1296,9 @@ void collision_Map1(RectangleShape& player_collider, ducks& duck)
             {
                 if (box.top < wall.top)
                 {
+                    if (duck.velocityY < 0) {
+                        continue;
+                    }
                     duck.onGround = true;
                     duck.isJumping = false;
                     duck.velocityY = 0.f;
@@ -1297,6 +1306,9 @@ void collision_Map1(RectangleShape& player_collider, ducks& duck)
                 }
                 else
                 {
+                    if (duck.velocityY > 0) {
+                        continue;
+                    }
                     duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
                 }
             }
@@ -2311,6 +2323,9 @@ void collision_Map2(RectangleShape& player_collider, ducks& duck)
             {
                 if (box.top < wall.top)
                 {
+                    if (duck.velocityY < 0) {
+                        continue;
+                    }
                     duck.onGround = true;
                     duck.isJumping = false;
                     duck.velocityY = 0.f;
@@ -2318,6 +2333,9 @@ void collision_Map2(RectangleShape& player_collider, ducks& duck)
                 }
                 else
                 {
+                    if (duck.velocityY > 0) {
+                        continue;
+                    }
                     duck.velocityY = 0.f;
                     duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
                 }
@@ -2357,6 +2375,9 @@ void collision_Map2(RectangleShape& player_collider, ducks& duck)
             {
                 if (box.top < wall.top)
                 {
+                    if (duck.velocityY < 0) {
+                        continue;
+                    }
                     duck.onGround = true;
                     duck.isJumping = false;
                     duck.velocityY = 0.f;
@@ -2364,6 +2385,9 @@ void collision_Map2(RectangleShape& player_collider, ducks& duck)
                 }
                 else
                 {
+                    if (duck.velocityY > 0) {
+                        continue;
+                    }
                     duck.velocityY = 0.f;
                     duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
                 }
@@ -2381,6 +2405,9 @@ void collision_Map2(RectangleShape& player_collider, ducks& duck)
             {
                 if (box.top < wall.top)
                 {
+                    if (duck.velocityY < 0) {
+                        continue;
+                    }
                     duck.onGround = true;
                     duck.isJumping = false;
                     duck.velocityY = 0.f;
@@ -2388,6 +2415,9 @@ void collision_Map2(RectangleShape& player_collider, ducks& duck)
                 }
                 else
                 {
+                    if (duck.velocityY > 0) {
+                        continue;
+                    }
                     duck.velocityY = 0.f;
                     duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
                 }
@@ -2416,6 +2446,9 @@ void collision_Map2(RectangleShape& player_collider, ducks& duck)
             {
                 if (box.top < wall.top)
                 {
+                    if (duck.velocityY < 0) {
+                        continue;
+                    }
                     duck.onGround = true;
                     duck.isJumping = false;
                     duck.velocityY = 0.f;
@@ -2423,6 +2456,9 @@ void collision_Map2(RectangleShape& player_collider, ducks& duck)
                 }
                 else
                 {
+                    if (duck.velocityY > 0) {
+                        continue;
+                    }
                     duck.velocityY = 0.f;
                     duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
                 }
@@ -2451,6 +2487,9 @@ void collision_Map2(RectangleShape& player_collider, ducks& duck)
             {
                 if (box.top < wall.top)
                 {
+                    if (duck.velocityY < 0) {
+                        continue;
+                    }
                     duck.onGround = true;
                     duck.isJumping = false;
                     duck.velocityY = 0.f;
@@ -2458,6 +2497,9 @@ void collision_Map2(RectangleShape& player_collider, ducks& duck)
                 }
                 else
                 {
+                    if (duck.velocityY > 0) {
+                        continue;
+                    }
                     duck.velocityY = 0.f;
                     duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
                 }
@@ -2486,6 +2528,9 @@ void collision_Map2(RectangleShape& player_collider, ducks& duck)
             {
                 if (box.top < wall.top)
                 {
+                    if (duck.velocityY < 0) {
+                        continue;
+                    }
                     duck.onGround = true;
                     duck.isJumping = false;
                     duck.velocityY = 0.f;
@@ -2493,6 +2538,9 @@ void collision_Map2(RectangleShape& player_collider, ducks& duck)
                 }
                 else
                 {
+                    if (duck.velocityY > 0) {
+                        continue;
+                    }
                     duck.velocityY = 0.f;
                     duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
                 }
@@ -2740,13 +2788,19 @@ void handleCollision3(RectangleShape& player, block& obj, ducks& duck)
         {
             if (duckBounds.top < objBounds.top)
             {
+                if (duck.velocityY < 0) {
+                    return;
+                }
                 duck.myduck.setPosition(duck.myduck.getPosition().x, obj.map_blocks.getPosition().y + 1.f);
                 duck.onGround = 1;
                 duck.isJumping = 0;
             }
-            else
+            else {
+                if (duck.velocityY > 0) {
+                    return;
+                }
                 duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
-            duck.velocityY = 0;
+            }
         }
     }
 }
@@ -3274,6 +3328,9 @@ void collision_Map4(ducks& duck)
                 }
                 else if (intersection.width - 4 > intersection.height) { // Vertical collision
                     if (duckBound.top < mapTiles[i].bounds.top) {
+                        if (duck.velocityY < 0) {
+                            continue;
+                        }
                         // Landing on ground (from above)
                         duck.myduck.setPosition(
                             duck.myduck.getPosition().x,
@@ -3284,6 +3341,9 @@ void collision_Map4(ducks& duck)
                         duck.velocityY = 0;
                     }
                     else {
+                        if (duck.velocityY > 0) {
+                            continue;
+                        }
                         // Hitting ceiling (from below)
                         duck.myduck.setPosition(
                             duck.myduck.getPosition().x,
@@ -3459,6 +3519,9 @@ void collision_Map5(RectangleShape& player_collider, ducks& duck)
             {
                 if (box.top < wall.top)
                 {
+                    if (duck.velocityY < 0) {
+                        continue;
+                    }
                     duck.onGround = true;
                     duck.isJumping = false;
                     duck.velocityY = 0.f;
@@ -3466,6 +3529,9 @@ void collision_Map5(RectangleShape& player_collider, ducks& duck)
                 }
                 else
                 {
+                    if (duck.velocityY > 0) {
+                        continue;
+                    }
                     duck.velocityY = 0.f;
                     duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
                 }
@@ -4066,6 +4132,9 @@ void collision_Map6(RectangleShape& player_collider, ducks& duck)
             {
                 if (box.top < wall.top)
                 {
+                    if (duck.velocityY < 0) {
+                        continue;
+                    }
                     duck.onGround = true;
                     duck.isJumping = false;
                     duck.velocityY = 0.f;
@@ -4073,6 +4142,9 @@ void collision_Map6(RectangleShape& player_collider, ducks& duck)
                 }
                 else
                 {
+                    if (duck.velocityY > 0) {
+                        continue;
+                    }
                     duck.velocityY = 0.f;
                     duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
                 }
@@ -4100,6 +4172,9 @@ void collision_Map6(RectangleShape& player_collider, ducks& duck)
             {
                 if (box.top < wall.top)
                 {
+                    if (duck.velocityY < 0) {
+                        continue;
+                    }
                     duck.onGround = true;
                     duck.isJumping = false;
                     duck.velocityY = 0.f;
@@ -4107,6 +4182,9 @@ void collision_Map6(RectangleShape& player_collider, ducks& duck)
                 }
                 else
                 {
+                    if (duck.velocityY > 0) {
+                        continue;
+                    }
                     duck.velocityY = 0.f;
                     duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
                 }
@@ -4134,6 +4212,9 @@ void collision_Map6(RectangleShape& player_collider, ducks& duck)
             {
                 if (box.top < wall.top)
                 {
+                    if (duck.velocityY < 0) {
+                        continue;
+                    }
                     duck.onGround = true;
                     duck.isJumping = false;
                     duck.velocityY = 0.f;
@@ -4141,6 +4222,9 @@ void collision_Map6(RectangleShape& player_collider, ducks& duck)
                 }
                 else
                 {
+                    if (duck.velocityY > 0) {
+                        continue;
+                    }
                     duck.velocityY = 0.f;
                     duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
                 }
@@ -4169,6 +4253,9 @@ void collision_Map6(RectangleShape& player_collider, ducks& duck)
             {
                 if (box.top < wall.top)
                 {
+                    if (duck.velocityY < 0) {
+                        continue;
+                    }
                     duck.onGround = true;
                     duck.isJumping = false;
                     duck.velocityY = 0.f;
@@ -4176,6 +4263,9 @@ void collision_Map6(RectangleShape& player_collider, ducks& duck)
                 }
                 else
                 {
+                    if (duck.velocityY > 0) {
+                        continue;
+                    }
                     duck.velocityY = 0.f;
                     duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
                 }
@@ -4203,6 +4293,9 @@ void collision_Map6(RectangleShape& player_collider, ducks& duck)
             {
                 if (box.top < wall.top)
                 {
+                    if (duck.velocityY < 0) {
+                        continue;
+                    }
                     duck.onGround = true;
                     duck.isJumping = false;
                     duck.velocityY = 0.f;
@@ -4210,6 +4303,9 @@ void collision_Map6(RectangleShape& player_collider, ducks& duck)
                 }
                 else
                 {
+                    if (duck.velocityY > 0) {
+                        continue;
+                    }
                     duck.velocityY = 0.f;
                     duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
                 }
@@ -4237,6 +4333,9 @@ void collision_Map6(RectangleShape& player_collider, ducks& duck)
             {
                 if (box.top < wall.top)
                 {
+                    if (duck.velocityY < 0) {
+                        continue;
+                    }
                     duck.onGround = true;
                     duck.isJumping = false;
                     duck.velocityY = 0.f;
@@ -4244,6 +4343,9 @@ void collision_Map6(RectangleShape& player_collider, ducks& duck)
                 }
                 else
                 {
+                    if (duck.velocityY > 0) {
+                        continue;
+                    }
                     duck.velocityY = 0.f;
                     duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
                 }
@@ -4271,6 +4373,9 @@ void collision_Map6(RectangleShape& player_collider, ducks& duck)
             {
                 if (box.top < wall.top)
                 {
+                    if (duck.velocityY < 0) {
+                        continue;
+                    }
                     duck.onGround = true;
                     duck.isJumping = false;
                     duck.velocityY = 0.f;
@@ -4278,6 +4383,9 @@ void collision_Map6(RectangleShape& player_collider, ducks& duck)
                 }
                 else
                 {
+                    if (duck.velocityY > 0) {
+                        continue;
+                    }
                     duck.velocityY = 0.f;
                     duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
                 }
@@ -4305,6 +4413,9 @@ void collision_Map6(RectangleShape& player_collider, ducks& duck)
             {
                 if (box.top < wall.top)
                 {
+                    if (duck.velocityY < 0) {
+                        continue;
+                    }
                     duck.onGround = true;
                     duck.isJumping = false;
                     duck.velocityY = 0.f;
@@ -4312,6 +4423,9 @@ void collision_Map6(RectangleShape& player_collider, ducks& duck)
                 }
                 else
                 {
+                    if (duck.velocityY > 0) {
+                        continue;
+                    }
                     duck.velocityY = 0.f;
                     duck.myduck.setPosition(duck.myduck.getPosition().x, duck.myduck.getPosition().y + intersection.height);
                 }
