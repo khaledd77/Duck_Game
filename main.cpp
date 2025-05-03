@@ -582,14 +582,14 @@ void update_Logic() {
     if(!duck2.dead) update_duck(duck2);
     update_weapons();
     update_bullets();
-    if (duck1.haveWeapon && duck1.myweap.type == "grenade" && duck1.myweap.ready) {
+    if (duck1.haveWeapon && duck1.myweap.type == "grenade" && duck1.myweap.ready && !duck1.dead) {
         update_grenade(duck1.myweap);
         if (duck1.myweap.boom) {
             duck1.haveWeapon = false;
             weaps.push_back(duck1.myweap);
         }
     }
-    if (duck2.haveWeapon && duck2.myweap.type == "grenade" && duck2.myweap.ready) {
+    if (duck2.haveWeapon && duck2.myweap.type == "grenade" && duck2.myweap.ready && !duck2.dead) {
         update_grenade(duck2.myweap);
         if (duck2.myweap.boom) {
             duck2.haveWeapon = false;
@@ -597,7 +597,7 @@ void update_Logic() {
         }
     }
 
-    if (Keyboard::isKeyPressed(duck1.hold)) {
+    if (Keyboard::isKeyPressed(duck1.hold) && !duck1.dead) {
         if (!duck1.holding) {
             duck1.holding = true;
             get_weapon(duck1);
@@ -606,7 +606,7 @@ void update_Logic() {
     else {
         duck1.holding = false;
     }
-    if (Keyboard::isKeyPressed(duck2.hold)) {
+    if (Keyboard::isKeyPressed(duck2.hold) && !duck2.dead) {
         if (!duck2.holding) {
             duck2.holding = true;
             get_weapon(duck2);
@@ -617,7 +617,7 @@ void update_Logic() {
     }
 
 
-    if (duck1.haveWeapon && Keyboard::isKeyPressed(duck1.fire)) {
+    if (duck1.haveWeapon && Keyboard::isKeyPressed(duck1.fire) && !duck1.dead) {
         if (!duck1.firing) {
             duck1.firing = true;
             Fire(duck1, 1);
@@ -626,7 +626,7 @@ void update_Logic() {
     else {
         duck1.firing = false;
     }
-    if (duck2.haveWeapon && Keyboard::isKeyPressed(duck2.fire)) {
+    if (duck2.haveWeapon && Keyboard::isKeyPressed(duck2.fire) && !duck2.dead) {
         if (!duck2.firing) {
             duck2.firing = true;
             Fire(duck2, 2);
@@ -635,8 +635,8 @@ void update_Logic() {
     else {
         duck2.firing = false;
     }
-    update_sword(duck1, 1);
-    update_sword(duck2, 2);
+    if(!duck1.dead) update_sword(duck1, 1);
+    if(!duck2.dead) update_sword(duck2, 2);
 }
 void draw_Logic() {
     for (int i = 0;i < weaps.size() ; ++i) {
@@ -2023,7 +2023,7 @@ void init_Map2() {
     bull[2].scalex = 0.12f;
     bull[2].scaley = 0.12f;
     //grave
-    Grave.setScale(0.16f, 0.1f);
+    Grave.setScale(0.0624f, 0.04f);
 
     BackGroundT.loadFromFile("BackGroundT.png");
     GroundT.loadFromFile("GroundT.png");
@@ -2880,7 +2880,7 @@ void init_Map3()
     fact = 3.f;
     gravity = 0.05f;
     jumpSpeed = -4.f;  //give it negative value
-    velocityX = 1;   // the duck speed
+    velocityX = 1.5;   // the duck speed
     weapsVelocity = 2;
     init();
     // pistol
