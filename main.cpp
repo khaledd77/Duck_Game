@@ -34,8 +34,8 @@ bool started = false;
 int fadeDirection = 0, fadeTargetState = 1000, fadeCurrentAlpha, fadeDuration = 500;
 RectangleShape fadeScreen;
 
-SoundBuffer buffer1, buffer2, buffer3, buffer4;
-Sound gunfire, lazerfire, launch, bombb;
+SoundBuffer buffer1, buffer2, buffer3, buffer4, buffer5;
+Sound gunfire, lazerfire, launch, bombb, quack;
 
 
 Texture gameBackgroundTexture;
@@ -78,6 +78,8 @@ void init() {
     launch.setBuffer(buffer3);
     buffer4.loadFromFile("img/explode.wav");
     bombb.setBuffer(buffer4);
+    buffer5.loadFromFile("img/quack.wav");
+    quack.setBuffer(buffer5);
 
     //init the first duck
     ducks duck;
@@ -725,13 +727,7 @@ void updateMapNum() {
     gameMenu.menuText[1].setString(currMap);
 }
 void updateReadiness(Menu& menu) {
-    SoundBuffer quackBuffer;
 
-    if (!quackBuffer.loadFromFile("img/quack.mp3")) {
-        cout << "Error loading sound file";
-    }
-
-    Sound quack(quackBuffer);
     if (duck1.ready) {
         menu.menuText[2].setString("READY!");
         quack.play();
