@@ -653,7 +653,7 @@ void draw_Logic() {
         window.draw(duck1.myarm.arm);
     }
     else {
-        Grave.setPosition(duck1.myduck.getPosition().x,duck1.myduck.getPosition().y - duck2.myduck.getLocalBounds().height);
+        Grave.setPosition(duck1.myduck.getPosition().x,duck1.myduck.getPosition().y);
         window.draw(Grave);
     }
     if (!duck2.dead) {
@@ -664,7 +664,7 @@ void draw_Logic() {
         window.draw(duck2.myarm.arm);
     }
     else {
-        Grave.setPosition(duck2.myduck.getPosition().x, duck2.myduck.getPosition().y - duck2.myduck.getLocalBounds().height);
+        Grave.setPosition(duck2.myduck.getPosition().x, duck2.myduck.getPosition().y);
         window.draw(Grave);
     }
 }
@@ -1018,7 +1018,7 @@ void initMusic() {
     if (!settingsMenu.menuMusic.openFromFile("img/music.wav")) {
         cout << "Error loading menu music.\n";
     }
-    settingsMenu.menuMusic.setVolume(2.f);
+    settingsMenu.menuMusic.setVolume(1.f);
     settingsMenu.menuMusic.setLoop(true);
     settingsMenu.menuMusic.play();
 
@@ -1509,6 +1509,7 @@ void init_Map1()
     bull[2].scaley = 0.2f;
     //grave
     Grave.setScale(0.13f, 0.083f);
+    Grave.setOrigin(0, Grave.getLocalBounds().height);
 
     background1_Texture.loadFromFile("img/BG.png");
     skeleton_texture.loadFromFile("img/skeleton.png");
@@ -2027,6 +2028,7 @@ void init_Map2() {
     bull[2].scaley = 0.096f;
     //grave
     Grave.setScale(0.0624f, 0.04f);
+    Grave.setOrigin(0, Grave.getLocalBounds().height);
 
     BackGroundT.loadFromFile("BackGroundT.png");
     GroundT.loadFromFile("GroundT.png");
@@ -2832,6 +2834,7 @@ void BulletCollision3()
 }
 void weapon_handleCollision3(weapons& weapon, Sprite& obj)
 {
+    if (weapon.type == "grenade" && weapon.boom) return;
     FloatRect weapBounds = weapon.weapon.getGlobalBounds();
     FloatRect objBounds = obj.getGlobalBounds();
 
@@ -2920,6 +2923,7 @@ void init_Map3()
     bull[2].scaley = 0.16f;
     //grave
     Grave.setScale(0.107f, 0.067f);
+    Grave.setOrigin(0, Grave.getLocalBounds().height);
 
     backgroundtexture.loadFromFile("img/background.jpg");
     mapblock_Texture.loadFromFile("img/cccc.png");
@@ -3146,6 +3150,7 @@ void init_Map4()
     bull[2].scaley = 0.16f;
     //grave
     Grave.setScale(0.107f, 0.067f);
+    Grave.setOrigin(0, Grave.getLocalBounds().height);
 
     SPAWN4();
 
@@ -3616,7 +3621,7 @@ void init_Map5() {
     fact = 3.f;
     gravity = 0.5;
     jumpSpeed = -14;  //give it negative value
-    velocityX = 3.5f;   // the duck speed
+    velocityX = 4.f;   // the duck speed
     weapsVelocity = 7;
     init();
     // pistol
@@ -3653,6 +3658,7 @@ void init_Map5() {
     bull[2].scaley = 0.16f;
     //grave
     Grave.setScale(0.107f, 0.067f);
+    Grave.setOrigin(0, Grave.getLocalBounds().height);
 
 
 
@@ -4862,6 +4868,7 @@ void init_Map6()
     bull[2].scaley = 0.136f;
     //grave
     Grave.setScale(0.088f, 0.056f);
+    Grave.setOrigin(0, Grave.getLocalBounds().height);
     blocks_texture6.loadFromFile("img/Tile (13).png");
     pillar_texture6.loadFromFile("img/Block 2 pill.png");
     right_edges_texture6.loadFromFile("img/Tile (14).png");
