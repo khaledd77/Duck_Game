@@ -727,10 +727,9 @@ void updateMapNum() {
     gameMenu.menuText[1].setString(currMap);
 }
 void updateReadiness(Menu& menu) {
-
+    quack.play();
     if (duck1.ready) {
         menu.menuText[2].setString("READY!");
-        quack.play();
     }
     else {
         menu.menuText[2].setString("PLAYER 1");
@@ -738,7 +737,6 @@ void updateReadiness(Menu& menu) {
 
     if (duck2.ready) {
         menu.menuText[3].setString("READY!");
-        quack.play();
     }
     else {
         menu.menuText[3].setString("PLAYER 2");
