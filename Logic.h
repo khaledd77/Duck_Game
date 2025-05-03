@@ -109,10 +109,6 @@ struct MyVector {
         data[length++] = value;
     }
 
-    void pop_back() {
-        if (length > 0) length--;
-    }
-
     void erase(int index) {
         if (index < 0 || index >= length) return;
         for (int i = index; i + 1 < length; i++)
@@ -121,10 +117,6 @@ struct MyVector {
     }
 
     T& operator[](int index) {
-        return data[index];
-    }
-
-    const T& operator[](int index) const {
         return data[index];
     }
 
@@ -138,9 +130,5 @@ struct MyVector {
 
     void clear() {
         length = 0;
-    }
-
-    ~MyVector() {
-        delete[] data;
     }
 };

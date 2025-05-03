@@ -264,7 +264,7 @@ void Fire(ducks& duck, ll shooter) {
     }
 }
 void update_grenade(weapons& weap) {
-    if (!weap.boom && weap.myclock.getElapsedTime().asMilliseconds() >= 3000) {
+    if (!weap.boom && weap.myclock.getElapsedTime().asMilliseconds() >= 1500) {
         bombb.play();
         weap.boom = 1;
         weap.weapon.setTexture(smoke);
@@ -1018,9 +1018,10 @@ void initMusic() {
     if (!settingsMenu.menuMusic.openFromFile("img/music.wav")) {
         cout << "Error loading menu music.\n";
     }
-
+    settingsMenu.menuMusic.setVolume(2.f);
     settingsMenu.menuMusic.setLoop(true);
     settingsMenu.menuMusic.play();
+
 }
 void initSettingsMenu(int width, int height, RenderWindow& window) {
     settingsMenu.backgroundTexture.loadFromFile("img/menu.png");
@@ -1472,6 +1473,7 @@ void init_Map1()
     gravity = 0.3f;
     jumpSpeed = -9.f;
     velocityX = 5;
+    weapsVelocity = 7;
     init();
     // pistol
     pistol.fix_X = -6.f;
@@ -1539,7 +1541,7 @@ void init_Map1()
     for (int i = 0;i < 2;i++) grs[i].setTexture(grass_texture);
     player1_collider.setOrigin(player1_collider.getLocalBounds().width / 2, player1_collider.getLocalBounds().height / 2);
     player2_collider.setOrigin(player2_collider.getLocalBounds().width / 2, player2_collider.getLocalBounds().height / 2);
-    Background1.setScale(1,1);
+    Background1.setScale(1, 0.75);
     duck1.myduck.setPosition(30, 210);
     duck2.myduck.setPosition(1170, 225);
 
@@ -1714,10 +1716,10 @@ void PosGround() {
 void PosBranch() {
     BranchF[0].setPosition(166, 195);
     BranchF[0].setScale(-1, 1);
-    BranchF[1].setPosition(166, 300);
+    BranchF[1].setPosition(166, 320);
     BranchF[1].setScale(-1, 1);
     BranchF[2].setPosition(1114, 195);
-    BranchF[3].setPosition(1114, 300);
+    BranchF[3].setPosition(1114, 320);
 }
 void PosSide() {
     SideF[0].setPosition(300, 300);
@@ -1991,37 +1993,38 @@ void init_Map2() {
     GUN_SCALE = 0.96f;
     fact = 3.f;
     gravity = 0.24f;
-    jumpSpeed = -7.0f;  //give it negative value
+    jumpSpeed = -7.2f;  //give it negative value
     velocityX = 3.f;   // the duck speed
+    weapsVelocity = 5;
     init();
     // pistol
-    pistol.fix_X = -2.f;
-    pistol.fix_Y = -17.f;
-    pistol.fix_hold_x = 18.f;
-    pistol.fix_hold_y = -12.f;
+    pistol.fix_X = -5.f;
+    pistol.fix_Y = -15.f;
+    pistol.fix_hold_x = 14.f;
+    pistol.fix_hold_y = -8.f;
     pistol.rev = 11.f;
     //sniper
-    sniper.fix_X = 13.f;
-    sniper.fix_Y = -14.f;
-    sniper.fix_hold_x = 11.f;
-    sniper.fix_hold_y = -15.f;
-    sniper.rev = 23.f;
+    sniper.fix_X = 10.f;
+    sniper.fix_Y = -12.f;
+    sniper.fix_hold_x = 8.f;
+    sniper.fix_hold_y = -11.f;
+    sniper.rev = 24.f;
     //pewpew
-    pewpew.fix_X = 4.f;
-    pewpew.fix_Y = -10.f;
-    pewpew.fix_hold_x = 15.f;
-    pewpew.fix_hold_y = -13.f;
-    pewpew.rev = 16.f;
+    pewpew.fix_X = -2.f;
+    pewpew.fix_Y = -8.f;
+    pewpew.fix_hold_x = 13.f;
+    pewpew.fix_hold_y = -10.f;
+    pewpew.rev = 14.f;
     //sword
-    sword.fix_hold_x = 29.f;
-    sword.fix_hold_y = -12.f;
+    sword.fix_hold_x = 23.f;
+    sword.fix_hold_y = -10.f;
     sword.rev = 2.f;
     //bull1
-    bull[1].scalex = 0.036f;
-    bull[1].scaley = 0.036f;
+    bull[1].scalex = 0.029f;
+    bull[1].scaley = 0.029f;
     //bull2
-    bull[2].scalex = 0.12f;
-    bull[2].scaley = 0.12f;
+    bull[2].scalex = 0.096f;
+    bull[2].scaley = 0.096f;
     //grave
     Grave.setScale(0.0624f, 0.04f);
 
@@ -3081,9 +3084,7 @@ void initBackground()
 {
     ground.loadFromFile("img/Lv7nNS.png");
     background.setTexture(ground);
-    scalex = window.getSize().x * 1.0f / ground.getSize().x;
-    scaley = window.getSize().y * 1.0f / ground.getSize().y;
-    background.setScale(scalex, scaley);
+    background.setScale(1.7f, 1.7f);
     background.setPosition(0.f, 0.f);
 }
 void init_Map4()
@@ -3098,6 +3099,7 @@ void init_Map4()
     MaxiVelocityY = 12.f;
     jumpSpeed = -10.5f;  //give it negative value
     velocityX = 3.5f;   // the duck speed
+    weapsVelocity = 7;
 
     // SET DUCKS POSISTIONS 
     for (int y = 0; y < 23; y++) {
@@ -3434,11 +3436,11 @@ void Map4() {
 
 
 //Hekal
-Texture backgroundTexture;
+Texture BackgroundTexture;
 Texture blockTexture;
 Texture groundTexture;
 Sprite blockse[9];
-Sprite backgroundSprite;
+Sprite BackgroundSprite;
 RectangleShape player1_colliderh(Vector2f(27, 50)), player2_colliderh(Vector2f(27, 50));
 RectangleShape pistol_colliderh(Vector2f(25, 20)), sniper_colliderh(Vector2f(55, 20)), pewpew_colliderh(Vector2f(45, 25)), swrd_colliderh(Vector2f(40, 20));
 
@@ -3522,7 +3524,7 @@ void collision_Map5(RectangleShape& player_collider, ducks& duck)
         }
     }
 }
-void collision_weaps_Map5(RectangleShape& collider, weapons& weap)
+void collision_weaps_Map5( weapons& weap)
 {
     FloatRect box, wall, intersection;
     box = weap.weapon.getGlobalBounds();
@@ -3615,6 +3617,7 @@ void init_Map5() {
     gravity = 0.5;
     jumpSpeed = -14;  //give it negative value
     velocityX = 3.5f;   // the duck speed
+    weapsVelocity = 7;
     init();
     // pistol
     pistol.fix_X = -4.f;
@@ -3653,16 +3656,16 @@ void init_Map5() {
 
 
 
-    backgroundTexture.loadFromFile("img/nature.png");
+    BackgroundTexture.loadFromFile("img/nature.png");
     blockTexture.loadFromFile("img/blocks.png");
     blocks5();
     for (int i = 0;i < 9;i++) {
         blockse[i].setTexture(blockTexture);
     }
-    backgroundSprite.setTexture(backgroundTexture);
+    BackgroundSprite.setTexture(BackgroundTexture);
     Vector2f windowSize = static_cast<sf::Vector2f>(window.getSize());
-    Vector2f textureSize = static_cast<sf::Vector2f>(backgroundTexture.getSize());
-    backgroundSprite.setScale(windowSize.x / textureSize.x, windowSize.y / textureSize.y);
+    Vector2f textureSize = static_cast<sf::Vector2f>(BackgroundTexture.getSize());
+    BackgroundSprite.setScale(2.3, 2);
     player1_colliderh.setOrigin(player1_colliderh.getLocalBounds().width / 2, player1_colliderh.getLocalBounds().height / 2);
     player2_colliderh.setOrigin(player2_colliderh.getLocalBounds().width / 2, player2_colliderh.getLocalBounds().height / 2);
     duck1.myduck.setPosition(30, 320);
@@ -3699,7 +3702,7 @@ void update_Map5() {
     Bullet_Collision5();
     for (int i = 0;i < weaps.size();i++)
     {
-        collision_weaps_Map5(weaps[i].collider, weaps[i]);
+        collision_weaps_Map5(weaps[i]);
     }
     if (duck1.onGround)
     {
@@ -3724,7 +3727,7 @@ void update_Map5() {
 }
 void draw_Map5() {
 
-    window.draw(backgroundSprite);
+    window.draw(BackgroundSprite);
     for (int i = 0;i < 9;i++)
         window.draw(blockse[i]);
     draw_Logic();
