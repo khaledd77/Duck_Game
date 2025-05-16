@@ -2811,16 +2811,14 @@ void handle_BulletCollision3(Sprite& obj)
 {
     for (int i = bulls.size() - 1;i >= 0; i--)
     {
-
-        for (int j = 0; j < MAX_BLOCKS; j++)
-        {
             if (bulls[i].bullet.getGlobalBounds().intersects(obj.getGlobalBounds()))
             {
 
                 bulls.erase(i);
                 break;
+                
             }
-        }
+        
     }
 }
 void BulletCollision3()
